@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ethers } from "ethers";
+import { ethers,  BrowserProvider } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json";
-import { JsonRpcProvider } from "ethers/providers";
 import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 
@@ -54,42 +53,42 @@ function FactoryPage() {
     
     async function deployToken(e) {
         e.preventDefault();
-
+    
         try {
-            const providerUrl = "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0";
-            const privateKey = "0x7388479fffd177a96efa0ca7e9596f0ea1478e090c9082a427052129c3d53df6";
-            
-            const provider = new JsonRpcProvider(providerUrl);
-            const wallet = new ethers.Wallet(privateKey, provider);
+            // Check if wallet is connected
+            if (!isConnected) {
+                console.error("Wallet is not connected");
+                return;
+            }
+    
 
+            // Get the signer from the 
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            // It will prompt user for account connections if it isnt connected
+            const signer = await provider.getSigner();
+            console.log("Account:", await signer.getAddress()); 
+    
+            // Prepare contract deployment data
             const factoryAddress = "0x8073bef1728a47dA7C370842A1D2a41af7761a0c";
             const factoryAbi = MyFactoryJson.abi;
-            
-            const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, wallet);
-
+            const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
+    
+            // Create transaction data for deploying the contract
             const tx = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);
-            const receipt = await tx.wait();
-
-            if (receipt.logs && receipt.logs.length > 0) {
-                const tokenDeployedEvent = receipt.logs.find(
-                    (log) => log.address.toLowerCase() === factoryAddress.toLowerCase() &&
-                              log.topics[0] === '0x91d24864a084ab70b268a1f865e757ca12006cf298d763b6be697302ef86498c'
-                );
-
-                if (tokenDeployedEvent) {
-                    const tokenAddress = tokenDeployedEvent.args[0];
-                    console.log('Your new contract address is:', tokenAddress);
-                    setContractAddress(tokenAddress);
-                } else {
-                    console.error('Token deployment event not found in transaction receipt');
-                }
-            } else {
-                console.error('No logs found in transaction receipt');
-            }
+            
+            // Send the transaction to the Ethereum network
+            const txResponse = await signer.sendTransaction(tx);
+            await txResponse.wait(); // Wait for transaction confirmation
+    
+            // Retrieve contract address from transaction receipt
+            const { contractAddress } = txResponse;
+            console.log('Your new contract address is:', contractAddress);
+            setContractAddress(contractAddress);
         } catch (error) {
             console.error("Error during deployment:", error);
         }
     }
+    
 
     return (
         <div className="center-container">
