@@ -76,12 +76,18 @@ function FactoryPage() {
             // Create transaction data for deploying the contract
             const tx = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);
             
+            const overrides = {
+                type: 2,
+                maxFeePerGas: ethers.parseUnits('100000', 'gwei'), // Set your desired max fee per gas
+                maxPriorityFeePerGas: ethers.parseUnits('100000', 'gwei') // Set your desired max priority fee per gas
+            };
+            delete tx.gasPrice;
             // Send the transaction to the Ethereum network
-            const txResponse = await signer.sendTransaction(tx);
+            const txResponse = await signer.sendTransaction({...tx, ...overrides});;
             await txResponse.wait(); // Wait for transaction confirmation
     
             // Retrieve contract address from transaction receipt
-            const { contractAddress } = txResponse;
+            const contractAddress = txResponse.contractAddress;
             console.log('Your new contract address is:', contractAddress);
             setContractAddress(contractAddress);
         } catch (error) {
