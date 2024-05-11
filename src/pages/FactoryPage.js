@@ -77,19 +77,20 @@ function FactoryPage() {
             const tx = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);
             
             const overrides = {
-                type: 2,
-                maxFeePerGas: ethers.parseUnits('100000', 'gwei'), // Set your desired max fee per gas
-                maxPriorityFeePerGas: ethers.parseUnits('100000', 'gwei') // Set your desired max priority fee per gas
+                gasPrice: undefined,
+                type: 0x0,
+                maxFeePerGas: undefined,
+                maxPriorityFeePerGas: undefined,
             };
-            delete tx.gasPrice;
+                
             // Send the transaction to the Ethereum network
-            const txResponse = await signer.sendTransaction({...tx, ...overrides});;
-            await txResponse.wait(); // Wait for transaction confirmation
+           // const txResponse = await signer.sendTransaction({...tx, ...overrides});;
+           // await txResponse.wait(); // Wait for transaction confirmation
     
             // Retrieve contract address from transaction receipt
-            const contractAddress = txResponse.contractAddress;
-            console.log('Your new contract address is:', contractAddress);
-            setContractAddress(contractAddress);
+            //const contractAddress = txResponse.contractAddress;
+           // console.log('Your new contract address is:', contractAddress);
+           // setContractAddress(contractAddress);
         } catch (error) {
             console.error("Error during deployment:", error);
         }
@@ -130,8 +131,7 @@ function FactoryPage() {
 
                     <button type="submit" className="deploy-button">Deploy Token</button>
                 </form>
-                {contractAddress && <p className="contract-address">Contract Address: {contractAddress}</p>}
-            </div>
+                           </div>
         </div>
     );
 }
