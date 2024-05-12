@@ -83,14 +83,7 @@ function FactoryPage() {
                 maxPriorityFeePerGas: undefined,
             };
                 
-            // Send the transaction to the Ethereum network
-           // const txResponse = await signer.sendTransaction({...tx, ...overrides});;
-           // await txResponse.wait(); // Wait for transaction confirmation
-    
-            // Retrieve contract address from transaction receipt
-            //const contractAddress = txResponse.contractAddress;
-           // console.log('Your new contract address is:', contractAddress);
-           // setContractAddress(contractAddress);
+           
         } catch (error) {
             console.error("Error during deployment:", error);
         }
