@@ -41,6 +41,8 @@ function FactoryPage() {
     const [tokenSupply, setTokenSupply] = useState("");
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount(); // Retrieve client's information
     const { open, close } = useWeb3Modal();
+    const [deployedContractAddress, setDeployedContractAddress] = useState("");
+
 
    
     async function connectWallet() {
@@ -51,6 +53,7 @@ function FactoryPage() {
         }
     }
     
+
     async function deployToken(e) {
         e.preventDefault();
     
@@ -61,10 +64,8 @@ function FactoryPage() {
                 return;
             }
     
-
-            // Get the signer from the 
+            // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
-            // It will prompt user for account connections if it isnt connected
             const signer = await provider.getSigner();
             console.log("Account:", await signer.getAddress()); 
     
@@ -74,21 +75,31 @@ function FactoryPage() {
             const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
     
             // Create transaction data for deploying the contract
-            const tx = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);
-            
-            const overrides = {
-                gasPrice: undefined,
-                type: 0x0,
-                maxFeePerGas: undefined,
-                maxPriorityFeePerGas: undefined,
-            };
-                
+            const txResponse = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);
+            console.log("Transaction sent: ", txResponse.hash);
+    
+            // Wait for the transaction to be mined
+            const receipt = await txResponse.wait();
+            console.log("Block number: ", receipt.blockNumber);
+    
+            // Accessing logs for emitted events
+            const logs = receipt.logs;
+            console.log("Logs found: ", logs.length);
            
+            console.log("Complete Receipt: ", receipt); 
+     
+            if (receipt.logs && receipt.logs.length > 0) {
+                const contractAddress = receipt.logs[0].address;
+                console.log("Deployed Token Contract Address:", contractAddress);
+                setDeployedContractAddress(contractAddress);  // Update state with the contract address
+            } else {
+                console.error("No logs found in the transaction receipt.");
+            }
         } catch (error) {
-            console.error("Error during deployment:", error);
+    any
+            console.error("Error during transaction:", error);
         }
     }
-    
 
     return (
         <div className="center-container">
@@ -124,8 +135,9 @@ function FactoryPage() {
 
                     <button type="submit" className="deploy-button">Deploy Token</button>
                 </form>
+                {deployedContractAddress && <p>Your new token is deployed at: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>}
                            </div>
-        </div>
+  j        </div>
     );
 }
 
