@@ -3,6 +3,7 @@ import { ethers,  BrowserProvider } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json";
 import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
+import { Link } from 'react-router-dom';
 
 
 const projectId = '9513bcef54af049b9471faff11d5a16a';
@@ -135,7 +136,14 @@ function FactoryPage() {
 
                     <button type="submit" className="deploy-button">Deploy Token</button>
                 </form>
-                {deployedContractAddress && <p>Your new token is deployed at: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>}
+                {deployedContractAddress && (
+                <>
+                    <p>Your new token is deployed at: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>
+                     <Link to={`/dashboard/${deployedContractAddress}`}>Go to Dashboard</Link>
+                     <button className="pool-button">Create Pool</button>
+
+                </>
+            )}
                            </div>
   j        </div>
     );

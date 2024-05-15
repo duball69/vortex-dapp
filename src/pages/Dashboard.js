@@ -1,44 +1,60 @@
 import React, { useState, useEffect } from 'react';
+import { ethers } from "ethers";
+import MyTokenJson from "../contracts/MyToken.json";  // Assuming you have a separate JSON file for the deployed token
+import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
+import { Link, useParams } from 'react-router-dom';
 
 function DashboardPage() {
-  // Example: State to store user data
-  const [userData, setUserData] = useState(null);
+    const { contractAddress } = useParams(); // Get the contract address from the URL
+    const [tokenDetails, setTokenDetails] = useState({ name: '', symbol: '', supply: '' });
+    const { address: connectedWallet, chainId, isConnected, open } = useWeb3ModalAccount();
 
-  // Example: Fetch user data when component mounts
-  useEffect(() => {
-    // Fetch user data from API or local storage
-    // Example:
-    // fetchUserData()
-    //   .then(data => setUserData(data))
-    //   .catch(error => console.error('Error fetching user data:', error));
-  }, []); // Empty dependency array ensures this effect runs only once on mount
+    async function connectWallet() {
+        try {
+            await open();
+        } catch (error) {
+            console.error("Error connecting wallet:", error);
+        }
+    }
 
-  return (
-    <div>
-      <h1>Dashboard</h1>
+    async function fetchTokenDetails() {
+        if (!contractAddress || !isConnected) return;
+        
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const tokenContract = new ethers.Contract(contractAddress, MyTokenJson.abi, provider);
+        const name = await tokenContract.name();
+        const symbol = await tokenContract.symbol();
+        const supply = await tokenContract.totalSupply();
 
-      {/* Example: Display user data */}
-      {userData && (
-        <div>
-          <h2>Welcome, {userData.username}!</h2>
-          <p>Email: {userData.email}</p>
-          {/* Add more user-specific information as needed */}
+        setTokenDetails({
+            name,
+            symbol,
+            supply: supply.toString()
+        });
+    }
+
+    useEffect(() => {
+        fetchTokenDetails();
+    }, [contractAddress, isConnected]); // Re-fetch if contractAddress or connection status changes
+
+    return (
+        <div className="dashboard-container">
+            <h1>Dashboard</h1>
+            {isConnected ? (
+                <>
+                    <p>Connected Wallet: {connectedWallet}</p>
+                    <p>Network Chain ID: {chainID}</p>
+                    <p>Token Name: {tokenDetails.name}</p>
+                    <p>Token Symbol: {tokenDetails.symbol}</p>
+                    <p>Total Supply: {tokenDetails.supply}</p>
+                    <p>Your Deployed Token Contract Address: <a href={`https://sepolia.etherscan.io/address/${contractAddress}`} target="_blank" rel="noopener noreferrer">{contractAddress}</a></p>
+                    <Link to="/factory">Back to Factory</Link>
+                </>
+            ) : (
+                <button onClick={connectWallet}>Connect Wallet</button>
+            )}
         </div>
-      )}
-
-      {/* Example: Display charts */}
-      <div>
-        <h2>Charts</h2>
-        {/* Add chart components here */}
-      </div>
-
-      {/* Example: Display settings */}
-      <div>
-        <h2>Settings</h2>
-        {/* Add settings components here */}
-      </div>
-    </div>
-  );
+    );
 }
 
 export default DashboardPage;

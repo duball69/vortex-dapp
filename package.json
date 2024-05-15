@@ -12,6 +12,7 @@
     "@uniswap/v3-periphery": "^1.4.4",
     "@web3modal/ethers": "^4.1.11",
     "ethers": "^6.12.1",
+    "firebase": "^10.12.0",
     "node-fetch": "^3.3.2",
     "path-browserify": "^1.0.1",
     "react": "^18.3.1",
