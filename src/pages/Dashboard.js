@@ -43,7 +43,6 @@ function DashboardPage() {
             {isConnected ? (
                 <>
                     <p>Connected Wallet: {connectedWallet}</p>
-                    <p>Network Chain ID: {chainID}</p>
                     <p>Token Name: {tokenDetails.name}</p>
                     <p>Token Symbol: {tokenDetails.symbol}</p>
                     <p>Total Supply: {tokenDetails.supply}</p>

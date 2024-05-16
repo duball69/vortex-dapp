@@ -139,8 +139,7 @@ function FactoryPage() {
                 {deployedContractAddress && (
                 <>
                     <p>Your new token is deployed at: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>
-                     <Link to={`/dashboard/${deployedContractAddress}`}>Go to Dashboard</Link>
-                     <button className="pool-button">Create Pool</button>
+                    <Link to={`/dashboard/${deployedContractAddress}`}>Go to Dashboard</Link>
 
                 </>
             )}

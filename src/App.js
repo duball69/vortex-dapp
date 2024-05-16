@@ -11,7 +11,7 @@ function App() {
     <Web3ModalProvider>
     <Router>
       <Routes>
-      <Route path="/dashboard/:contractAddress" element={DashboardPage} />
+      <Route path="/dashboard/:contractAddress" element={<DashboardPage/>} />
         <Route path="/" element={<HomePage />} />
         <Route path="/factory" element={<FactoryPage />} />
       </Routes>
