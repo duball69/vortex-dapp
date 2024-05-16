@@ -97,7 +97,7 @@ function FactoryPage() {
                 console.error("No logs found in the transaction receipt.");
             }
         } catch (error) {
-    any
+    
             console.error("Error during transaction:", error);
         }
     }
