@@ -103,10 +103,13 @@ function FactoryPage() {
     }
 
     return (
+        <div>
+            <button type="button" className="connect-button" onClick={connectWallet}>Connect Wallet</button>
         <div className="center-container">
+             
             <div className="factory-container">
                 <h1>Create Your ERC20 Token</h1>
-                <button type="button" className="connect-button" onClick={connectWallet}>Connect Wallet</button>
+               
                 {isConnected && <p>Connected Wallet: {connectedWallet}</p>} {/* Display connected wallet address */}
                 <form onSubmit={deployToken} className="token-form">
                     <input
@@ -144,7 +147,7 @@ function FactoryPage() {
                 </>
             )}
                            </div>
-  j        </div>
+                            </div></div>
     );
 }
 

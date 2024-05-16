@@ -2,21 +2,26 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    background-color: #000000;
+    background-image: url('https://i.imgur.com/58ekpDG.jpeg'); /* Background image */
+    background-size: cover;
 }
 
 .factory-container {
     max-width: 600px;
     margin: auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    padding: 30px;
+    border: 1px solid #cccccc81;
+    border-radius: 30px;
+    background-color: #0000006c;
+    color:white;
     display: flex;
     flex-direction: column;
     justify-content: center; /* Vertically center */
     align-items: center; /* Horizontally center */
     height: 50%; /* Ensure the container takes the full height of the viewport */
     text-align: center;
+    
 }
 
 h1 {
@@ -35,7 +40,7 @@ input[type="number"] {
     padding: 8px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 30px;
     box-sizing: border-box;
 }
 
@@ -54,7 +59,7 @@ button.deploy-button {
     background-color: #007bff;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
@@ -67,6 +72,21 @@ button.deploy-button {
 button.deploy-button:hover {
     background-color: #0056b3;
 }
+
+.connect-button{ background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto; /* This centers the button horizontally */
+    margin-top:10px;}
+
+    .connect-button:hover {
+        background-color: #0056b3;
+      }
 
 .contract-address {
     margin-top: 20px;
