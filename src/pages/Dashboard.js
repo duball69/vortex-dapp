@@ -70,7 +70,7 @@ function DashboardPage() {
             if (logs && logs.length > 0) {
                 // Process the logs if needed
                 console.log("Logs:", logs);
-                const poolAddress = receipt.logs[0].address;
+                const poolAddress = receipt.logs[1].args[1];
                 console.log("Deployed Pool Address:", poolAddress);
                 setDeployedPoolAddress(poolAddress);
             } else {
@@ -88,27 +88,33 @@ function DashboardPage() {
 
     return (
         <div className="dashboard-container">
-            <h1>Dashboard</h1>
+        <h1>Dashboard</h1>
+        <div className="wallet-status">
             {isConnected ? (
-                <>
-                    <p>Connected Wallet: {connectedWallet}</p>
-                    <p>Token Name: {tokenDetails.name}</p>
-                    <p>Token Symbol: {tokenDetails.symbol}</p>
-                    <p>Total Supply: {tokenDetails.supply}</p>
-                    <p>Your Deployed Token Contract Address: <a href={`https://sepolia.etherscan.io/address/${contractAddress}`} target="_blank" rel="noopener noreferrer">{contractAddress}</a></p>
-                   
-                   
-                    <Link to="/factory">Back to Factory</Link>
-                    {deployedPoolAddress && (
-        <div className="deployed-pool-info">
-            <p>Your new deployed pool address is: <a href={`https://sepolia.etherscan.io/address/${deployedPoolAddress}`} target="_blank">{deployedPoolAddress}</a></p>
-        </div>
-    )}
-                </>
+                <p>Connected Wallet: {connectedWallet}</p>
             ) : (
                 <button onClick={connectWallet}>Connect Wallet</button>
             )}
         </div>
+        <div className="token-info">
+            <p>Token Name: {tokenDetails.name}</p>
+            <p>Token Symbol: {tokenDetails.symbol}</p>
+            <p>Total Supply: {tokenDetails.supply}</p>
+            <p>Your Deployed Token Contract Address: <a href={`https://sepolia.etherscan.io/address/${contractAddress}`} target="_blank" rel="noopener noreferrer">{contractAddress}</a></p>
+        </div>
+        <div className="create-pair-button">
+            {isConnected && (
+                <button onClick={createPair} className="deploy-button">Create Pair</button>
+            )}
+        </div>
+        {deployedPoolAddress && (
+            <p>Your new deployed pool address is: <a href={`https://sepolia.etherscan.io/address/${deployedPoolAddress}`} target="_blank">{deployedPoolAddress}</a></p>
+        )}
+        <div className="navigation-links">
+            <Link to="/factory">Back to Factory</Link>
+        </div>
+    </div>
+    
     );
 }
 
