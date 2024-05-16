@@ -10,6 +10,7 @@ function DashboardPage() {
     const [tokenDetails, setTokenDetails] = useState({ name: '', symbol: '', supply: '' });
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
     const { open, close } = useWeb3Modal();
+    const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
 
     async function connectWallet() {
         try {
@@ -69,6 +70,9 @@ function DashboardPage() {
             if (logs && logs.length > 0) {
                 // Process the logs if needed
                 console.log("Logs:", logs);
+                const poolAddress = receipt.logs[0].address;
+                console.log("Deployed Pool Address:", poolAddress);
+                setDeployedPoolAddress(poolAddress);
             } else {
                 console.error("No logs found in the transaction receipt.");
             }
