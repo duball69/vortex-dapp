@@ -71,7 +71,7 @@ function FactoryPage() {
             console.log("Account:", await signer.getAddress()); 
     
             // Prepare contract deployment data
-            const factoryAddress = "0x8073bef1728a47dA7C370842A1D2a41af7761a0c";
+            const factoryAddress = "0xEc920653009D228D044cEAF59563b2d41c07eA6F";
             const factoryAbi = MyFactoryJson.abi;
             const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
     
