@@ -1,0 +1,33 @@
+.centered-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+  }
+  
+.start-button{   background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    text-decoration: none;  }
+
+  p{margin:10px;}
+
+.start-button:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .centered-container {
+      padding: 20px; /* Add padding to the container */
+      text-align: center;
+    }
+
+  }
+

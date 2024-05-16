@@ -16,6 +16,7 @@ html, body {
     justify-content: center; /* Vertically center */
     align-items: center; /* Horizontally center */
     height: 50%; /* Ensure the container takes the full height of the viewport */
+    text-align: center;
 }
 
 h1 {
