@@ -96,14 +96,8 @@ function DashboardPage() {
                     <p>Token Symbol: {tokenDetails.symbol}</p>
                     <p>Total Supply: {tokenDetails.supply}</p>
                     <p>Your Deployed Token Contract Address: <a href={`https://sepolia.etherscan.io/address/${contractAddress}`} target="_blank" rel="noopener noreferrer">{contractAddress}</a></p>
-                   
-                   
                     <Link to="/factory">Back to Factory</Link>
-                    {deployedPoolAddress && (
-        <div className="deployed-pool-info">
-            <p>Your new deployed pool address is: <a href={`https://sepolia.etherscan.io/address/${deployedPoolAddress}`} target="_blank">{deployedPoolAddress}</a></p>
-        </div>
-    )}
+                    <button onClick={createPair}>Create Pair</button> {/* Call createPair function on button click */}
                 </>
             ) : (
                 <button onClick={connectWallet}>Connect Wallet</button>
