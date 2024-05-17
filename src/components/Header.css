@@ -1,0 +1,55 @@
+/* Header.css */
+.header {
+    background-color: #00000000;
+    padding: 10px 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 80px; /* Adjust the width according to your preference */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 50%; 
+  }
+
+
+  
+  /* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
+  @media only screen and (max-width: 600px) {
+    .logo {
+      width: 50px; /* Adjust the width for smaller screens */
+    }
+  }
+  
+  .header-content {
+    padding: 10px 20px;
+    max-width: 100%; /* Ensure content does not exceed viewport width */
+    margin: 0 auto; /* Center the content horizontally */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  button {
+    padding: 7px 20px;
+    margin-top:10px;
+    font-size: 16px;
+    border-radius: 30px;
+    /* Gradient background */
+    background: linear-gradient(45deg, #8900d8a9, /* purple */ #00c3ff43); /* Replace #FF5733 with your desired color */
+    border: 1px solid rgba(255, 255, 255, 0.519);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-style: normal;
+    font-weight: 400;
+}
+
+
+button:hover {
+    background-color: #0056b3;
+}
+
+

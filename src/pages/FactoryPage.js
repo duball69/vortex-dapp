@@ -4,7 +4,7 @@ import MyFactoryJson from "../contracts/MyFactory.json";
 import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 import { Link } from 'react-router-dom';
-
+import Header from '../components/Header.js';
 
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
@@ -104,7 +104,8 @@ function FactoryPage() {
 
     return (
         <div>
-            <button type="button" className="connect-button" onClick={connectWallet}>Connect Wallet</button>
+            <Header connectWallet={connectWallet} />
+           
         <div className="center-container">
              
             <div className="factory-container">

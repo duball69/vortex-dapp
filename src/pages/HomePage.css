@@ -1,3 +1,5 @@
+
+
 .centered-content {
     display: flex;
     flex-direction: column;
@@ -5,7 +7,7 @@
     align-items: center;
     height: 100vh;
     text-align: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Futuristic font */
+    font-family: 'Inter', sans-serif; /* Futuristic font */
     
     color: #fff; /* Light text */
     background-image: url('https://i.imgur.com/58ekpDG.jpeg'); /* Background image */
@@ -25,7 +27,7 @@
     background-color: #bd00da; /* Green color */
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     padding: 10px 30px;
     font-size: 18px; /* Larger font size for button */
     cursor: pointer;

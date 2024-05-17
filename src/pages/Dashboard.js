@@ -4,6 +4,8 @@ import MyFactoryJson from "../contracts/MyFactory.json";  // Assuming you have a
 import MyTokenJson from "../contracts/MyToken.json";
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount, open } from '@web3modal/ethers/react';
 import { Link, useParams } from 'react-router-dom';
+import './Dashboard.css';
+import Header from '../components/Header.js';
 
 function DashboardPage() {
     const { contractAddress } = useParams(); // Get the contract address from the URL
@@ -87,7 +89,9 @@ function DashboardPage() {
     }, [contractAddress, isConnected]); // Re-fetch if contractAddress or connection status changes
 
     return (
+        <div>  <Header connectWallet={connectWallet} />
         <div className="dashboard-container">
+            
         <h1>Dashboard</h1>
         <div className="wallet-status">
             {isConnected ? (
@@ -113,7 +117,7 @@ function DashboardPage() {
         <div className="navigation-links">
             <Link to="/factory">Back to Factory</Link>
         </div>
-    </div>
+    </div></div>
     
     );
 }

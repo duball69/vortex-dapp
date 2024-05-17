@@ -56,16 +56,18 @@ input[type="number"]:focus {
 }
 
 button.deploy-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    display: block;
-    margin: 0 auto; /* This centers the button horizontally */
+    padding: 7px 20px;
     margin-top:10px;
+    font-size: 16px;
+    border-radius: 30px;
+    /* Gradient background */
+    background: linear-gradient(45deg, #8900d8a9, /* purple */ #00c3ff43); /* Replace #FF5733 with your desired color */
+    border: 1px solid rgba(255, 255, 255, 0.519);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-style: normal;
+    font-weight: 400;
 }
 
 
@@ -76,7 +78,7 @@ button.deploy-button:hover {
 .connect-button{ background-color: #007bff;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
