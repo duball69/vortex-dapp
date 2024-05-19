@@ -72,6 +72,7 @@ function FactoryPage() {
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenSupply, setTokenSupply] = useState("");
     const [tokenImage, setTokenImage] = useState(null);
+    const [tokenImageUrl, setTokenImageUrl] = useState(null);
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount(); // Retrieve client's information
     const { open, close } = useWeb3Modal();
     const [deployedContractAddress, setDeployedContractAddress] = useState("");
@@ -105,15 +106,18 @@ function FactoryPage() {
             setIsLoading(true);
 
             let imageUrl = null;
-    if (tokenImage) {
-        imageUrl = await uploadImageToImgur(tokenImage);
-        if (!imageUrl) {
-            console.error("Failed to upload image to Imgur");
-            setError("Failed to upload image. Please try again.");
-            setIsLoading(false);
-            return;
-        }
-    }
+            if (tokenImage) {
+                const imageUrl = await uploadImageToImgur(tokenImage);
+                if (imageUrl) {
+                    setTokenImageUrl(imageUrl); // Store the image URL in state
+                } else {
+                    console.error("Failed to upload image to Imgur");
+                    setError("Failed to upload image. Please try again.");
+                    setIsLoading(false);
+                    return;
+                }
+            }
+            
     
             // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
@@ -143,10 +147,23 @@ function FactoryPage() {
             if (receipt.logs && receipt.logs.length > 0) {
                 const contractAddress = receipt.logs[0].address;
                 console.log("Deployed Token Contract Address:", contractAddress);
-                setDeployedContractAddress(contractAddress);  // Update state with the contract address
+                setDeployedContractAddress(contractAddress);
+                
+                // Update state with the contract address
+
+                await db.collection("tokens").doc(contractAddress).set({
+                    name: tokenName,
+                    symbol: tokenSymbol,
+                    supply: tokenSupply,
+                    imageUrl: imageUrl,
+                    deployer: connectedWallet
+                });
+    
+                console.log("Token data saved to Firestore");
             } else {
                 console.error("No logs found in the transaction receipt.");
             }
+            
         } catch (error) {
     
             console.error("Error during transaction:", error);
