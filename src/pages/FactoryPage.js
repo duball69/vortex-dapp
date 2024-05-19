@@ -5,7 +5,9 @@ import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header.js';
-import db from '../components/firebaseConfig';
+
+import { firestore } from '../components/firebaseConfig.js';
+import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
@@ -92,86 +94,78 @@ function FactoryPage() {
         }
     }
     
-
     async function deployToken(e) {
         e.preventDefault();
     
-        try {
-            // Check if wallet is connected
-            if (!isConnected) {
-                console.error("Wallet is not connected");
-                setError("Please connect wallet before trying to deploy a token.");
-                return;
-            }
-
-            setIsLoading(true);
-
-            let imageUrl = null;
-            if (tokenImage) {
-                const imageUrl = await uploadImageToImgur(tokenImage);
-                if (imageUrl) {
-                    setTokenImageUrl(imageUrl); // Store the image URL in state
-                } else {
-                    console.error("Failed to upload image to Imgur");
-                    setError("Failed to upload image. Please try again.");
-                    setIsLoading(false);
-                    return;
-                }
-            }
-            
+        if (!isConnected) {
+            console.error("Wallet is not connected");
+            setError("Please connect wallet before trying to deploy a token.");
+            return; // Exits early if the wallet is not connected
+        }
     
-            // Get the signer from the provider
+        setIsLoading(true);
+    
+        let imageUrl = null;
+        if (tokenImage) {
+            imageUrl = await uploadImageToImgur(tokenImage); // Try uploading the image
+            if (!imageUrl) {
+                console.error("Failed to upload image to Imgur");
+                setError("Failed to upload image, proceeding without it.");
+                // Do not return here; just log the error and continue with deployment
+            } else {
+                setTokenImageUrl(imageUrl); // Store the image URL in state if upload was successful
+            }
+        }
+        
+        try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             console.log("Account:", await signer.getAddress()); 
     
-            // Prepare contract deployment data
             const factoryAddress = "0xEc920653009D228D044cEAF59563b2d41c07eA6F";
             const factoryAbi = MyFactoryJson.abi;
             const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
-    
+        
             // Create transaction data for deploying the contract
             const txResponse = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);
             console.log("Transaction sent: ", txResponse.hash);
-    
+        
             // Wait for the transaction to be mined
             const receipt = await txResponse.wait();
             console.log("Block number: ", receipt.blockNumber);
-    
+        
             // Accessing logs for emitted events
             const logs = receipt.logs;
             console.log("Logs found: ", logs.length);
-            setIsLoading(false);
-           
-            console.log("Complete Receipt: ", receipt); 
-     
-            if (receipt.logs && receipt.logs.length > 0) {
-                const contractAddress = receipt.logs[0].address;
+        
+            if (logs.length > 0) {
+                const contractAddress = logs[0].address;
                 console.log("Deployed Token Contract Address:", contractAddress);
                 setDeployedContractAddress(contractAddress);
-                
-                // Update state with the contract address
-
-                await db.collection("tokens").doc(contractAddress).set({
+    
+                const tokensCollection = collection(firestore, 'tokens');
+                await setDoc(doc(tokensCollection, contractAddress), {
                     name: tokenName,
                     symbol: tokenSymbol,
                     supply: tokenSupply,
-                    imageUrl: imageUrl,
+                    address: contractAddress,
+                    imageUrl: imageUrl,  // This may be null if the image failed to upload
                     deployer: connectedWallet
                 });
-    
+                
                 console.log("Token data saved to Firestore");
             } else {
                 console.error("No logs found in the transaction receipt.");
             }
-
         } catch (error) {
-    
             console.error("Error during transaction:", error);
-            setIsLoading(false);
+            setError("Deployment failed: " + error.message);
+        } finally {
+            setIsLoading(false); // Ensure loading is turned off whether there's an error or not
         }
     }
 
+    
     return (
         <div>
             <Header connectWallet={connectWallet} />
