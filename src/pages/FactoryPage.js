@@ -6,7 +6,9 @@ import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } fro
 import { Link } from 'react-router-dom';
 import Header from '../components/Header.js';
 
-const projectId = '9513bcef54af049b9471faff11d5a16a';
+const projectId = '9513bcef54af049b9471faff11d5a16a';7
+
+
 
 const sepoliaMainnet = {
     chainId: 11155111,
@@ -34,6 +36,35 @@ const ethersConfig = defaultConfig({
 
 const web3Modal = createWeb3Modal({ ethersConfig, chains: [sepoliaMainnet], projectId, enableAnalytics: true });
 
+const IMGUR_API_URL = "https://api.imgur.com/3/image";
+const CLIENT_ID = '7bd162baabe49a2'; // Your Imgur Client ID
+
+const uploadImageToImgur = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+  
+    try {
+      const response = await fetch(IMGUR_API_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Client-ID ${CLIENT_ID}`,
+          Accept: 'application/json',
+        },
+        body: formData,
+      });
+  
+      const data = await response.json();
+      if (data.success) {
+        console.log('Image uploaded to Imgur:', data.data.link);
+        return data.data.link; // Returns the URL of the uploaded image
+      } else {
+        throw new Error('Failed to upload image to Imgur');
+      }
+    } catch (error) {
+      console.error('Error uploading image to Imgur:', error);
+      return null;
+    }
+  };
 
 function FactoryPage() {
     const [contractAddress, setContractAddress] = useState(null);
@@ -72,6 +103,17 @@ function FactoryPage() {
             }
 
             setIsLoading(true);
+
+            let imageUrl = null;
+    if (tokenImage) {
+        imageUrl = await uploadImageToImgur(tokenImage);
+        if (!imageUrl) {
+            console.error("Failed to upload image to Imgur");
+            setError("Failed to upload image. Please try again.");
+            setIsLoading(false);
+            return;
+        }
+    }
     
             // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
