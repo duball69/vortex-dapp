@@ -6,7 +6,7 @@ import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } fro
 import { Link } from 'react-router-dom';
 import Header from '../components/Header.js';
 
-const projectId = '9513bcef54af049b9471faff11d5a16a';7
+const projectId = '9513bcef54af049b9471faff11d5a16a';
 
 
 
