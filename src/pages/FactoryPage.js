@@ -150,7 +150,9 @@ function FactoryPage() {
                     supply: tokenSupply,
                     address: contractAddress,
                     imageUrl: imageUrl,  // This may be null if the image failed to upload
+                    hasImage: !!imageUrl,  // True if imageUrl is not null, false otherwise
                     deployer: connectedWallet
+
                 });
                 
                 console.log("Token data saved to Firestore");
