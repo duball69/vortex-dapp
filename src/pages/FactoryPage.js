@@ -5,7 +5,7 @@ import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header.js';
-
+import Footer from '../components/Footer.js';
 import { firestore } from '../components/firebaseConfig.js';
 import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -150,7 +150,6 @@ function FactoryPage() {
                     supply: tokenSupply,
                     address: contractAddress,
                     imageUrl: imageUrl,  // This may be null if the image failed to upload
-                    hasImage: !!imageUrl,  // True if imageUrl is not null, false otherwise
                     deployer: connectedWallet
 
                 });
@@ -242,7 +241,7 @@ function FactoryPage() {
                 </>
             )}
                            </div>
-                            </div></div>
+                            </div> <Footer /></div>
     );
 }
 

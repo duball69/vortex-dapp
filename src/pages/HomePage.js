@@ -4,6 +4,7 @@ import './HomePage.css'; // Import the CSS file for styling
 import Header from '../components/Header.js';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount} from '@web3modal/ethers/react';
 import TokensList from "../components/TokenList.js";
+import Footer from '../components/Footer.js';
 
 
 function HomePage() {
@@ -29,10 +30,11 @@ function HomePage() {
       
       <div className="centered-content">
       <h1>Create your own token with 1 ETH of LP</h1>
-      <p>We help you create tokens with low costs and add 1 ETH to launch your coin!</p>
+      <h3>We help you create tokens with low costs and add 1 ETH to launch your coin!</h3>
       <Link to="/factory" className="start-button">Let's Start</Link>
     </div>
     <TokensList />
+    <Footer/>
     </div>
  
   );

@@ -1,0 +1,17 @@
+/* Footer.css */
+.footer {
+    padding: 20px;
+    text-align: center;
+   
+}
+
+.footer-content p {
+    margin: 5px 0;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+}

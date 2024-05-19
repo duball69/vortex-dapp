@@ -6,6 +6,7 @@ import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount, open
 import { Link, useParams } from 'react-router-dom';
 import './Dashboard.css';
 import Header from '../components/Header.js';
+import Footer from '../components/Footer.js';
 
 function DashboardPage() {
     const { contractAddress } = useParams(); // Get the contract address from the URL
@@ -35,7 +36,7 @@ function DashboardPage() {
         setTokenDetails({
             name,
             symbol,
-            supply: supply.toString(),
+            supply: supply.toString()/10**18,
             
         });
     }
@@ -129,7 +130,9 @@ function DashboardPage() {
         <div className="navigation-links">
             <Link to="/factory">Back to Factory</Link>
         </div>
-    </div></div>
+    </div>
+    <Footer />
+    </div>
     
     );
 }

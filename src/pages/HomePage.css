@@ -5,7 +5,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 80vh;
     text-align: center;
     font-family: 'Inter', sans-serif; /* Futuristic font */    
     color: #fff; /* Light text */
@@ -22,18 +22,19 @@
 
   
   h1 {
-    font-size: 56px; /* Larger font size for heading */
+    font-size: 46px; /* Larger font size for heading */
   }
   
-  p {
+  h3 {
     font-size: 18px; /* Larger font size for paragraph */
-    margin: 10px 0; /* Adjust vertical margin */
+    margin-top:-80px; /* Adjust vertical margin */
+    margin-bottom:10px;
   }
   
 
 .start-button {
     padding: 7px 20px;
-    margin-top:10px;
+    margin-top:30px;
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */

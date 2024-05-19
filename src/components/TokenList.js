@@ -10,11 +10,7 @@ function TokensList() {
     useEffect(() => {
         const fetchTokens = async () => {
             try {
-                // Create a query against the collection.
-                const tokensRef = collection(firestore, 'tokens');
-                const q = query(tokensRef, where("hasImage", "==", true)); // Only fetch tokens with images
-        
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await getDocs(collection(firestore, 'tokens'));
                 const tokensArray = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setTokens(tokensArray);
                 setLoading(false);
@@ -41,8 +37,8 @@ function TokensList() {
                         )}
                         <div className="token-info">
                             <h2 className="token-title">{token.name} ({token.symbol})</h2>
-                            <p className="token-supply">Supply: {token.supply}</p>
-                            <p className="token-deployer">Deployed by: {token.deployer}</p>
+                            <h4 className="token-deployer">Contract Address: {token.address}</h4>
+                          
                         </div>
                     </div>
                 ))}
