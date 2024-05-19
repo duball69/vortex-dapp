@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '../components/firebaseConfig.js';
 import './TokenList.css'; // Assuming you have a separate CSS file
 
