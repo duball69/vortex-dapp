@@ -212,18 +212,17 @@ function FactoryPage() {
                     
 <br />
 
-                    <button type="submit" className="deploy-button">
-                    {isLoading ? (
-                            "Loading..." // Display "Loading..." if isLoading is true
-                        ) : (
-                            "Deploy Token" // Otherwise, display the button text
-                        )}
-                        </button>
+{!deployedContractAddress && (
+            <button type="submit" className="deploy-button">
+                {isLoading ? "Loading..." : "Deploy Token"}
+            </button>
+        )}
+                   
                 </form>
                 {error && <p className="error-message">{error}</p>}
                 {deployedContractAddress && (
                 <>
-                    <p>Your new token address is: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>
+                    <p className="token_address_message">Your new token address is: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>
                     <Link className="start-button" to={`/dashboard/${deployedContractAddress}`}>Go to Dashboard</Link>
 
                 </>
