@@ -17,8 +17,8 @@ const sepoliaMainnet = {
 };
 
 const metadata = {
-  name: 'LP Provider Labs',
-  description: 'Description of your DApp',
+  name: 'Vortex',
+  description: 'A dapp to create ERC20 tokens on any EVM chain, and get intiial LP without costs. ',
   url: 'https://your-dapp-url.com',
   icons: ['https://your-dapp-url.com/favicon.ico']
 };
@@ -43,14 +43,18 @@ function FactoryPage() {
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount(); // Retrieve client's information
     const { open, close } = useWeb3Modal();
     const [deployedContractAddress, setDeployedContractAddress] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(""); 
 
 
    
     async function connectWallet() {
         try {
             open(); // Open the Web3Modal modal
+            setError("");
         } catch (error) {
             console.error("Error connecting wallet:", error);
+            
         }
     }
     
@@ -62,8 +66,11 @@ function FactoryPage() {
             // Check if wallet is connected
             if (!isConnected) {
                 console.error("Wallet is not connected");
+                setError("Please connect wallet before trying to deploy a token.");
                 return;
             }
+
+            setIsLoading(true);
     
             // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
@@ -86,6 +93,7 @@ function FactoryPage() {
             // Accessing logs for emitted events
             const logs = receipt.logs;
             console.log("Logs found: ", logs.length);
+            setIsLoading(false);
            
             console.log("Complete Receipt: ", receipt); 
      
@@ -99,17 +107,21 @@ function FactoryPage() {
         } catch (error) {
     
             console.error("Error during transaction:", error);
+            setIsLoading(false);
         }
     }
 
     return (
         <div>
             <Header connectWallet={connectWallet} />
-           
+           <div>
+            <h1>Launch your new token without costs. We lend you the liquidity.</h1>
+            <h3>Vortex provides liquidity lending to launch tokens, directly on Uniswap.</h3>
+           </div>
         <div className="center-container">
              
             <div className="factory-container">
-                <h1>Create Your ERC20 Token</h1>
+                <h2>Create Your ERC20 Token</h2>
                
                 {isConnected && <p>Connected Wallet: {connectedWallet}</p>} {/* Display connected wallet address */}
                 <form onSubmit={deployToken} className="token-form">
@@ -138,12 +150,19 @@ function FactoryPage() {
                     />
                     <br />
 
-                    <button type="submit" className="deploy-button">Deploy Token</button>
+                    <button type="submit" className="deploy-button">
+                    {isLoading ? (
+                            "Loading..." // Display "Loading..." if isLoading is true
+                        ) : (
+                            "Deploy Token" // Otherwise, display the button text
+                        )}
+                        </button>
                 </form>
+                {error && <p className="error-message">{error}</p>}
                 {deployedContractAddress && (
                 <>
-                    <p>Your new token is deployed at: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>
-                    <Link to={`/dashboard/${deployedContractAddress}`}>Go to Dashboard</Link>
+                    <p>Your new token address is: <a href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`} target="_blank">{deployedContractAddress}</a></p>
+                    <Link className="start-button" to={`/dashboard/${deployedContractAddress}`}>Go to Dashboard</Link>
 
                 </>
             )}

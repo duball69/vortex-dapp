@@ -4,6 +4,7 @@ html, body {
     padding: 0;
     background-image: url('https://i.imgur.com/58ekpDG.jpeg'); /* Background image */
     background-size: cover;
+    background-attachment: fixed;
 }
 
 .factory-container {
@@ -30,10 +31,7 @@ html, body {
     }
   }
 
-h1 {
-    font-size: 23px;
-    margin-bottom: 20px;
-}
+
 
 .token-form label {
     display: block;
@@ -95,3 +93,42 @@ button.deploy-button:hover {
     height: 100vh;
 }
 
+/* styles.css */
+h1 {
+    text-align: center;
+    color: white;
+    margin-top:100px;
+    font-size:23px; 
+    
+  }
+  
+  h3 {
+    text-align: center;
+    color: white;
+    margin-bottom:-100px;
+    font-size: 16px;
+    
+  }
+
+  
+.start-button {
+    padding: 7px 20px;
+    margin-top:10px;
+    font-size: 16px;
+    border-radius: 30px;
+    /* Gradient background */
+    background: linear-gradient(45deg, #8900d8a9, /* purple */ #00c3ff43); /* Replace #FF5733 with your desired color */
+    border: 1px solid rgba(255, 255, 255, 0.519);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-style: normal;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+
+.start-button:hover {
+    background-color: #0056b3;
+}
+  

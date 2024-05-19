@@ -11,6 +11,7 @@
     color: #fff; /* Light text */
     background-image: url('https://i.imgur.com/58ekpDG.jpeg'); /* Background image */
     background-size: cover;
+    background-attachment: fixed;
   }
 
   @media only screen and (max-width: 600px) {

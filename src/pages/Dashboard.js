@@ -13,6 +13,7 @@ function DashboardPage() {
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
     const { open, close } = useWeb3Modal();
     const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
+    const [isCreatingPair, setIsCreatingPair] = useState(false);
 
     async function connectWallet() {
         try {
@@ -46,6 +47,8 @@ function DashboardPage() {
                 console.error("Wallet is not connected");
                 return;
             }
+
+            setIsCreatingPair(true); 
     
             // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
@@ -68,6 +71,7 @@ function DashboardPage() {
             // Accessing logs for emitted events
             const logs = receipt.logs;
             console.log("Logs found: ", logs.length);
+            setIsCreatingPair(false); 
     
             if (logs && logs.length > 0) {
                 // Process the logs if needed
@@ -80,6 +84,7 @@ function DashboardPage() {
             }
         } catch (error) {
             console.error("Error creating pair:", error);
+            setIsCreatingPair(false); 
         }
     }
     
@@ -108,7 +113,13 @@ function DashboardPage() {
         </div>
         <div className="create-pair-button">
             {isConnected && (
-                <button onClick={createPair} className="deploy-button">Create Pair</button>
+                <button onClick={createPair} className="deploy-button">
+                      {isCreatingPair? (
+                            "Loading..." // Display "Loading..." if isLoading is true
+                        ) : (
+                            "Create Pair" // Otherwise, display the button text
+                        )}
+                </button>
             )}
         </div>
         {deployedPoolAddress && (
