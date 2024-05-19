@@ -9,7 +9,7 @@ import Header from '../components/Header.js';
 
 function DashboardPage() {
     const { contractAddress } = useParams(); // Get the contract address from the URL
-    const [tokenDetails, setTokenDetails] = useState({ name: '', symbol: '', supply: '' });
+    const [tokenDetails, setTokenDetails] = useState({ name: '', symbol: '', supply: ''});
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
     const { open, close } = useWeb3Modal();
     const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
@@ -35,7 +35,8 @@ function DashboardPage() {
         setTokenDetails({
             name,
             symbol,
-            supply: supply.toString()
+            supply: supply.toString(),
+            
         });
     }
     async function createPair() {

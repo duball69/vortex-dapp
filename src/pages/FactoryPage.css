@@ -10,7 +10,7 @@ html, body {
 .factory-container {
     max-width: 600px;
     margin: auto;
-    padding: 30px;
+    padding: 50px 50px 50px 50px;
     border: 1px solid #cccccc81;
     border-radius: 30px;
     background-color: #0000006c;
@@ -132,3 +132,37 @@ h1 {
     background-color: #0056b3;
 }
   
+.custom-file-input {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    cursor: pointer;
+    padding: 7px 25px;
+    background-color: #00000027;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-size: 16px;
+    margin-bottom:20px;
+}
+
+.custom-file-input input[type="file"] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-file-input span {
+    display: inline-block;
+    pointer-events: none;
+}
+
+.connected-wallet {
+    font-size: 14px;
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom:20px;
+}

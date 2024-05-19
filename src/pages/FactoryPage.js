@@ -40,6 +40,7 @@ function FactoryPage() {
     const [tokenName, setTokenName] = useState("");
     const [tokenSymbol, setTokenSymbol] = useState("");
     const [tokenSupply, setTokenSupply] = useState("");
+    const [tokenImage, setTokenImage] = useState(null);
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount(); // Retrieve client's information
     const { open, close } = useWeb3Modal();
     const [deployedContractAddress, setDeployedContractAddress] = useState("");
@@ -123,8 +124,26 @@ function FactoryPage() {
             <div className="factory-container">
                 <h2>Create Your ERC20 Token</h2>
                
-                {isConnected && <p>Connected Wallet: {connectedWallet}</p>} {/* Display connected wallet address */}
+                {isConnected && <p className="connected-wallet">Connected Wallet: {connectedWallet}</p>} {/* Display connected wallet address */}
                 <form onSubmit={deployToken} className="token-form">
+
+                                     <div className="custom-file-input">
+    <span>Add your token image</span>
+    <input
+        type="file"
+        id="tokenImage"
+        accept="image/*"
+        onChange={(e) => setTokenImage(e.target.files[0])}
+        className="input"
+    />
+    {tokenImage && (
+    <div>
+  
+        <img src={URL.createObjectURL(tokenImage)} alt="Token Preview" style={{ maxWidth: '100px', maxHeight: '100px' }} />
+    </div>
+)}
+</div>
+
                     <input
                         type="text"
                         value={tokenName}
@@ -148,7 +167,8 @@ function FactoryPage() {
                         placeholder="Total Supply"
                         className="input"
                     />
-                    <br />
+                    
+<br />
 
                     <button type="submit" className="deploy-button">
                     {isLoading ? (
