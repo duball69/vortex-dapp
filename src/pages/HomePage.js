@@ -8,6 +8,7 @@ import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount} from
 function HomePage() {
   const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
   const { open, close } = useWeb3Modal();
+  const [error, setError] = useState(""); 
 
   async function connectWallet() {
     try {

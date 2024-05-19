@@ -5,21 +5,8 @@ import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header.js';
-import { create } from 'ipfs-http-client';
 
-const projectId = '9513bcef54af049b9471faff11d5a16a'; //walletconnect
-
-
-const auth = 'Basic ' + Buffer.from("99b3813d7d62470987697dfa83991abe" + ':' + "McoOMuSx2bL4uqMpXfabtSlOzCK0K3oOAU41c9DQcj6tFX1kj4ONjg").toString('base64');
-
-const client = create({
-  host: 'ipfs.infura.io',
-  port: 5001,
-  protocol: 'https',
-  headers: {
-    authorization: auth,
-  }
-});
+const projectId = '9513bcef54af049b9471faff11d5a16a';
 
 const sepoliaMainnet = {
     chainId: 11155111,
@@ -73,20 +60,6 @@ function FactoryPage() {
     }
     
 
-    const handleImageUpload = async (file) => {
-        try {
-          const added = await client.add(file);
-          const imageUrl = `https://ipfs.infura.io/ipfs/${added.path}`;
-          console.log('Image successfully uploaded to IPFS:', imageUrl);
-          return imageUrl;
-        } catch (error) {
-          console.error('Error uploading image to IPFS:', error);
-          return null;
-        }
-      };
-
-      
-
     async function deployToken(e) {
         e.preventDefault();
     
@@ -99,22 +72,6 @@ function FactoryPage() {
             }
 
             setIsLoading(true);
-
-            if (tokenImage) {
-                const imageUrl = await handleImageUpload(tokenImage);
-                if (imageUrl) {
-                  // Proceed to deploy the token with the image URL
-                  // You might need to adjust your smart contract to accept an image URL if necessary
-                  console.log('Proceed to deploy the token with this image URL:', imageUrl);
-                } else {
-                  setError('Failed to upload token image.');
-                  setIsLoading(false);
-                }
-              } else {
-                // Proceed without an image or handle accordingly
-                console.log('No image provided, deploying token without image.');
-              }
-            
     
             // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
@@ -176,7 +133,7 @@ function FactoryPage() {
         type="file"
         id="tokenImage"
         accept="image/*"
-        onChange={(e) => setTokenImage(e.target.files[0])}
+          onChange={(e) => setTokenImage(e.target.files[0])}
         className="input"
     />
     {tokenImage && (
