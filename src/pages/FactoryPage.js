@@ -5,6 +5,7 @@ import './FactoryPage.css';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header.js';
+import db from '../components/firebaseConfig';
 
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
@@ -163,7 +164,7 @@ function FactoryPage() {
             } else {
                 console.error("No logs found in the transaction receipt.");
             }
-            
+
         } catch (error) {
     
             console.error("Error during transaction:", error);
