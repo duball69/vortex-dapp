@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import './Dashboard.css';
 import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
+/* global BigInt */
 
 function DashboardPage() {
     const { contractAddress } = useParams(); // Get the contract address from the URL
@@ -42,7 +43,7 @@ function DashboardPage() {
         // Calculate the square root of the price ratio
         const sqrtPriceRatio = sqrtBigInt(priceRatio);
     
-        // Now calculate sqrtPriceX96
+        // Now calculate sqrtPriceX96   
         const sqrtPriceX96 = (sqrtPriceRatio * 2n**96n) / 10n**9n;
     
         return sqrtPriceX96;
