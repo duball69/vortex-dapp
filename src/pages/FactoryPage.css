@@ -8,14 +8,16 @@ html, body {
 }
 
 .subtitlefactory{font-size:14px;
+    margin-top:20px;
 }
 
 .factory-container {
     max-width: 600px;
-    margin: auto;
+    
     padding: 70px 70px 100px 70px;
     border: 1px solid #cccccc81;
     border-radius: 30px;
+    margin-top:60px;
     background-color: #0000006c;
     color:white;
     display: flex;
