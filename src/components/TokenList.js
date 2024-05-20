@@ -28,7 +28,7 @@ function TokensList() {
 
     return (
         <div className="tokens-container">
-            <h1>Deployed Tokens</h1>
+            <h3 className="deployedtokenstitle">Deployed Tokens</h3>
             <div className="tokens-grid">
                 {tokens.map(token => (
                     <div key={token.id} className="token-card">

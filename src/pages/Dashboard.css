@@ -30,7 +30,7 @@
   }
   
   .create-pair-button button {
-    background-color: #007bff;
+    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6);
     color: #fff;
     border: none;
     border-radius: 5px;

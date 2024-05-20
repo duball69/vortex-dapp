@@ -7,6 +7,9 @@ html, body {
     background-attachment: fixed;
 }
 
+.subtitlefactory{font-size:14px;
+}
+
 .factory-container {
     max-width: 600px;
     margin: auto;
@@ -65,7 +68,7 @@ button.deploy-button {
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
-    background: linear-gradient(45deg, #8900d8a9, /* purple */ #00c3ff43); /* Replace #FF5733 with your desired color */
+    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6); /* Replace #FF5733 with your desired color */
     border: 1px solid rgba(255, 255, 255, 0.519);
     color: #ffffff;
     cursor: pointer;
@@ -76,7 +79,7 @@ button.deploy-button {
 
 
 button.deploy-button:hover {
-    background-color: #0056b3;
+    background-color: #ffffff;
 }
 
 
@@ -97,7 +100,7 @@ button.deploy-button:hover {
 h1 {
     text-align: center;
     color: white;
-    margin-top:70px;
+ 
     font-size:30px; 
     
   }
@@ -105,7 +108,8 @@ h1 {
   h3 {
     text-align: center;
     color: white;
-    margin-bottom:-70px;
+    margin-bottom:-60px;
+    margin-top:-75px;
     font-size: 16px;
     
   }
@@ -117,7 +121,7 @@ h1 {
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
-    background: linear-gradient(45deg, #8900d8a9, /* purple */ #00c3ff43); /* Replace #FF5733 with your desired color */
+    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6); /* Replace #FF5733 with your desired color */
     border: 1px solid rgba(255, 255, 255, 0.519);
     color: #ffffff;
     cursor: pointer;

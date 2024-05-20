@@ -172,7 +172,7 @@ function FactoryPage() {
             <Header connectWallet={connectWallet} />
            <div>
             <h1>Launch your new token without costs. We lend you the liquidity.</h1>
-            <h3>Vortex provides liquidity lending to launch tokens, directly on Uniswap.</h3>
+            <h3 className="subtitlefactory">Vortex provides liquidity lending to launch tokens, directly on Uniswap.</h3>
            </div>
         <div className="center-container">
              
@@ -183,7 +183,7 @@ function FactoryPage() {
                 <form onSubmit={deployToken} className="token-form">
 
                                      <div className="custom-file-input">
-    <span>Add your token image</span>
+    <span>Add your token image here</span>
     <input
         type="file"
         id="tokenImage"
