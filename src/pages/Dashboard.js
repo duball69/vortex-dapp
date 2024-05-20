@@ -119,7 +119,7 @@ function DashboardPage() {
                       {isCreatingPair? (
                             "Loading..." // Display "Loading..." if isLoading is true
                         ) : (
-                            "Create Pair" // Otherwise, display the button text
+                            "Launch Token" // Otherwise, display the button text
                         )}
                 </button>
             )}

@@ -5,14 +5,21 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 80vh;
+    height: 70vh;   
     text-align: center;
     font-family: 'Inter', sans-serif; /* Futuristic font */    
     color: #fff; /* Light text */
-    background-image: url('https://i.imgur.com/58ekpDG.jpeg'); /* Background image */
+    
     background-size: cover;
     background-attachment: fixed;
   }
+
+  .text-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
   @media only screen and (max-width: 600px) {
     .centered-content {
@@ -21,21 +28,20 @@
   }
 
   
-  h1 {
-    font-size: 46px; /* Larger font size for heading */
+.titlehome {
+    font-size: 42px; /* Larger font size for heading */
+margin-bottom:-20px;
   }
   
-  h3 {
+  h5 {
     font-size: 18px; /* Larger font size for paragraph */
-    margin-top:-80px; /* Adjust vertical margin */
-    margin-bottom:10px;
   }
   
 
-.start-button {
+.start-button2 {
     padding: 7px 20px;
-    margin-top:30px;
     font-size: 16px;
+  
     border-radius: 30px;
     /* Gradient background */
     background: linear-gradient(45deg, #8900d8a9, /* purple */ #00c3ff43); /* Replace #FF5733 with your desired color */
@@ -49,7 +55,7 @@
 }
 
 
-.start-button:hover {
+.start-button2:hover {
     background-color: #0056b3;
 }
   

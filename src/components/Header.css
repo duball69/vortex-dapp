@@ -11,7 +11,7 @@
   .logo {
     width: 80px; /* Adjust the width according to your preference */
     height: auto; /* Maintain aspect ratio */
-    border-radius: 50%; 
+    
   }
 
 
@@ -53,3 +53,4 @@ button:hover {
 }
 
 
+ 
