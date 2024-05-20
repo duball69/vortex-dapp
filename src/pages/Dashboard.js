@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json";  // Assuming you have a separate JSON file for the deployed 
 import MyTokenJson from "../contracts/MyToken.json";
+import PositionManagerJson from "../contracts/PositionManager.json";
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount, open } from '@web3modal/ethers/react';
 import { Link, useParams } from 'react-router-dom';
 import './Dashboard.css';
@@ -16,6 +17,42 @@ function DashboardPage() {
     const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
     const [isCreatingPair, setIsCreatingPair] = useState(false);
 
+    function sqrtBigInt(value) {
+        if (value < 0n) {
+            throw new Error("Square root of negative numbers is not supported");
+        }
+        if (value === 0n) return 0n;
+        let z = value;
+        let x = (value / 2n) + 1n;
+        while (x < z) {
+            z = x;
+            x = (value / x + x) / 2n;
+        }
+        return z;
+    }
+    
+    function calculateSqrtPriceX96(token1Amount, token0Amount) {
+        // Use BigInt for price ratio calculations to ensure precision
+        const token1AmountBigInt = BigInt(token1Amount);
+        const token0AmountBigInt = BigInt(token0Amount);
+    
+        // Calculate the price ratio as token1 / token0, scaled up to maintain precision
+        const priceRatio = (token1AmountBigInt * 10n**14n) / token0AmountBigInt;
+    
+        // Calculate the square root of the price ratio
+        const sqrtPriceRatio = sqrtBigInt(priceRatio);
+    
+        // Now calculate sqrtPriceX96
+        const sqrtPriceX96 = (sqrtPriceRatio * 2n**96n) / 10n**9n;
+    
+        return sqrtPriceX96;
+    }
+    
+  
+  
+  
+  
+  
     async function connectWallet() {
         try {
             await open();
@@ -58,7 +95,7 @@ function DashboardPage() {
             console.log("Account:", await signer.getAddress()); 
     
             // Prepare contract interaction with factory contract
-            const factoryAddress = "0x8073bef1728a47dA7C370842A1D2a41af7761a0c"; // Replace with your actual factory contract address
+            const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6"; // Replace with your actual factory contract address
             const factoryAbi = MyFactoryJson.abi;
             const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
     
@@ -89,6 +126,76 @@ function DashboardPage() {
             setIsCreatingPair(false); 
         }
     }
+
+    const initializePool = async (token1Amount, token0Amount) => {
+        if (!deployedPoolAddress || !isConnected) return;
+    
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6"; // Replace with your actual factory contract address
+            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
+            console.log(deployedPoolAddress);
+
+            
+            const token1Amount = ethers.parseUnits(String(tokenDetails.supply)); // Assuming this is a string of total supply in wei
+            console.log("Token Supply to add:", token1Amount); //working
+            const token0Amount = ethers.parseUnits("0.01", 18); 
+            console.log("WETH to add to LP:",token0Amount);
+            
+            if (!token1Amount || !token0Amount) {
+                console.error("Token amounts must be provided");
+                return;
+            }
+    
+            const sqrtPriceX96 = calculateSqrtPriceX96(token1Amount, token0Amount); // Ensure these are passed correctly
+            console.log(sqrtPriceX96);
+            const initializeResponse = await factoryContract.initializePool(deployedPoolAddress, sqrtPriceX96);
+            await initializeResponse.wait();
+            console.log("Pool initialized successfully!");
+        } catch (error) {
+            console.error("Error initializing pool:", error);
+        }
+    };
+    
+
+    async function addLiquidity() {
+        if (!deployedPoolAddress || !isConnected) {
+            console.error("Deployed pool address not set or wallet not connected");
+            return;
+        }
+    
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6"; 
+            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
+
+            const positionManager_address = "0x1238536071E1c677A632429e3655c799b22cDA52";
+            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; 
+    
+            // Assuming these amounts are defined or passed in from component state
+            const tokenAmount = ethers.parseUnits(String(tokenDetails.supply)); // Assume tokenDetails.supply is available
+            console.log(tokenAmount);
+            const wethAmount = ethers.parseUnits("0.01", 18); // Fixed amount of WETH to be used
+    
+            // Approve the tokens for the factory contract
+            await factoryContract.approveToken(contractAddress, positionManager_address, tokenAmount);
+            await factoryContract.approveToken(WETH_address, positionManager_address, wethAmount);
+    
+            // Add liquidity using the simplified method similar to your script
+            const tx = await factoryContract.addInitialLiquidity(contractAddress, deployedPoolAddress, factoryAddress, tokenAmount, wethAmount, {
+                gasLimit: 5000000 // Higher gas limit
+            });
+            await tx.wait();
+    
+            console.log("Liquidity added successfully!");
+    
+        } catch (error) {
+            console.error("Error adding liquidity:", error);
+        }
+    };
+    
     
 
     useEffect(() => {
@@ -96,7 +203,8 @@ function DashboardPage() {
     }, [contractAddress, isConnected]); // Re-fetch if contractAddress or connection status changes
 
     return (
-        <div>  <Header connectWallet={connectWallet} />
+        <div>
+            <Header connectWallet={connectWallet} />
         <div className="dashboard-container">
             
         <h1>Dashboard</h1>
@@ -119,11 +227,19 @@ function DashboardPage() {
                       {isCreatingPair? (
                             "Loading..." // Display "Loading..." if isLoading is true
                         ) : (
-                            "Launch Token" // Otherwise, display the button text
+                            "Create Pool" // Otherwise, display the button text
                         )}
                 </button>
             )}
         </div>
+
+        <button onClick={initializePool} className="deploy-button">
+            Initialize Pool
+            </button>
+
+            <button onClick={addLiquidity} className="deploy-button">
+            Get LP
+            </button>
         {deployedPoolAddress && (
             <p>Your new deployed pool address is: <a href={`https://sepolia.etherscan.io/address/${deployedPoolAddress}`} target="_blank">{deployedPoolAddress}</a></p>
         )}
@@ -138,3 +254,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+
