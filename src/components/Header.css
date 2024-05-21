@@ -72,7 +72,7 @@ button:hover {
 .menu a {
     text-decoration: none;
     color: #ffffff; /* Adjust color as needed */
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .menu a:hover {

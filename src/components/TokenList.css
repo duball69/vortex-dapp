@@ -10,8 +10,16 @@
     gap: 20px;
 }
 
-.deployedtokenstitle {margin-bottom:50px;
-font-size:24px;}
+
+.deployedtokenstitle {
+  margin-bottom:10px;
+    font-size:24px;}
+
+    
+.subtitletokens{margin-top:10px;
+margin-bottom:50px;}
+
+
 .token-card {
     background: #00000043;
     border: 1px solid #ddd;

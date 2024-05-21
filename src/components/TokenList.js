@@ -29,6 +29,7 @@ function TokensList() {
     return (
         <div className="tokens-container">
             <h3 className="deployedtokenstitle">Deployed Tokens</h3>
+            <h5 className="subtitletokens">Trade them directly on Uniswap</h5>
             <div className="tokens-grid">
                 {tokens.map(token => (
                     <div key={token.id} className="token-card">

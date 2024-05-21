@@ -9,6 +9,7 @@ import Footer from '../components/Footer.js';
 import { firestore } from '../components/firebaseConfig.js';
 import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 
+
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
 
@@ -18,14 +19,32 @@ const sepoliaMainnet = {
     name: 'Sepolia',
     currency: 'ETH',
     explorerUrl: 'https://sepolia.etherscan.io/',
-    rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0'
+    rpcUrl: process.env.REACT_APP_SEPOLIA_RPC_URL
 };
 
+
+const baseMainnet= {
+    chainId:  8453,
+    name: 'Base',
+    currency: 'ETH',
+    explorerUrl: 'https://basescan.org/',
+    rpcUrl: process.env.REACT_APP_BASE_RPC_URL
+};
+
+const arbitrumMainnet=  {
+
+    chainId: 42161,
+    name: 'Arbitrum',
+    currency: 'ETH',
+    explorerUrl: "https://arbiscan.io",
+    rpcUrl: process.env.REACT_APP_ARBITRUM_RPC_URL
+}
+
 const metadata = {
-  name: 'Vortex',
+  name: 'Vortex Dapp',
   description: 'A dapp to create ERC20 tokens on any EVM chain, and get intiial LP without costs. ',
-  url: 'https://your-dapp-url.com',
-  icons: ['https://your-dapp-url.com/favicon.ico']
+  url: 'https://vortexdapp.com',
+  icons: ['https://vortexdapp.com/favicon.ico']
 };
 
 const ethersConfig = defaultConfig({
@@ -40,7 +59,7 @@ const ethersConfig = defaultConfig({
 const web3Modal = createWeb3Modal({ ethersConfig, chains: [sepoliaMainnet], projectId, enableAnalytics: true });
 
 const IMGUR_API_URL = "https://api.imgur.com/3/image";
-const CLIENT_ID = '7bd162baabe49a2'; // Your Imgur Client ID
+const CLIENT_ID = process.env.IMGUR_API; // Your Imgur Client ID
 
 const uploadImageToImgur = async (file) => {
     const formData = new FormData();

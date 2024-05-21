@@ -3,10 +3,29 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    padding: 70px 70px 100px 70px;
+    padding: 0px 70px 100px 70px;
+    margin-top:-100px;
 }
 
+  
+h5 {
+    text-align: center;
+    color: white;
+    margin-bottom:-20px;
+    margin-top:-25px;
+    font-size: 16px;
+    
+  }
 
+  .texthome2 {font-size:16px;
+    font-weight: 200;
+    color:white;
+text-align:center;
+
+  }
+  
+
+  
 
 .staking-container {
     max-width: 600px;
@@ -47,6 +66,10 @@
     font-style: normal;
     font-weight: 400;
 }
+
+.titlestake{margin-bottom:20px;
+text-align:center;
+color:white;}
 
 
 button.stake-button:hover {

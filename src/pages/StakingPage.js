@@ -20,9 +20,17 @@ const StakingPage = () => {
     return (
         <div>
              <Header connectWallet={connectWallet} />
-             <div className="center2-container">
+
+             <div >
+             <h1 className="titlestake">Earn from every token deployed through Vortex</h1>
+      <h5 className="subtitlefactory">Stake your ETH and get a share of all revenues</h5>
+      <h6 className="texthome2">Currently only on Sepolia Testnet</h6>   
+            </div>
+              <div className="center2-container">
+            
+ 
              <div className="staking-container">
-            <h1>Stake ETH</h1>
+            <h1>Vortex ETH Pool</h1>
             {!isConnected && (
                 <button onClick={connectWallet}>Connect Wallet</button>
             )}
@@ -36,7 +44,7 @@ const StakingPage = () => {
                             onChange={e => setStakeAmount(e.target.value)}
                             placeholder="Enter amount to stake (ETH)"
                         />
-                        <button className="stake-button" onClick={() => alert(`Stake amount: ${stakeAmount} ETH`)}>Submit Stake</button>
+                        <button className="stake-button" onClick={() => alert(`Stake amount: ${stakeAmount} ETH`)}>Stake</button>
                     </div>
                 </>
             
