@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers/react'; // Adjust the import based on your actual package
+import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers/react'; 
 import Header from '../components/Header.js';
 import './StakingPage.css'; 
 import Footer from '../components/Footer.js';
@@ -20,7 +20,7 @@ const StakingPage = () => {
     return (
         <div>
              <Header connectWallet={connectWallet} />
-             <div className="center-container">
+             <div className="center2-container">
              <div className="staking-container">
             <h1>Stake ETH</h1>
             {!isConnected && (
