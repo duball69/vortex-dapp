@@ -3,7 +3,7 @@
     background-color: #00000000;
     padding: 10px 20px;
     color: white;
-    display: flex;
+       display: flex;
     justify-content: space-between;
     align-items: center;
   }
@@ -33,7 +33,7 @@
   }
   
   button {
-    padding: 7px 20px;
+    padding: 7px 25px;
     margin-top:10px;
     font-size: 16px;
     border-radius: 30px;
@@ -53,5 +53,53 @@ button:hover {
     background-color: #0056b3;
 }
 
+
+
+
+.burger-menu {
+    display: none; /* Hide burger menu on desktop */
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.menu {
+    display: flex; /* Horizontal menu on desktop */
+    gap: 20px; /* Space between links */
+}
+
+.menu a {
+    text-decoration: none;
+    color: #ffffff; /* Adjust color as needed */
+    font-weight: bold;
+}
+
+.menu a:hover {
+    color: #a333ff; /* Change to your desired hover color */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .burger-menu {
+        display: block; /* Show burger menu on mobile */
+    }
+
+    .menu {
+        display: none; /* Hide horizontal menu on mobile */
+        flex-direction: column; /* Stack links vertically */
+        position: absolute;
+        right: 0;
+        top: 60px; /* Adjust based on header height */
+        background-color: rgba(0, 0, 0, 0.436); /* Adjust color as needed */
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .menu.open {
+        display: flex; /* Show menu when burger is clicked */
+    }
+}
 
  
