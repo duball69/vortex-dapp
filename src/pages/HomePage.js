@@ -33,6 +33,7 @@ function HomePage() {
     
       <h1 className="titlehome">Create your own token with 1 ETH of LP</h1>
       <h5 className="subtitlehome">We help you create tokens for free and loan you initial liquidity!</h5>
+      <h6 className="texthome">Currently only on Sepolia Testnet</h6>
   
       <Link to="/factory" className="start-button2">Let's Start</Link></div>
     

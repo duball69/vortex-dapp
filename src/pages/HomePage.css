@@ -31,6 +31,7 @@
 .titlehome {
     font-size: 42px; /* Larger font size for heading */
 margin-bottom:-20px;
+margin-top:10px;
   }
 
   .subtitlehome {font-size:20px;
@@ -38,6 +39,11 @@ margin-bottom:-20px;
     font-weight: 300;
 }
   
+.texthome {font-size:16px;
+  margin-top: -20px;
+  font-weight: 200;
+}
+
 
 .start-button2 {
     padding: 7px 20px;

@@ -28,7 +28,7 @@ function Header({ connectWallet }) {
                     <Link to="/" onClick={() => setIsOpen(false)}>Home</Link>
                     <Link to="/factory" onClick={() => setIsOpen(false)}>Launch</Link>
                     <Link to="/staking" onClick={() => setIsOpen(false)}>Stake</Link>
-                    <a href="https://www.pornhub.com" target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>Docs</a>
+                    <a href="https://www.gitbook.com" target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>Docs</a>
 
                     </nav>
 
