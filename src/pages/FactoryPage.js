@@ -171,7 +171,7 @@ function FactoryPage() {
         <div>
             <Header connectWallet={connectWallet} />
            <div>
-            <h1>Launch your new token without costs. We lend you the liquidity.</h1>
+            <h1 className="titlefactory">Launch your new token without costs. We lend you the liquidity.</h1>
             <h3 className="subtitlefactory">Vortex provides liquidity lending to launch tokens, directly on Uniswap.</h3>
            </div>
         <div className="center-container">

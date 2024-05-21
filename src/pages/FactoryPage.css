@@ -7,8 +7,17 @@ html, body {
     background-attachment: fixed;
 }
 
-.subtitlefactory{font-size:14px;
-    margin-top:20px;
+.titlefactory {font-size:35px;
+    text-align: center;
+    color: white;
+    padding-right:250px;
+    padding-left:250px;
+ 
+    }
+
+.subtitlefactory {font-size:18px;
+    margin-top:15px;
+    font-weight: 300;
 }
 
 .factory-container {
@@ -17,7 +26,7 @@ html, body {
     padding: 70px 70px 100px 70px;
     border: 1px solid #cccccc81;
     border-radius: 30px;
-    margin-top:60px;
+    margin-top:40px;
     background-color: #0000006c;
     color:white;
     display: flex;
@@ -51,6 +60,7 @@ input[type="number"] {
     border: 1px solid #ccc;
     border-radius: 30px;
     box-sizing: border-box;
+    font-family: "Lexend Deca", sans-serif;
 }
 
 input[type="text"]:focus,
@@ -66,7 +76,7 @@ input[type="number"]:focus {
 
 button.deploy-button {
     padding: 7px 20px;
-    margin-top:10px;
+    margin-top:20px;
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
@@ -77,6 +87,7 @@ button.deploy-button {
     transition: background-color 0.3s ease;
     font-style: normal;
     font-weight: 400;
+    font-family: "Lexend Deca", sans-serif;
 }
 
 
@@ -98,14 +109,7 @@ button.deploy-button:hover {
     height: 100vh;
 }
 
-/* styles.css */
-h1 {
-    text-align: center;
-    color: white;
- 
-    font-size:30px; 
-    
-  }
+
   
   h3 {
     text-align: center;
@@ -131,6 +135,9 @@ h1 {
     font-style: normal;
     font-weight: 400;
     text-decoration: none;
+    font-family: 'Comfortaa', sans-serif; /* Updated font-family */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 

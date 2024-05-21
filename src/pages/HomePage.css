@@ -5,9 +5,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 70vh;   
+    height: 80vh;   
     text-align: center;
-    font-family: 'Inter', sans-serif; /* Futuristic font */    
+   
     color: #fff; /* Light text */
     
     background-size: cover;
@@ -32,16 +32,17 @@
     font-size: 42px; /* Larger font size for heading */
 margin-bottom:-20px;
   }
-  
-  h5 {
-    font-size: 18px; /* Larger font size for paragraph */
-  }
+
+  .subtitlehome {font-size:20px;
+    margin-top:25px;
+    font-weight: 300;
+}
   
 
 .start-button2 {
     padding: 7px 20px;
     font-size: 16px;
-  
+  margin-top:-15px;
     border-radius: 30px;
     /* Gradient background */
     background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6); /* Replace #FF5733 with your desired color */
@@ -52,6 +53,7 @@ margin-bottom:-20px;
     font-style: normal;
     font-weight: 400;
     text-decoration: none;
+    font-family: "Lexend Deca", sans-serif;
 }
 
 
@@ -66,3 +68,18 @@ margin-bottom:-20px;
     }
   }
   
+
+  .logo2 {
+    width: 120px; /* Adjust the width according to your preference */
+    height: auto; /* Maintain aspect ratio */
+    
+  }
+
+
+  
+  /* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
+  @media only screen and (max-width: 600px) {
+    .logo2 {
+      width: 70px; /* Adjust the width for smaller screens */
+    }
+  }
