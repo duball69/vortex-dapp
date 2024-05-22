@@ -14,7 +14,8 @@ function Header({ connectWallet, isConnected, chainId }) {
         "56": "BSC",
         "42161": "Arbitrum",
         "8453": "Base",
-        "11155111": "Sepolia"
+        "11155111": "Sepolia",
+        "81457":"Blast"
     };
 
     const chainName = CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`;
@@ -42,7 +43,10 @@ function Header({ connectWallet, isConnected, chainId }) {
                     <a href="https://www.gitbook.com" target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>Docs</a>
 
                     </nav>
-<div>                <button onClick={connectWallet}>Connect</button>
+<div>              {isConnected ?
+                        <button onClick={connectWallet}>Options</button> :
+                        <button onClick={connectWallet}>Connect</button>
+                    }
                 {isConnected && <p className="connected-chain">Chain: {chainName}</p>}
                 </div>
 

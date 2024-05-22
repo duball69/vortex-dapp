@@ -10,14 +10,15 @@ import { firestore } from '../components/firebaseConfig.js';
 import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 
 
-const projectId = '9513bcef54af049b9471faff11d5a16a';
+const projectId = "9513bcef54af049b9471faff11d5a16a";
 
 
 const CHAIN_NAMES = {
     "56": "BSC",
     "42161": "Arbitrum",
     "8453": "Base",
-    "11155111": "Sepolia"
+    "11155111": "Sepolia",
+    "81457":"Blast"
 };
 
 const sepoliaMainnet = {
@@ -35,6 +36,15 @@ const baseMainnet= {
     currency: 'ETH',
     explorerUrl: 'https://basescan.org/',
     rpcUrl: process.env.BASE_RPC_URL
+};
+
+
+const blastMainnet= {
+    chainId:  81457,
+    name: 'Blast Mainnet',
+    currency: 'ETH',
+    explorerUrl: 'https://blastscan.io/',
+    rpcUrl: process.env.BLAST_RPC_URL
 };
 
 const bscMainnet={
