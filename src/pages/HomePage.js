@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './HomePage.css'; // Import the CSS file for styling
 import Header from '../components/Header.js';
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalAccount} from '@web3modal/ethers/react';
-import TokensList from "../components/TokenList.js";
+import TokensList from "../components/tokenList.js";
 import Footer from '../components/Footer.js';
 
 
