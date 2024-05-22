@@ -49,6 +49,27 @@ text-align:center;
       margin: 30px 0px 60px 20px; /* Add margin for mobile devices */
       height:60%;
     }
+
+    
+.titlestake{margin-bottom:10px;
+    text-align:center;
+    color:white;
+    font-size:23px;
+}
+    
+.titlestake{
+    text-align:center;
+    color:white;
+    font-size:18px;}
+
+    .texthome2{
+        text-align:center;
+        color:white;
+        font-size:14px;
+    margin-bottom:30px;}
+    
+
+    
   }
 
 
@@ -61,7 +82,7 @@ text-align:center;
     background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6); /* Replace #FF5733 with your desired color */
     border: 1px solid rgba(255, 255, 255, 0.519);
     color: #ffffff;
-    cursor: pointer;
+     cursor: pointer;
     transition: background-color 0.3s ease;
     font-style: normal;
     font-weight: 400;
