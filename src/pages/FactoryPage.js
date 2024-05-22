@@ -19,7 +19,7 @@ const sepoliaMainnet = {
     name: 'Sepolia',
     currency: 'ETH',
     explorerUrl: 'https://sepolia.etherscan.io/',
-    rpcUrl: process.env.REACT_APP_SEPOLIA_RPC_URL
+    rpcUrl: process.env.SEPOLIA_RPC_URL
 };
 
 
@@ -28,16 +28,23 @@ const baseMainnet= {
     name: 'Base',
     currency: 'ETH',
     explorerUrl: 'https://basescan.org/',
-    rpcUrl: process.env.REACT_APP_BASE_RPC_URL
+    rpcUrl: process.env.BASE_RPC_URL
 };
 
+const bscMainnet={
+    chainId: 56,
+    name: 'BSC',
+    currency: 'BNB',
+    explorerUrl: "https://bscscan.com",
+    rpcUrl: process.env.BSC_RPC_URL
+}
 const arbitrumMainnet=  {
 
     chainId: 42161,
     name: 'Arbitrum',
     currency: 'ETH',
     explorerUrl: "https://arbiscan.io",
-    rpcUrl: process.env.REACT_APP_ARBITRUM_RPC_URL
+    rpcUrl: process.env.ARBITRUM_RPC_URL
 }
 
 const metadata = {
@@ -56,7 +63,7 @@ const ethersConfig = defaultConfig({
   defaultChainId: 1
 });
 
-const web3Modal = createWeb3Modal({ ethersConfig, chains: [sepoliaMainnet], projectId, enableAnalytics: true });
+const web3Modal = createWeb3Modal({ ethersConfig, chains: [sepoliaMainnet, arbitrumMainnet, baseMainnet,bscMainnet], projectId, enableAnalytics: true });
 
 const IMGUR_API_URL = "https://api.imgur.com/3/image";
 const CLIENT_ID = process.env.IMGUR_API; // Your Imgur Client ID
@@ -106,9 +113,12 @@ function FactoryPage() {
     async function connectWallet() {
         try {
             open(); // Open the Web3Modal modal
+            console.log('Connected to chain:', chainId);
             setError("");
+            
         } catch (error) {
             console.error("Error connecting wallet:", error);
+
             
         }
     }
@@ -133,13 +143,14 @@ function FactoryPage() {
                 // Do not return here; just log the error and continue with deployment
             } else {
                 setTokenImageUrl(imageUrl); // Store the image URL in state if upload was successful
-            }
+            } 
         }
         
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             console.log("Account:", await signer.getAddress()); 
+    
     
             const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6";
             const factoryAbi = MyFactoryJson.abi;
@@ -169,7 +180,8 @@ function FactoryPage() {
                     supply: tokenSupply,
                     address: contractAddress,
                     imageUrl: imageUrl,  // This may be null if the image failed to upload
-                    deployer: connectedWallet
+                    deployer: connectedWallet,
+                    chain:chainId
 
                 });
                 
