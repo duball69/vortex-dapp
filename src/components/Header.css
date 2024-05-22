@@ -20,6 +20,9 @@
   @media only screen and (max-width: 600px) {
     .logo {
       width: 50px; /* Adjust the width for smaller screens */
+      align-items: center;
+      display:flex;
+      
     }
   }
   
@@ -88,7 +91,8 @@ text-align: center;}
 @media (max-width: 768px) {
     .burger-menu {
         display: block; /* Show burger menu on mobile */
-        align-items: middle;
+      margin-top:0px;
+
     }
 
     .menu {
