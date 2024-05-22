@@ -15,3 +15,9 @@
     color: #ffffff;
     text-decoration: none;
 }
+
+.x-icon {
+    margin-top:5px;
+    width: 24px;  /* Adjust size as needed */
+    height: 24px; /* Adjust size as needed */
+  }

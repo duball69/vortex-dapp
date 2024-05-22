@@ -8,6 +8,9 @@ function Footer() {
       <div className="footer-content">
         <p>Vortex © 2024. All rights reserved.</p>
         <p>Contact us: <a href="mailto:team@vortexdapp.com">team@vortexdapp.com</a></p>
+        <a href="https://x.com/vortexdapp" className="icon-link">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cc/X_icon.svg" alt="X icon" className="x-icon" />
+        </a>
       </div>
     </footer>
   );
