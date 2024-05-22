@@ -39,6 +39,7 @@ function TokensList() {
                         <div className="token-info">
                             <h2 className="token-title">{token.name} ({token.symbol})</h2>
                             <h4 className="token-deployer">Contract Address: {token.address}</h4>
+                            <h4 className="token-deployer">Chain: {token.chain}</h4>
                           
                         </div>
                     </div>

@@ -40,9 +40,36 @@ html, body {
 
 @media only screen and (max-width: 600px) {
     .factory-container {
-      margin: 30px 20px 60px 20px; /* Add margin for mobile devices */
+      margin: 10px 20px 60px 20px; /* Add margin for mobile devices */
       height:60%;
+      margin-top:140px;
     }
+    .center-container{margin:50px 50px 50px 50px;
+    margin-top:100px;
+margin-left:10px;
+margin-right:10px;}
+
+    .titlefactory {font-size:23px;
+        text-align: center;
+        color: white;
+        padding-right:15px;
+        padding-left:15px;
+     
+        }
+
+        .createerc{font-size:18px;}
+
+      
+
+        .subtitlefactory {font-size:15px;
+            margin-top:10px;
+            margin-right:20px;
+            margin-left:10px;
+            font-weight: 300;
+        }
+
+      
+        
   }
 
 

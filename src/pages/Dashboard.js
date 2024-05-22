@@ -205,7 +205,7 @@ function DashboardPage() {
 
     return (
         <div>
-            <Header connectWallet={connectWallet} />
+             <Header connectWallet={connectWallet}   isConnected={isConnected} chainId={chainId} />
         <div className="dashboard-container">
             
         <h1>Dashboard</h1>

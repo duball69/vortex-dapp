@@ -34,7 +34,7 @@
   
   button {
     padding: 7px 25px;
-    margin-top:10px;
+    margin-top: 30px;
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
@@ -75,6 +75,11 @@ button:hover {
     font-weight: 500;
 }
 
+.connected-chain {color:white;
+margin-top:10px;
+font-size: 12px;
+text-align: center;}
+
 .menu a:hover {
     color: #a333ff; /* Change to your desired hover color */
 }
@@ -83,6 +88,7 @@ button:hover {
 @media (max-width: 768px) {
     .burger-menu {
         display: block; /* Show burger menu on mobile */
+        align-items: middle;
     }
 
     .menu {

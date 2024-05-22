@@ -13,6 +13,12 @@ import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from '
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
 
+const CHAIN_NAMES = {
+    "56": "BSC",
+    "42161": "Arbitrum",
+    "8453": "Base",
+    "11155111": "Sepolia"
+};
 
 const sepoliaMainnet = {
     chainId: 11155111,
@@ -46,6 +52,7 @@ const arbitrumMainnet=  {
     explorerUrl: "https://arbiscan.io",
     rpcUrl: process.env.ARBITRUM_RPC_URL
 }
+
 
 const metadata = {
   name: 'Vortex Dapp',
@@ -108,8 +115,7 @@ function FactoryPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(""); 
 
-
-   
+  
     async function connectWallet() {
         try {
             open(); // Open the Web3Modal modal
@@ -122,7 +128,14 @@ function FactoryPage() {
             
         }
     }
+
     
+    
+        const chainName = CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`;
+
+   
+       
+
     async function deployToken(e) {
         e.preventDefault();
     
@@ -181,7 +194,7 @@ function FactoryPage() {
                     address: contractAddress,
                     imageUrl: imageUrl,  // This may be null if the image failed to upload
                     deployer: connectedWallet,
-                    chain:chainId
+                    chain:chainName
 
                 });
                 
@@ -200,7 +213,7 @@ function FactoryPage() {
     
     return (
         <div>
-            <Header connectWallet={connectWallet} />
+            <Header connectWallet={connectWallet}   isConnected={isConnected} chainId={chainId} />
            <div>
             <h1 className="titlefactory">Launch your new token without costs. We lend you the liquidity.</h1>
             <h3 className="subtitlefactory">Vortex provides liquidity lending to launch tokens, directly on Uniswap.</h3>
@@ -208,8 +221,7 @@ function FactoryPage() {
         <div className="center-container">
              
             <div className="factory-container">
-                <h2>Create Your ERC20 Token</h2>
-               
+                <h2 className="createerc">Create Your ERC20 Token</h2>
                 {isConnected && <p className="connected-wallet">Connected Wallet: {connectedWallet}</p>} {/* Display connected wallet address */}
                 <form onSubmit={deployToken} className="token-form">
 

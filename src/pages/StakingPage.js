@@ -4,9 +4,17 @@ import Header from '../components/Header.js';
 import './StakingPage.css'; 
 import Footer from '../components/Footer.js';
 
+
+const CHAIN_NAMES = {
+    "56": "BSC",
+    "42161": "Arbitrum",
+    "8453": "Base",
+    "11155111": "Sepolia"
+};
+
 const StakingPage = () => {
     const [stakeAmount, setStakeAmount] = useState('');
-    const { address: connectedWallet, isConnected } = useWeb3ModalAccount();
+    const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount(); 
     const { open } = useWeb3Modal();
 
     const connectWallet = async () => {
@@ -19,7 +27,7 @@ const StakingPage = () => {
 
     return (
         <div>
-             <Header connectWallet={connectWallet} />
+              <Header connectWallet={connectWallet}   isConnected={isConnected} chainId={chainId} />
 
              <div >
              <h1 className="titlestake">Earn from every token deployed through Vortex</h1>

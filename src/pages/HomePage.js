@@ -26,7 +26,7 @@ function HomePage() {
   
     
     <div> 
-    <Header connectWallet={connectWallet} />
+     <Header connectWallet={connectWallet}   isConnected={isConnected} chainId={chainId} />
       
       <div className="centered-content">
       <img src="logo512.png" alt="Logo" className="logo2" />

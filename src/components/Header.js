@@ -2,11 +2,22 @@ import React, { useState } from 'react';
 import './Header.css';
 import { Link } from 'react-router-dom';
 
-function Header({ connectWallet }) {
+
+
+function Header({ connectWallet, isConnected, chainId }) {
 
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = () => setIsOpen(!isOpen);
+
+    const CHAIN_NAMES = {
+        "56": "BSC",
+        "42161": "Arbitrum",
+        "8453": "Base",
+        "11155111": "Sepolia"
+    };
+
+    const chainName = CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`;
 
 
 
@@ -31,8 +42,10 @@ function Header({ connectWallet }) {
                     <a href="https://www.gitbook.com" target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>Docs</a>
 
                     </nav>
+<div>                <button onClick={connectWallet}>Connect</button>
+                {isConnected && <p className="connected-chain">Chain: {chainName}</p>}
+                </div>
 
-                <button onClick={connectWallet}>Connect</button>
             </div></header>
   );
 }
