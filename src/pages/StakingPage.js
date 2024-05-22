@@ -31,14 +31,14 @@ const StakingPage = () => {
 
              <div >
              <h1 className="titlestake">Earn from every token deployed through Vortex</h1>
-      <h5 className="subtitlefactory">Stake your ETH and get a share of all revenues</h5>
+      <h5 className="subtitlefactory">Lend your ETH and get a share of all revenues</h5>
       <h6 className="texthome2">Currently only on Sepolia Testnet</h6>   
             </div>
               <div className="center2-container">
             
  
              <div className="staking-container">
-            <h1>Vortex ETH Pool</h1>
+            <h2>Vortex ETH Pool</h2>
             {!isConnected && (
                 <button onClick={connectWallet}>Connect Wallet</button>
             )}

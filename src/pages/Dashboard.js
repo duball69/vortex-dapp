@@ -8,6 +8,8 @@ import { Link, useParams } from 'react-router-dom';
 import './Dashboard.css';
 import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { firestore } from '../components/firebaseConfig.js';
 /* global BigInt */
 
 function DashboardPage() {
@@ -64,20 +66,34 @@ function DashboardPage() {
 
     async function fetchTokenDetails() {
         if (!contractAddress || !isConnected) return;
-        
+    
+        // Fetch token information from the blockchain
         const provider = new ethers.BrowserProvider(window.ethereum);
         const tokenContract = new ethers.Contract(contractAddress, MyTokenJson.abi, provider);
         const name = await tokenContract.name();
         const symbol = await tokenContract.symbol();
         const supply = await tokenContract.totalSupply();
-
+    
+        // Fetch token image URL from Firestore
+        const tokensCollection = collection(firestore, 'tokens');
+        const q = query(tokensCollection, where("address", "==", contractAddress));
+        const querySnapshot = await getDocs(q);
+    
+        let imageUrl = "";
+        querySnapshot.forEach((doc) => {
+            // Assuming there's one document matching the contract address
+            imageUrl = doc.data().imageUrl;
+        });
+    
         setTokenDetails({
             name,
             symbol,
-            supply: supply.toString()/10**18,
-            
+            supply: (supply.toString() / 10**18).toString(),
+            imageUrl  // Add image URL to state
         });
     }
+    
+    
     async function createPair() {
         if (!contractAddress || !isConnected) return;
     
@@ -217,6 +233,7 @@ function DashboardPage() {
             )}
         </div>
         <div className="token-info">
+        {tokenDetails.imageUrl && <img src={tokenDetails.imageUrl} alt={tokenDetails.name} className="token-image" />}
             <p>Token Name: {tokenDetails.name}</p>
             <p>Token Symbol: {tokenDetails.symbol}</p>
             <p>Total Supply: {tokenDetails.supply}</p>

@@ -12,6 +12,14 @@
     margin-bottom: 20px;
     color: #fff;
   }
+
+  .token-image {
+    max-width: 100px; /* Set the maximum width to 100px or any size you prefer */
+    height: auto; /* Maintain the aspect ratio */
+    display: block; /* Make the image a block-level element */
+    margin: 0 auto; /* Center the image horizontally */
+    padding: 10px 0; /* Optional: adds some space above and below the image */
+}
   
   .wallet-status {
     margin-bottom: 20px;

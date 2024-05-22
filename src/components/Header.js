@@ -26,7 +26,7 @@ function Header({ connectWallet, isConnected, chainId }) {
       <div className="header-content">
         
                 <Link to="/">
-                    <img src="logo512.png" alt="VortexLogo png" className="logo" />
+                    <img src="https://i.imgur.com/aDk96bW.png" alt="VortexLogo png" className="logo" />
                 </Link>
 
                 {/* Burger Icon */}
