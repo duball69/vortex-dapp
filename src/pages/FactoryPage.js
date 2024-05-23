@@ -10,15 +10,14 @@ import { firestore } from '../components/firebaseConfig.js';
 import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
 
 
-const projectId = "9513bcef54af049b9471faff11d5a16a";
+const projectId = '9513bcef54af049b9471faff11d5a16a';
 
 
 const CHAIN_NAMES = {
     "56": "BSC",
     "42161": "Arbitrum",
     "8453": "Base",
-    "11155111": "Sepolia",
-    "81457":"Blast"
+    "11155111": "Sepolia"
 };
 
 const sepoliaMainnet = {
@@ -36,15 +35,6 @@ const baseMainnet= {
     currency: 'ETH',
     explorerUrl: 'https://basescan.org/',
     rpcUrl: process.env.BASE_RPC_URL
-};
-
-
-const blastMainnet= {
-    chainId:  81457,
-    name: 'Blast Mainnet',
-    currency: 'ETH',
-    explorerUrl: 'https://blastscan.io/',
-    rpcUrl: process.env.BLAST_RPC_URL
 };
 
 const bscMainnet={
@@ -82,8 +72,8 @@ const ethersConfig = defaultConfig({
 
 const web3Modal = createWeb3Modal({ ethersConfig, chains: [sepoliaMainnet, arbitrumMainnet, baseMainnet,bscMainnet], projectId, enableAnalytics: true });
 
-const IMGUR_API_URL =process.env.IMGUR_API;
-const CLIENT_ID = process.env.WALLETCONNECT_PROJECTID; // Your Imgur Client ID
+const IMGUR_API_URL = "https://api.imgur.com/3/image";
+const CLIENT_ID = process.env.IMGUR_API; // Your Imgur Client ID
 
 const uploadImageToImgur = async (file) => {
     const formData = new FormData();
