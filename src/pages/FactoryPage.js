@@ -73,7 +73,7 @@ const ethersConfig = defaultConfig({
 const web3Modal = createWeb3Modal({ ethersConfig, chains: [sepoliaMainnet, arbitrumMainnet, baseMainnet,bscMainnet], projectId, enableAnalytics: true });
 
 const IMGUR_API_URL = "https://api.imgur.com/3/image";
-const CLIENT_ID = process.env.IMGUR_API; // Your Imgur Client ID
+const CLIENT_ID = "7bd162baabe49a2"; // Your Imgur Client ID
 
 const uploadImageToImgur = async (file) => {
     const formData = new FormData();
