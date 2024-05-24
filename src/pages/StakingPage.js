@@ -16,12 +16,12 @@ const CHAIN_NAMES = {
 };
 
 const StakingPage = () => {
-    const [stakeAmount, setStakeAmount] = useState('');
-    const [unstakeAmount, setUnstakeAmount] = useState('');
+    const [amount, setAmount] = useState(''); // Use a single state for the input amount
     const [stakedMessage, setStakedMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isStaked, setIsStaked] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loadingStake, setLoadingStake] = useState(false);
+    const [loadingUnstake, setLoadingUnstake] = useState(false);
     const [stakedAmount, setStakedAmount] = useState(0n); // Use BigInt for staked amount
 
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
@@ -70,7 +70,7 @@ const StakingPage = () => {
     };
 
     const handleStake = async () => {
-        if (!stakeAmount) {
+        if (!amount) {
             setErrorMessage("Please enter an amount to stake.");
             return;
         }
@@ -81,7 +81,7 @@ const StakingPage = () => {
         }
 
         try {
-            setLoading(true);
+            setLoadingStake(true);
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
 
@@ -92,11 +92,11 @@ const StakingPage = () => {
             );
 
             const tx = await stakingPoolContract.stake({
-                value: ethers.parseUnits(stakeAmount, 18)
+                value: ethers.parseUnits(amount, 18)
             });
             await tx.wait();
 
-            setStakedMessage(`You staked ${stakeAmount} ETH in the Vortex Pool.`);
+            setStakedMessage(`You staked ${amount} ETH in the Vortex Pool.`);
             setIsStaked(true);
             setErrorMessage(''); // Clear any previous error messages
 
@@ -107,12 +107,12 @@ const StakingPage = () => {
             console.error("Error staking ETH:", error);
             setErrorMessage("An error occurred while staking. Please try again.");
         } finally {
-            setLoading(false);
+            setLoadingStake(false);
         }
     };
 
     const handleUnstake = async () => {
-        if (!unstakeAmount) {
+        if (!amount) {
             setErrorMessage("Please enter an amount to unstake.");
             return;
         }
@@ -123,7 +123,7 @@ const StakingPage = () => {
         }
 
         try {
-            setLoading(true);
+            setLoadingUnstake(true);
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
 
@@ -133,10 +133,10 @@ const StakingPage = () => {
                 signer
             );
 
-            const tx = await stakingPoolContract.unstake(ethers.parseUnits(unstakeAmount, 18));
+            const tx = await stakingPoolContract.unstake(ethers.parseUnits(amount, 18));
             await tx.wait();
 
-            setStakedMessage(`You unstaked ${unstakeAmount} ETH from the Vortex Pool.`);
+            setStakedMessage(`You unstaked ${amount} ETH from the Vortex Pool.`);
             setIsStaked(false);
             setErrorMessage(''); // Clear any previous error messages
 
@@ -147,7 +147,7 @@ const StakingPage = () => {
             console.error("Error unstaking ETH:", error);
             setErrorMessage("An error occurred while unstaking. Please try again.");
         } finally {
-            setLoading(false);
+            setLoadingUnstake(false);
         }
     };
 
@@ -170,38 +170,27 @@ const StakingPage = () => {
                             <div>
                                 <p>Wallet Connected: {connectedWallet}</p>
                                 <p>{stakedMessage}</p>
-                                {!isStaked ? (
-                                    <>
-                                        <input
-                                            type="text"
-                                            value={stakeAmount}
-                                            onChange={e => setStakeAmount(e.target.value)}
-                                            placeholder="Enter amount to stake (ETH)"
-                                        />
-                                        <button
-                                            className="stake-button"
-                                            onClick={handleStake}
-                                            disabled={loading}
-                                        >
-                                            {loading ? 'Staking...' : 'Stake'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <input
-                                            type="text"
-                                            value={unstakeAmount}
-                                            onChange={e => setUnstakeAmount(e.target.value)}
-                                            placeholder="Enter amount to unstake (ETH)"
-                                        />
-                                        <button
-                                            className="unstake-button"
-                                            onClick={handleUnstake}
-                                            disabled={loading}
-                                        >
-                                            {loading ? 'Unstaking...' : 'Unstake'}
-                                        </button>
-                                    </>
+                                <input
+                                    type="text"
+                                    value={amount}
+                                    onChange={e => setAmount(e.target.value)}
+                                    placeholder="Enter amount (ETH)"
+                                />
+                                <button
+                                    className="stake-button"
+                                    onClick={handleStake}
+                                    disabled={loadingStake || loadingUnstake}
+                                >
+                                    {loadingStake ? 'Staking...' : 'Stake'}
+                                </button>
+                                {isStaked && (
+                                    <button
+                                        className="unstake-button"
+                                        onClick={handleUnstake}
+                                        disabled={loadingStake || loadingUnstake}
+                                    >
+                                        {loadingUnstake ? 'Unstaking...' : 'Unstake'}
+                                    </button>
                                 )}
                                 {errorMessage && (
                                     <p className="error-message">{errorMessage}</p>
