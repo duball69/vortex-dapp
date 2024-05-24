@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers/react';
 import Header from '../components/Header.js';
@@ -25,6 +22,7 @@ const StakingPage = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [isStaked, setIsStaked] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [walletBalance, setWalletBalance] = useState('');
 
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
     const { open } = useWeb3Modal();
@@ -43,11 +41,15 @@ const StakingPage = () => {
                     signer
                 );
 
-                const stakedAmount = await stakingPoolContract.balanceOf(connectedWallet); // Replace with your contract's method to get staked balance
+                const stakedAmount = await stakingPoolContract.getStake(connectedWallet); // Use getStake method
                 if (stakedAmount.gt(0)) {
                     setIsStaked(true);
                     setStakedMessage(`You have ${ethers.formatEther(stakedAmount)} ETH staked in the Vortex Pool.`);
                 }
+
+                const balance = await provider.getBalance(connectedWallet);
+                setWalletBalance(ethers.formatEther(balance));
+                console.log(`Wallet Balance: ${ethers.formatEther(balance)} ETH`);
             } catch (error) {
                 console.error("Error checking staking status:", error);
                 setErrorMessage("An error occurred while checking staking status. Please try again.");
@@ -158,6 +160,7 @@ const StakingPage = () => {
                         <>
                             <div>
                                 <p>Wallet Connected: {connectedWallet}</p>
+                                <p>Wallet Balance: {walletBalance} ETH</p>
                                 {!isStaked ? (
                                     <>
                                         <input
