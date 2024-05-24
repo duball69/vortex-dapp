@@ -8,6 +8,8 @@ import SimpleStakingJson from "../contracts/SimpleStaking.json";
 
 const STAKING_POOL_ADDRESS = "0xb4b34C9413Bf4d63D5589454114a354ac637e35E";
 
+/* global BigInt */
+
 const CHAIN_NAMES = {
     "56": "BSC",
     "42161": "Arbitrum",
