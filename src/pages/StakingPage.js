@@ -1,3 +1,5 @@
+/* global BigInt */
+
 import React, { useState, useEffect } from 'react';
 import { useWeb3ModalAccount, useWeb3Modal } from '@web3modal/ethers/react';
 import Header from '../components/Header.js';
@@ -5,10 +7,10 @@ import './StakingPage.css';
 import Footer from '../components/Footer.js';
 import { ethers, BrowserProvider } from "ethers";
 import SimpleStakingJson from "../contracts/SimpleStaking.json";
+import { firestore } from '../components/firebaseConfig.js';
+import { collection, doc, setDoc, updateDoc } from 'firebase/firestore';
 
-const STAKING_POOL_ADDRESS = "0xb4b34C9413Bf4d63D5589454114a354ac637e35E";
-
-/* global BigInt */
+const STAKING_POOL_ADDRESS = "0x879a17d5275cF45bBB48DCe94CC13624e04c77c8";
 
 const CHAIN_NAMES = {
     "56": "BSC",
@@ -44,7 +46,7 @@ const StakingPage = () => {
                 );
 
                 const stakedAmount = await stakingPoolContract.getStake(connectedWallet);
-                const stakedAmountBN = BigInt(stakedAmount); // Convert to BigInt
+                const stakedAmountBN = BigInt(stakedAmount.toString()); // Convert to BigInt
                 if (stakedAmountBN > 0n) {
                     setIsStaked(true);
                     setStakedAmount(stakedAmountBN);
@@ -68,6 +70,22 @@ const StakingPage = () => {
         } catch (error) {
             console.error("Error connecting wallet:", error);
             setErrorMessage("Error connecting wallet. Please try again.");
+        }
+    };
+
+    const logStakingEvent = async (action, amount) => {
+        try {
+            const stakingEventsCollection = collection(firestore, 'stakingEvents');
+            await setDoc(doc(stakingEventsCollection), {
+                wallet: connectedWallet,
+                action,
+                amount,
+                timestamp: new Date(),
+                chain: CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`,
+            });
+            console.log("Staking event logged to Firestore");
+        } catch (error) {
+            console.error("Error logging staking event:", error);
         }
     };
 
@@ -102,9 +120,12 @@ const StakingPage = () => {
             setIsStaked(true);
             setErrorMessage(''); // Clear any previous error messages
 
+            // Log staking event
+            await logStakingEvent('stake', amount);
+
             // Update the staked amount
             const newStakedAmount = await stakingPoolContract.getStake(connectedWallet);
-            setStakedAmount(BigInt(newStakedAmount));
+            setStakedAmount(BigInt(newStakedAmount.toString()));
         } catch (error) {
             console.error("Error staking ETH:", error);
             setErrorMessage("An error occurred while staking. Please try again.");
@@ -142,9 +163,12 @@ const StakingPage = () => {
             setIsStaked(false);
             setErrorMessage(''); // Clear any previous error messages
 
+            // Log unstaking event
+            await logStakingEvent('unstake', amount);
+
             // Update the staked amount
             const newStakedAmount = await stakingPoolContract.getStake(connectedWallet);
-            setStakedAmount(BigInt(newStakedAmount));
+            setStakedAmount(BigInt(newStakedAmount.toString()));
         } catch (error) {
             console.error("Error unstaking ETH:", error);
             setErrorMessage("An error occurred while unstaking. Please try again.");
