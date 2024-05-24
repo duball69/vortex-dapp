@@ -22,7 +22,7 @@ const StakingPage = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [isStaked, setIsStaked] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [walletBalance, setWalletBalance] = useState('');
+    const [stakedAmount, setStakedAmount] = useState(0n); // Use BigInt for staked amount
 
     const { address: connectedWallet, chainId, isConnected } = useWeb3ModalAccount();
     const { open } = useWeb3Modal();
@@ -41,15 +41,16 @@ const StakingPage = () => {
                     signer
                 );
 
-                const stakedAmount = await stakingPoolContract.getStake(connectedWallet); // Use getStake method
-                if (stakedAmount.gt(0)) {
+                const stakedAmount = await stakingPoolContract.getStake(connectedWallet);
+                const stakedAmountBN = BigInt(stakedAmount); // Convert to BigInt
+                if (stakedAmountBN > 0n) {
                     setIsStaked(true);
-                    setStakedMessage(`You have ${ethers.formatEther(stakedAmount)} ETH staked in the Vortex Pool.`);
+                    setStakedAmount(stakedAmountBN);
+                    setStakedMessage(`You have ${ethers.formatUnits(stakedAmountBN, 18)} ETH staked in the Vortex Pool.`);
+                } else {
+                    setIsStaked(false);
+                    setStakedMessage('You have no ETH staked in the Vortex Pool.');
                 }
-
-                const balance = await provider.getBalance(connectedWallet);
-                setWalletBalance(ethers.formatEther(balance));
-                console.log(`Wallet Balance: ${ethers.formatEther(balance)} ETH`);
             } catch (error) {
                 console.error("Error checking staking status:", error);
                 setErrorMessage("An error occurred while checking staking status. Please try again.");
@@ -91,13 +92,17 @@ const StakingPage = () => {
             );
 
             const tx = await stakingPoolContract.stake({
-                value: ethers.parseEther(stakeAmount)
+                value: ethers.parseUnits(stakeAmount, 18)
             });
             await tx.wait();
 
             setStakedMessage(`You staked ${stakeAmount} ETH in the Vortex Pool.`);
             setIsStaked(true);
             setErrorMessage(''); // Clear any previous error messages
+
+            // Update the staked amount
+            const newStakedAmount = await stakingPoolContract.getStake(connectedWallet);
+            setStakedAmount(BigInt(newStakedAmount));
         } catch (error) {
             console.error("Error staking ETH:", error);
             setErrorMessage("An error occurred while staking. Please try again.");
@@ -128,12 +133,16 @@ const StakingPage = () => {
                 signer
             );
 
-            const tx = await stakingPoolContract.unstake(ethers.parseEther(unstakeAmount));
+            const tx = await stakingPoolContract.unstake(ethers.parseUnits(unstakeAmount, 18));
             await tx.wait();
 
             setStakedMessage(`You unstaked ${unstakeAmount} ETH from the Vortex Pool.`);
             setIsStaked(false);
             setErrorMessage(''); // Clear any previous error messages
+
+            // Update the staked amount
+            const newStakedAmount = await stakingPoolContract.getStake(connectedWallet);
+            setStakedAmount(BigInt(newStakedAmount));
         } catch (error) {
             console.error("Error unstaking ETH:", error);
             setErrorMessage("An error occurred while unstaking. Please try again.");
@@ -160,7 +169,7 @@ const StakingPage = () => {
                         <>
                             <div>
                                 <p>Wallet Connected: {connectedWallet}</p>
-                                <p>Wallet Balance: {walletBalance} ETH</p>
+                                <p>{stakedMessage}</p>
                                 {!isStaked ? (
                                     <>
                                         <input
@@ -193,9 +202,6 @@ const StakingPage = () => {
                                             {loading ? 'Unstaking...' : 'Unstake'}
                                         </button>
                                     </>
-                                )}
-                                {stakedMessage && (
-                                    <p>{stakedMessage}</p>
                                 )}
                                 {errorMessage && (
                                     <p className="error-message">{errorMessage}</p>
