@@ -12,7 +12,19 @@ import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from '
 
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
+const networkConfig = {
+    // Example Chain IDs for Base and Sepolia
+    8453: { // Mainnet (as an example; replace with the correct ID for "base")
+      factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+      WETH_address: "0x4200000000000000000000000000000000000006"
+    },
+    11155111: { // Sepolia Testnet Chain ID
+      factoryAddress: "0x6b2e54664164b146217c3cddeb1737da9c91409a",
+      WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"
+    }
+  };
 
+  
 const CHAIN_NAMES = {
     "56": "BSC",
     "42161": "Arbitrum",
@@ -165,7 +177,7 @@ function FactoryPage() {
             console.log("Account:", await signer.getAddress()); 
     
     
-            const factoryAddress = "0x248fBeBECe799dCc05bD0E22190d62f0c4e983d1";
+            const factoryAddress = networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
             const factoryAbi = MyFactoryJson.abi;
             const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
         

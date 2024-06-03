@@ -80,7 +80,7 @@ async function main() {
     const provider = ethers.getDefaultProvider(); // Update with your WebSocket provider URL
 
     const tokenAmount = ethers.parseUnits(tokenSupply, 18); // 1,000,000 tokens with 18 decimals
-    const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
+    const wethAmount = ethers.parseUnits("0.0001", 18); // 0.01 WETH
 
     // Call the deployToken function of the factory contract
     const tx = await factory.deployToken(tokenName, tokenSymbol, tokenSupply);  //DEPLOY

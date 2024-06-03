@@ -23,7 +23,7 @@ function DashboardPage() {
     const [isPoolInitializing, setIsPoolInitializing] = useState(false);
     const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
 
-    const factoryAddress = "0x248fBeBECe799dCc05bD0E22190d62f0c4e983d1"; //sepolia
+    const factoryAddress = "0x6b2e54664164b146217c3cddeb1737da9c91409a"; //sepolia
     const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; //sepolia
             
     useEffect(() => {
