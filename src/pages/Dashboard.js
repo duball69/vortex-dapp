@@ -23,6 +23,9 @@ function DashboardPage() {
     const [isPoolInitializing, setIsPoolInitializing] = useState(false);
     const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
 
+    const factoryAddress = "0x248fBeBECe799dCc05bD0E22190d62f0c4e983d1"; //sepolia
+    const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; //sepolia
+            
     useEffect(() => {
         const savedPoolAddress = localStorage.getItem('deployedPoolAddress');
         if (savedPoolAddress) {
@@ -84,7 +87,6 @@ function DashboardPage() {
             const signer = await provider.getSigner();
             console.log("Using account:", await signer.getAddress());
     
-            const factoryAddress = "0x29F2D1De98A37D8ba0948186DacA7f1d2814239B";
             const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
     
             let token0, token1;
@@ -171,7 +173,7 @@ function DashboardPage() {
     
         
         let token0, token1, token0Amount, token1Amount;
-            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
+           
             console.log(tokenDetails.supply);
            
             const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
@@ -194,7 +196,7 @@ function DashboardPage() {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            const factoryContract = new ethers.Contract('0x29F2D1De98A37D8ba0948186DacA7f1d2814239B', MyFactoryJson.abi, signer);
+            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
             const txResponse = await factoryContract.initializePool(deployedPoolAddress, sqrtPriceX96);
             await txResponse.wait();
             console.log("Pool initialized successfully!");
@@ -219,11 +221,11 @@ function DashboardPage() {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            const factoryContract = new ethers.Contract('0x29F2D1De98A37D8ba0948186DacA7f1d2814239B', MyFactoryJson.abi, signer);
+            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
             
             // Determine tokens and their amounts based on address comparison
             let token0, token1, token0Amount, token1Amount;
-            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
+            
             const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
             const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
     
