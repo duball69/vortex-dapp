@@ -1,6 +1,23 @@
-/*
-//const { ethers } = require("ethers");
 const fs = require("fs");
+
+// Array to store deployed token contract addresses
+const deployedTokenAddresses = [];
+
+
+async function getTokenDeployedEvent(token, factoryAddress) {
+    // Get the filter for the TokenDeployed event
+    const filter = token.filters.TokenDeployed();
+
+    // Query the filter for events emitted by the token contract
+    const events = await token.queryFilter(filter);
+
+    // Find the TokenDeployed event emitted by the token contract
+    const tokenDeployedEvent = events[events.length - 1]; // Get the latest event
+
+    return tokenDeployedEvent;
+}
+
+
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -19,39 +36,41 @@ async function main() {
     const factoryAbi = myFactoryJson.abi;
 
     // Replace this with the address of the deployed factory contract
-    const factoryAddress = "0x8073bef1728a47dA7C370842A1D2a41af7761a0c";
+    //const factoryAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; local one
+    //const factoryAddress = "0xf490f0ceeeb9AC8295797DB594b9827CAAacdAFC";  //this one has 1 weth + 0.6sepolia eth + tokens
+    const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6";
 
     // Connect to the factory contract using its ABI and address
     const Factory = await ethers.getContractFactory("MyFactory");
     const factory = await Factory.attach(factoryAddress);
     
+
+    // Retrieve the contract address of the deployed token
+    const provider = ethers.getDefaultProvider(); // Update with your WebSocket provider URL
+    const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, provider);
+
     // Call the deployToken function of the factory contract
     const tx = await factory.deployToken(tokenName, tokenSymbol, tokenSupply);
 
     // Wait for the transaction to be mined
     const receipt = await tx.wait();
-    console.log("Token deployed successfully!"); 
-// Log all events emitted during the transaction
-
-// Check if receipt contains logs
-if (receipt.logs && receipt.logs.length > 0) {
-    // Parse logs to find the TokenDeployed event
-    const tokenDeployedEvent = receipt.logs.find(
-        (log) => log.address.toLowerCase() === factoryAddress.toLowerCase() &&
-                  log.topics[0] === '0x91d24864a084ab70b268a1f865e757ca12006cf298d763b6be697302ef86498c' // keccak256 hash of the event signature
-    );
+    console.log("Token deployed successfully!");   
+    
+    // Get the TokenDeployed event emitted by the token contract
+    const tokenDeployedEvent = await getTokenDeployedEvent(factory);
 
     if (tokenDeployedEvent) {
-        // Extract the token address from the event data
-        const tokenAddress = tokenDeployedEvent.args[0]; // Assuming the token address is the first argument
-        console.log('Your new contract address is:', tokenAddress);
+        const tokenAddress = tokenDeployedEvent.args[0];
+        console.log('Token deployed at:', tokenAddress);
+        // Store the deployed token address
+        deployedTokenAddresses.push(tokenAddress);
     } else {
-        console.error('Token deployment event not found in transaction receipt');
+        console.error('Token deployment event not found');
     }
-    
-} else {
-    console.error('No logs found in transaction receipt');
-}
+
+    // Output all deployed token addresses
+    console.log('Deployed token addresses:', deployedTokenAddresses);
+
 }
 
 main()
@@ -60,7 +79,3 @@ main()
         console.error(error);
         process.exit(1);
     });
-
-
-     }
-*/

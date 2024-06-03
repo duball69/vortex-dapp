@@ -5,20 +5,27 @@ require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.24",
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 1000,
+  solidity: {
+    version: "0.8.24",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+      viaIR: true
+    }
+  },
+  networks: {
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL,
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY],
+    },
+    base: {
+      url: process.env.BASE_RPC_URL,
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY],
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545", // This is the default URL for the Hardhat node
     },
   },
-    networks:{
-      sepolia:{
-        url: process.env.ALCHEMY_SEPOLIA_ENDPOINT,
-        accounts: [process.env.SEPOLIA_PRIVATE_KEY],
-              },
-      localhost: {
-        url: "http://127.0.0.1:8545", // This is the default URL for the Hardhat node
-                 },
-},
 };

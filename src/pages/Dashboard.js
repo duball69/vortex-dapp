@@ -10,6 +10,7 @@ import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { firestore } from '../components/firebaseConfig.js';
+import { typeImplementation } from '@testing-library/user-event/dist/type/typeImplementation.js';
 /* global BigInt */
 
 function DashboardPage() {
@@ -19,41 +20,17 @@ function DashboardPage() {
     const { open, close } = useWeb3Modal();
     const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
     const [isCreatingPair, setIsCreatingPair] = useState(false);
+    const [isPoolInitializing, setIsPoolInitializing] = useState(false);
+    const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
 
-    function sqrtBigInt(value) {
-        if (value < 0n) {
-            throw new Error("Square root of negative numbers is not supported");
+    useEffect(() => {
+        const savedPoolAddress = localStorage.getItem('deployedPoolAddress');
+        if (savedPoolAddress) {
+            setDeployedPoolAddress(savedPoolAddress);
         }
-        if (value === 0n) return 0n;
-        let z = value;
-        let x = (value / 2n) + 1n;
-        while (x < z) {
-            z = x;
-            x = (value / x + x) / 2n;
-        }
-        return z;
-    }
-    
-    function calculateSqrtPriceX96(token1Amount, token0Amount) {
-        // Use BigInt for price ratio calculations to ensure precision
-        const token1AmountBigInt = BigInt(token1Amount);
-        const token0AmountBigInt = BigInt(token0Amount);
-    
-        // Calculate the price ratio as token1 / token0, scaled up to maintain precision
-        const priceRatio = (token1AmountBigInt * 10n**14n) / token0AmountBigInt;
-    
-        // Calculate the square root of the price ratio
-        const sqrtPriceRatio = sqrtBigInt(priceRatio);
-    
-        // Now calculate sqrtPriceX96   
-        const sqrtPriceX96 = (sqrtPriceRatio * 2n**96n) / 10n**9n;
-    
-        return sqrtPriceX96;
-    }
-    
-  
-  
-  
+        fetchTokenDetails();
+    }, [contractAddress, isConnected]); // Dependencies adjusted as per usage
+
   
   
     async function connectWallet() {
@@ -64,6 +41,7 @@ function DashboardPage() {
         }
     }
 
+  
     async function fetchTokenDetails() {
         if (!contractAddress || !isConnected) return;
     
@@ -93,36 +71,40 @@ function DashboardPage() {
         });
     }
     
-    
     async function createPair() {
-        if (!contractAddress || !isConnected) return;
+        if (!contractAddress || !isConnected) {
+            console.error("createPair called without a connected wallet or valid contract address.");
+            return;
+        }
+    
+        setIsCreatingPair(true);
     
         try {
-            // Check if wallet is connected
-            if (!isConnected) {
-                console.error("Wallet is not connected");
-                return;
-            }
-
-            setIsCreatingPair(true); 
-    
-            // Get the signer from the provider
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            console.log("Account:", await signer.getAddress()); 
+            console.log("Using account:", await signer.getAddress());
     
-            // Prepare contract interaction with factory contract
-            const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6"; // Replace with your actual factory contract address
-            const factoryAbi = MyFactoryJson.abi;
-            const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
+            const factoryAddress = "0x29F2D1De98A37D8ba0948186DacA7f1d2814239B";
+            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
     
-            // Call the function to create the pair on the factory contract
-            const txResponse = await factoryContract.createPoolForToken(contractAddress);
-            console.log("Transaction sent: ", txResponse.hash);
+            let token0, token1;
+            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
     
+            if (contractAddress.toLowerCase() < WETH_address.toLowerCase()) {
+                token0 = contractAddress;
+                token1 = WETH_address;
+               
+            } else {
+                token0 = WETH_address;
+                token1 = contractAddress;
+     }
+    
+    
+            console.log(`Attempting to create pool with token0: ${token0} and token1: ${token1}`);
+            const txResponse = await factoryContract.createPoolForToken(token0, token1);
             // Wait for the transaction to be mined
             const receipt = await txResponse.wait();
-            console.log("Block number: ", receipt.blockNumber);
+      
     
             // Accessing logs for emitted events
             const logs = receipt.logs;
@@ -144,37 +126,89 @@ function DashboardPage() {
         }
     }
 
-    const initializePool = async (token1Amount, token0Amount) => {
-        if (!deployedPoolAddress || !isConnected) return;
+
     
+    function calculateSqrtPriceX96(token1Amount, token0Amount) {
+
+        
+        console.log("Token0amount:",token0Amount);
+        console.log("Token1amount:",token1Amount);   
+        
+        
+        // Calculate the price ratio as token1 / token0, scaled up by 10^18 to maintain precision
+        const priceRatio = BigInt(token1Amount)* BigInt(10 ** 18) / BigInt(token0Amount);
+   
+        console.log("Price ratio:",priceRatio);
+    
+        // Calculate the square root of the price ratio, convert it to a number to handle floating-point operations
+        const sqrtPriceRatio = Math.sqrt(Number(priceRatio));
+    console.log(sqrtPriceRatio);
+    console.log("sqrtpricerati:",sqrtPriceRatio)
+        // Adjust the floating point result before converting it back to BigInt
+        const adjustedSqrtPriceRatio = Math.floor(sqrtPriceRatio * 10 ** 9); // Adjust by scaling up to preserve precision
+    
+        // Convert the adjusted result to BigInt and then scale it to sqrtPriceX96 format
+        const sqrtPriceX96 = BigInt(adjustedSqrtPriceRatio) * BigInt(2 ** 96) / BigInt(10 ** 18);
+    console.log("sqrtpriceratio96:",sqrtPriceX96)
+        return sqrtPriceX96.toString();  // Return as string to avoid further BigInt conversion issues in ethers.js
+
+
+        
+    }
+    
+    
+
+    async function initializePool() {
+        if (!deployedPoolAddress || !tokenDetails.supply) {
+            console.error("Both pool address and token supply are required.");
+
+            setIsPoolInitializing(false);
+        
+            return;
+        }
+    
+        setIsPoolInitializing(true);
+    
+        
+        let token0, token1, token0Amount, token1Amount;
+            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
+            console.log(tokenDetails.supply);
+           
+            const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
+            const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
+    
+
+        if (contractAddress.toLowerCase() < WETH_address.toLowerCase()) {
+            token0 = contractAddress;
+            token1 = WETH_address;
+            token0Amount = tokenAmount;
+            token1Amount = wethAmount;
+        } else {
+            token0 = WETH_address;
+            token1 = contractAddress; 
+            token0Amount = wethAmount;
+            token1Amount = tokenAmount;
+        }
+
+        const sqrtPriceX96 = calculateSqrtPriceX96(token1Amount.toString(), token0Amount.toString());
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6"; // Replace with your actual factory contract address
-            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
-            console.log(deployedPoolAddress);
-
-            
-            const token1Amount = ethers.parseUnits(String(tokenDetails.supply)); // Assuming this is a string of total supply in wei
-            console.log("Token Supply to add:", token1Amount); //working
-            const token0Amount = ethers.parseUnits("0.01", 18); 
-            console.log("WETH to add to LP:",token0Amount);
-            
-            if (!token1Amount || !token0Amount) {
-                console.error("Token amounts must be provided");
-                return;
-            }
-    
-            const sqrtPriceX96 = calculateSqrtPriceX96(token1Amount, token0Amount); // Ensure these are passed correctly
-            console.log(sqrtPriceX96);
-            const initializeResponse = await factoryContract.initializePool(deployedPoolAddress, sqrtPriceX96);
-            await initializeResponse.wait();
+            const factoryContract = new ethers.Contract('0x29F2D1De98A37D8ba0948186DacA7f1d2814239B', MyFactoryJson.abi, signer);
+            const txResponse = await factoryContract.initializePool(deployedPoolAddress, sqrtPriceX96);
+            await txResponse.wait();
             console.log("Pool initialized successfully!");
         } catch (error) {
-            console.error("Error initializing pool:", error);
+            console.error("Failed to initialize pool:", error);
+            setIsPoolInitializing(false);
+        
+            // Handle specific failure actions here if necessary
+        } finally {
+            // Always stop showing "Initializing..." regardless of success or failure
+            setIsPoolInitializing(false);
         }
-    };
-    
+    }    
+
 
     async function addLiquidity() {
         if (!deployedPoolAddress || !isConnected) {
@@ -185,33 +219,50 @@ function DashboardPage() {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            const factoryAddress = "0x5f0Cc56D44596396E70F619e21CbB8F9eB1641D6"; 
-            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
-
-            const positionManager_address = "0x1238536071E1c677A632429e3655c799b22cDA52";
-            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; 
+            const factoryContract = new ethers.Contract('0x29F2D1De98A37D8ba0948186DacA7f1d2814239B', MyFactoryJson.abi, signer);
+            
+            // Determine tokens and their amounts based on address comparison
+            let token0, token1, token0Amount, token1Amount;
+            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
+            const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
+            const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
     
-            // Assuming these amounts are defined or passed in from component state
-            const tokenAmount = ethers.parseUnits(String(tokenDetails.supply)); // Assume tokenDetails.supply is available
-            console.log(tokenAmount);
-            const wethAmount = ethers.parseUnits("0.01", 18); // Fixed amount of WETH to be used
+            if (contractAddress.toLowerCase() < WETH_address.toLowerCase()) {
+                token0 = contractAddress;
+                token1 = WETH_address;
+                token0Amount = tokenAmount;
+                token1Amount = wethAmount;
+            } else {
+                token0 = WETH_address;
+                token1 = contractAddress;
+                token0Amount = wethAmount;
+                token1Amount = tokenAmount;
+            }
+    
+            console.log(`Adding liquidity with token0: ${token0} (amount: ${token0Amount.toString()}) and token1: ${token1} (amount: ${token1Amount.toString()})`);
     
             // Approve the tokens for the factory contract
-            await factoryContract.approveToken(contractAddress, positionManager_address, tokenAmount);
-            await factoryContract.approveToken(WETH_address, positionManager_address, wethAmount);
+            await factoryContract.approveToken(token0, deployedPoolAddress, token0Amount);
+            await factoryContract.approveToken(token1, deployedPoolAddress, token1Amount);
     
-            // Add liquidity using the simplified method similar to your script
-            const tx = await factoryContract.addInitialLiquidity(contractAddress, deployedPoolAddress, factoryAddress, tokenAmount, wethAmount, {
-                gasLimit: 5000000 // Higher gas limit
-            });
+            // Add liquidity using the simplified method
+            const tx = await factoryContract.addInitialLiquidity(
+                token0,
+                token1,
+                deployedPoolAddress,
+                token0Amount,
+                token1Amount,
+                {
+                    gasLimit: 5000000 // Higher gas limit if necessary
+                }
+            );
             await tx.wait();
-    
             console.log("Liquidity added successfully!");
-    
         } catch (error) {
             console.error("Error adding liquidity:", error);
         }
-    };
+    }
+    
     
     
 
@@ -251,13 +302,15 @@ function DashboardPage() {
             )}
         </div>
 
-        <button onClick={initializePool} className="deploy-button">
-            Initialize Pool
-            </button>
+        <button disabled={isPoolInitializing} className="deploy-button" onClick={initializePool}>
+    {isPoolInitializing ? 'Initializing...' : 'Initialize Pool'}
+</button>
 
-            <button onClick={addLiquidity} className="deploy-button">
-            Get LP
-            </button>
+        
+            <button disabled={isAddingLiquidity} className="deploy-button" onClick={addLiquidity}>
+    {isAddingLiquidity ? 'Adding Liquidity...' : 'Add Liquidity'}
+</button>
+
         {deployedPoolAddress && (
             <p>Your new deployed pool address is: <a href={`https://sepolia.etherscan.io/address/${deployedPoolAddress}`} target="_blank">{deployedPoolAddress}</a></p>
         )}
@@ -272,4 +325,3 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
-

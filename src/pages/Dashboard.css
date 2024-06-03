@@ -13,6 +13,22 @@
     color: #fff;
   }
 
+  .white-text {
+    color: white;
+}
+
+.white-text a {color:white;}
+
+.subtitledashboard{margin-bottom:30px;
+  margin-top:10px;}
+
+  .titledashboard{padding:10px;
+margin-top:1px;
+}
+
+.main-dashboard-text{margin-bottom:10px;
+padding:10px;}
+
   .token-image {
     max-width: 100px; /* Set the maximum width to 100px or any size you prefer */
     height: auto; /* Maintain the aspect ratio */
@@ -23,6 +39,7 @@
   
   .wallet-status {
     margin-bottom: 20px;
+    margin-top:50px;
   }
   
   .wallet-status p {

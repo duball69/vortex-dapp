@@ -7,6 +7,8 @@ import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.s
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+//import "@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol";
 
 
 
@@ -23,19 +25,23 @@ contract MyFactory {
     INonfungiblePositionManager public positionManager;
     address public weth;
     IUniswapV3Factory public uniswapFactory;
+    ISwapRouter public swapRouter; // Add the SwapRouter variable
     
     event TokenDeployed(address indexed tokenAddress);
-    event PoolCreated(address indexed tokenAddress, address indexed poolAddress);
+    event PoolCreated(address indexed token0, address indexed poolAddress);
     event PoolInitialized(address indexed poolAddress, uint160 sqrtPriceX96);
     event TokenApproved(address indexed tokenAddress, address indexed poolAddress);
     event LiquidityAdded(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount);
+    event LiquidityRemoved(address indexed token, uint256 tokenId, uint256 amount0, uint256 amount1);
     event LiquidityAdditionFailed(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount, string error);
+    event FeesCollected(address indexed token, uint256 amount0, uint256 amount1);
+    event SwappedToWETH(address indexed token, uint256 amountIn, uint256 amountOut);
 
-
-    constructor(address _positionManager, address _weth, address _uniswapFactory) {
+    constructor(address _positionManager, address _weth, address _uniswapFactory, address _swapRouter) {
         positionManager = INonfungiblePositionManager(_positionManager);
         weth = _weth;
         uniswapFactory = IUniswapV3Factory(_uniswapFactory);
+        swapRouter = ISwapRouter(_swapRouter);
     }
 
     function deployToken(
@@ -53,13 +59,15 @@ contract MyFactory {
         return tokenAddress;
     }
 
-    function createPoolForToken(address _token) external returns (address poolAddress) {
-    //require(tokenExists(_token), "Token does not exist");
+    function createPoolForToken(address _token0, address _token1) external returns (address poolAddress) {
+    //require(_token0 != _token1, "Tokens must be different");
 
-    poolAddress = uniswapFactory.getPool(_token, weth, 3000);
+    //(address token0, address token1) = _tokenA < _tokenB ? (_tokenA, _tokenB) : (_tokenB, _tokenA);
+
+    poolAddress = uniswapFactory.getPool(_token0, _token1, 10000);
     if (poolAddress == address(0)) {
-        poolAddress = uniswapFactory.createPool(_token, weth, 3000);
-        emit PoolCreated(_token, poolAddress);
+        poolAddress = uniswapFactory.createPool(_token0, _token1, 10000);
+        emit PoolCreated(_token0, poolAddress);
     }
         return poolAddress;
     }
@@ -68,6 +76,11 @@ contract MyFactory {
     function initializePool(address poolAddress, uint160 sqrtPriceX96) external {
         IUniswapV3Pool(poolAddress).initialize(sqrtPriceX96);
         emit PoolInitialized(poolAddress, sqrtPriceX96);
+    }
+
+    // Function to get the pool address
+    function get_Pool(address tokenA, address tokenB, uint24 fee) external view returns (address pool) {
+        pool = uniswapFactory.getPool(tokenA, tokenB, fee);
     }
 
 
@@ -95,47 +108,161 @@ contract MyFactory {
 }
     
 
-    function addInitialLiquidity(address _token, address _pool, address factory_addy, uint256 _tokenAmount, uint256 _wethAmount) external {
-
-    //uint256 tokenAmount = _tokenAmount * 10**18;
-    //uint256 wethAmount = _wethAmount * 10**18; 
-    //uint256 wethAmountInWei = 0.1 * 10**18; // Assuming you want to add 0.1 ETH to liquidity
-
-    emit TokenApproved(_token, _pool);
-
-    require(IERC20(_token).balanceOf(address(this)) >= _tokenAmount, "Not enough token balance");
-    require(IERC20(weth).balanceOf(address(this)) >= _wethAmount, "Not enough WETH balance");
+    function addInitialLiquidity(address _token0, address _token1, address factory_addy, uint256 _token0Amount, uint256 _token1Amount) external {
 
     // Approve the position manager to spend tokens
-    TransferHelper.safeApprove(_token, address(positionManager), _tokenAmount);
-    TransferHelper.safeApprove(weth, address(positionManager), _wethAmount);
+    TransferHelper.safeApprove(_token0, address(positionManager), _token0Amount);
+    TransferHelper.safeApprove(_token1, address(positionManager), _token1Amount);
 
     // Log the parameters before attempting to mint
-    emit LiquidityAdded(_token, _pool, _tokenAmount, _wethAmount);
+    //emit LiquidityAdded(_token0, _token1, _tokenAmount, _wethAmount);
 
     try positionManager.mint(
             INonfungiblePositionManager.MintParams({
-                token0: _token,
-                token1: weth,
-                fee: 3000,
-                tickLower: -887220,
-                tickUpper: 887220,
-                amount0Desired: _tokenAmount,
-                amount1Desired: _wethAmount,
+                token0: _token0,
+                token1: _token1,
+                fee: 10000,
+                tickLower: -887200,
+                tickUpper: 887200,
+                amount0Desired: _token0Amount,
+                amount1Desired: _token1Amount,
                 amount0Min: 0,
                 amount1Min: 0,
                 recipient: factory_addy,
                 deadline: block.timestamp + 5 minutes
             })
         ) returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
-            emit LiquidityAdded(_token, address(positionManager), _tokenAmount, _wethAmount);
+            emit LiquidityAdded(_token0, address(positionManager), _token0Amount, _token1Amount);
         } catch Error(string memory reason) {
-            emit LiquidityAdditionFailed(_token, address(positionManager), _tokenAmount, _wethAmount, reason);
+            emit LiquidityAdditionFailed(_token0, address(positionManager), _token0Amount, _token1Amount, reason);
         } catch (bytes memory lowLevelData) {
-            emit LiquidityAdditionFailed(_token, address(positionManager), _tokenAmount, _wethAmount, "Low-level error");
+            emit LiquidityAdditionFailed(_token0, address(positionManager), _token0Amount, _token1Amount, "Low-level error");
         }
     }
+
+    function removeLiquidity(uint256 tokenId, uint128 liquidityToRemove) external {
+        // Decrease liquidity
+        (uint256 amount0, uint256 amount1) = positionManager.decreaseLiquidity(
+            INonfungiblePositionManager.DecreaseLiquidityParams({
+                tokenId: tokenId,
+                liquidity: liquidityToRemove,
+                amount0Min: 0,
+                amount1Min: 0,
+                deadline: block.timestamp
+            })
+        );
+
+        // Collect the tokens from the position
+        (uint256 collectedAmount0, uint256 collectedAmount1) = positionManager.collect(
+            INonfungiblePositionManager.CollectParams({
+                tokenId: tokenId,
+                recipient: address(this),
+                amount0Max: type(uint128).max,
+                amount1Max: type(uint128).max
+            })
+        );
+
+        emit LiquidityRemoved(msg.sender, tokenId, collectedAmount0, collectedAmount1);
+    }
+
+
+    function getPosition(uint256 tokenId) external view returns (
+    uint96 nonce,
+    address operator,
+    address token0,
+    address token1,
+    uint24 fee,
+    int24 tickLower,
+    int24 tickUpper,
+    uint128 liquidity,
+    uint256 feeGrowthInside0LastX128,
+    uint256 feeGrowthInside1LastX128,
+    uint128 tokensOwed0,
+    uint128 tokensOwed1
+) {
+    return positionManager.positions(tokenId);
 }
+
+// Function to perform a swap from ETH to token
+    function swapETHForToken(address tokenOut, uint amount_In) external payable returns (uint amountOut) {
+        
+        // Convert ETH to WETH
+        IWETH(weth).deposit{value: amount_In}();
+
+        // Approve the router to spend WETH
+        TransferHelper.safeApprove(weth, address(swapRouter), amount_In);
+
+        ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: weth,
+                tokenOut: tokenOut,
+                fee: 10000,
+                recipient: msg.sender,
+                deadline: block.timestamp,
+                amountIn: amount_In,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+
+        amountOut = swapRouter.exactInputSingle(params);
+    }
+
+
+    function _swapTokenForWETH(address token, uint256 amountIn) internal {
+        //require(IERC20(token).approve(address(swapRouter), amountIn), "Approval failed");
+
+        // Approve the router to spend DAI.
+        TransferHelper.safeApprove(weth, address(swapRouter), amountIn);
+
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
+            tokenIn: token,
+            tokenOut: weth,
+            fee: 10000,
+            recipient: address(this),
+            deadline: block.timestamp + 15,
+            amountIn: amountIn,
+            amountOutMinimum: 0,
+            sqrtPriceLimitX96: 0
+        });
+
+        uint256 amountOut = swapRouter.exactInputSingle(params);
+        emit SwappedToWETH(token, amountIn, amountOut);
+    }
+
+
+function collectFeesAndSwap(uint256 tokenId) external {
+        // Collect the fees from the position
+        (uint256 amount0, uint256 amount1) = positionManager.collect(
+            INonfungiblePositionManager.CollectParams({
+                tokenId: tokenId,
+                recipient: address(this),
+                amount0Max: type(uint128).max,
+                amount1Max: type(uint128).max
+            })
+        );
+        emit FeesCollected(address(this), amount0, amount1);
+
+    }
+
+
+}
+
+
+/*interface ISwapRouter is IUniswapV3SwapCallback {
+    struct ExactInputSingleParams {
+        address tokenIn;
+        address tokenOut;
+        uint24 fee;
+        address recipient;
+        uint256 deadline;
+        uint256 amountIn;
+        uint256 amountOutMinimum;
+        uint160 sqrtPriceLimitX96;
+    }
+
+    function exactInputSingle(ExactInputSingleParams calldata params) external payable returns (uint256 amountOut);
+}*/
+
 
 interface IWETH {
     function deposit() external payable;

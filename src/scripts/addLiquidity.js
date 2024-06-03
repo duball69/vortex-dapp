@@ -44,16 +44,16 @@ async function main() {
     console.log("Interacting with the factory contract using the account:", deployer.address);
 
     // Replace this with the address of the deployed factory contract
-    const factoryAddress = "0xb16b40b5d1F9B7478B3ffF43487042546aDbAa85";
+    const factoryAddress = "0x0C72947fdb04CeB13d986B3b8aCdeb5BB4EfeC0f";
 
     // Connect to the factory contract using its ABI and address
     const Factory = await ethers.getContractFactory("MyFactory");
     const factory = await Factory.attach(factoryAddress);
 
-    const tokenAddress = "0x1e4114b68d6becB1a4ac2dC4b7A672f27798a66D";
+    const tokenAddress = "0x0BCb8eec818BbE53F89604deabfECACB1dAa2A93";
 
     //const pool_Address = "0x1c00Afa3Ba73471359661C537c036CA5915A4330";
-    const pool_Address = "0x259Ac28B1c2FCb1a40fD0c6322Dc7C71BDa3813D";
+    const pool_Address = "0xEcFD252e136E2E83C570EAeC94fDe4A2a6352db5";
 
     const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
     const positionManager_address = "0x1238536071E1c677A632429e3655c799b22cDA52";
@@ -70,8 +70,8 @@ async function main() {
 
 
     // Initialize the pool
-    const initializeTx = await factory.initializePool(pool_Address, sqrtPriceX96);
-    await initializeTx.wait();
+    //const initializeTx = await factory.initializePool(pool_Address, sqrtPriceX96);
+    //await initializeTx.wait();
 
 
     // Approve tokens for the factory contract

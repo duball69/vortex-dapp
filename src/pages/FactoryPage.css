@@ -20,6 +20,8 @@ html, body {
     font-weight: 300;
 }
 
+.token_address_message{   color: white;}
+.token_address_message a{color:white;}
 .factory-container {
     max-width: 600px;
     
