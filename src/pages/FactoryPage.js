@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ethers,  BrowserProvider } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json";
 import './FactoryPage.css';
@@ -8,8 +8,6 @@ import Header from '../components/Header.js';
 import Footer from '../components/Footer.js';
 import { firestore } from '../components/firebaseConfig.js';
 import { collection, doc, setDoc, deleteDoc, getDocs, getDoc, updateDoc } from 'firebase/firestore';
-
-
 const projectId = '9513bcef54af049b9471faff11d5a16a';
 
 const networkConfig = {
@@ -126,8 +124,19 @@ function FactoryPage() {
     const [deployedContractAddress, setDeployedContractAddress] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(""); 
+    const [isInitialized, setIsInitialized] = useState(false);
+    const factoryChainAddress = networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
+         
+    
+      // Effect to log and set factory address only when chainId changes
+      useEffect(() => {
+        if (!isInitialized && chainId) {
+          console.log("Factory Address initialized:", factoryChainAddress);
+          setIsInitialized(true); // Prevent further initialization logs
+        }
+      }, [chainId, isInitialized]); 
 
-  
+      
     async function connectWallet() {
         try {
             open(); // Open the Web3Modal modal
@@ -177,9 +186,8 @@ function FactoryPage() {
             console.log("Account:", await signer.getAddress()); 
     
     
-            const factoryAddress = networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
             const factoryAbi = MyFactoryJson.abi;
-            const factoryContract = new ethers.Contract(factoryAddress, factoryAbi, signer);
+            const factoryContract = new ethers.Contract(factoryChainAddress, factoryAbi, signer);
         
             // Create transaction data for deploying the contract
             const txResponse = await factoryContract.deployToken(tokenName, tokenSymbol, tokenSupply);

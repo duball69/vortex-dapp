@@ -13,6 +13,21 @@ import { firestore } from '../components/firebaseConfig.js';
 import { typeImplementation } from '@testing-library/user-event/dist/type/typeImplementation.js';
 /* global BigInt */
 
+
+
+const networkConfig = {
+    // Example Chain IDs for Base and Sepolia
+    8453: { // Mainnet (as an example; replace with the correct ID for "base")
+      factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+      WETH_address: "0x4200000000000000000000000000000000000006"
+    },
+    11155111: { // Sepolia Testnet Chain ID
+      factoryAddress: "0x6b2e54664164b146217c3cddeb1737da9c91409a",
+      WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"
+    }
+  };
+
+
 function DashboardPage() {
     const { contractAddress } = useParams(); // Get the contract address from the URL
     const [tokenDetails, setTokenDetails] = useState({ name: '', symbol: '', supply: ''});
@@ -22,9 +37,22 @@ function DashboardPage() {
     const [isCreatingPair, setIsCreatingPair] = useState(false);
     const [isPoolInitializing, setIsPoolInitializing] = useState(false);
     const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
+    const factoryChainAddress = networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
+    const WETH_ChainAddress = networkConfig[chainId]?.WETH_address || "DefaultWETHAddress";
 
-    const factoryAddress = "0x6b2e54664164b146217c3cddeb1737da9c91409a"; //sepolia
-    const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; //sepolia
+   
+    // Effect to log and set factory address only when chainId changes
+    useEffect(() => {
+        if (!isInitialized && chainId) {
+         
+          console.log("Factory Address initialized:", factoryChainAddress);
+          console.log("WETH Address initialized:", WETH_ChainAddress);
+          setIsInitialized(true); // Prevent further initialization logs
+        }
+      }, [chainId, isInitialized]); 
+    
+
             
     useEffect(() => {
         const savedPoolAddress = localStorage.getItem('deployedPoolAddress');
@@ -87,17 +115,17 @@ function DashboardPage() {
             const signer = await provider.getSigner();
             console.log("Using account:", await signer.getAddress());
     
-            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
+            const factoryContract = new ethers.Contract(factoryChainAddress, MyFactoryJson.abi, signer);
     
             let token0, token1;
-            const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
+            
     
-            if (contractAddress.toLowerCase() < WETH_address.toLowerCase()) {
+            if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
                 token0 = contractAddress;
-                token1 = WETH_address;
+                token1 = WETH_ChainAddress;
                
             } else {
-                token0 = WETH_address;
+                token0 = WETH_ChainAddress;
                 token1 = contractAddress;
      }
     
@@ -177,16 +205,16 @@ function DashboardPage() {
             console.log(tokenDetails.supply);
            
             const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-            const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
+            const wethAmount = ethers.parseUnits("0.0001", 18); // 0.01 WETH
     
 
-        if (contractAddress.toLowerCase() < WETH_address.toLowerCase()) {
+        if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
             token0 = contractAddress;
-            token1 = WETH_address;
+            token1 = WETH_ChainAddress;
             token0Amount = tokenAmount;
             token1Amount = wethAmount;
         } else {
-            token0 = WETH_address;
+            token0 = WETH_ChainAddress;
             token1 = contractAddress; 
             token0Amount = wethAmount;
             token1Amount = tokenAmount;
@@ -196,7 +224,7 @@ function DashboardPage() {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
+            const factoryContract = new ethers.Contract(factoryChainAddress, MyFactoryJson.abi, signer);
             const txResponse = await factoryContract.initializePool(deployedPoolAddress, sqrtPriceX96);
             await txResponse.wait();
             console.log("Pool initialized successfully!");
@@ -221,21 +249,21 @@ function DashboardPage() {
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
-            const factoryContract = new ethers.Contract(factoryAddress, MyFactoryJson.abi, signer);
+            const factoryContract = new ethers.Contract(factoryChainAddress, MyFactoryJson.abi, signer);
             
             // Determine tokens and their amounts based on address comparison
             let token0, token1, token0Amount, token1Amount;
             
             const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-            const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
+            const wethAmount = ethers.parseUnits("0.0001", 18); // 0.01 WETH
     
-            if (contractAddress.toLowerCase() < WETH_address.toLowerCase()) {
+            if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
                 token0 = contractAddress;
-                token1 = WETH_address;
+                token1 = WETH_ChainAddress;
                 token0Amount = tokenAmount;
                 token1Amount = wethAmount;
             } else {
-                token0 = WETH_address;
+                token0 = WETH_ChainAddress;
                 token1 = contractAddress;
                 token0Amount = wethAmount;
                 token1Amount = tokenAmount;
