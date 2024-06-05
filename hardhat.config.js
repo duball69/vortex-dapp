@@ -14,7 +14,13 @@ module.exports = {
       },
       viaIR: true
     }
+
   },
+
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+
   networks: {
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL,

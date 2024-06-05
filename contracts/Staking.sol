@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+// VortexDapp Staking v0.1
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -6,6 +8,9 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 contract SimpleStaking is ReentrancyGuard{
     mapping(address => uint256) public stakes;
     mapping(address => uint256) public rewardDebt;
+    address public factoryAddress;
+    address public weth;
+    address public owner;
     uint256 public totalStaked;
     uint256 public totalRewards;
     uint256 public accRewardPerShare; // Accumulated rewards per share, times 1e12 to prevent precision loss
@@ -17,28 +22,45 @@ contract SimpleStaking is ReentrancyGuard{
     event RewardsAdded(uint256 amount);
     event RewardClaimed(address indexed user, uint256 amount);
 
-    constructor() {
+ 
+  constructor(address _weth) {
+        owner = msg.sender;  // Set the deployer as the owner
         lastRewardTime = block.timestamp;
+        weth = _weth;
     }
 
-    function stake() external payable nonReentrant {
+
+function stake() external payable nonReentrant {
     require(msg.value > 0, "Cannot stake 0 ETH");
     updatePool();
 
+    // Convert the entire ETH amount to WETH
+    IWETH(weth).deposit{value: msg.value}();
+
+    uint256 factoryShare = (msg.value * 70) / 100; // 70% to factory
+    uint256 reserveShare = msg.value - factoryShare; // 30% stays in the contract as WETH
+
+    // Send 70% WETH to the factory address
+    require(IWETH(weth).transfer(factoryAddress, factoryShare), "Failed to send WETH to factory");
+
+    // Handle rewards and stake recording
     if (stakes[msg.sender] > 0) {
         uint256 pending = (stakes[msg.sender] * accRewardPerShare / 1e12) - rewardDebt[msg.sender];
         if (pending > 0) {
+            IWETH(weth).withdraw(pending);
             payable(msg.sender).transfer(pending);
             emit RewardClaimed(msg.sender, pending);
         }
     }
 
+    // Record the full amount staked, not just the reserve share
     stakes[msg.sender] += msg.value;
     totalStaked += msg.value;
     rewardDebt[msg.sender] = stakes[msg.sender] * accRewardPerShare / 1e12;
     
     emit Stake(msg.sender, msg.value);
 }
+
 
 
 function unstake(uint256 amount) external nonReentrant {
@@ -100,6 +122,21 @@ function unstake(uint256 amount) external nonReentrant {
         }
         return (stakes[_user] * _accRewardPerShare / 1e12) - rewardDebt[_user];
     }
+
+
+ 
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
+    }
+
+    function setFactoryAddress(address _factoryAddress) external onlyOwner {
+        factoryAddress = _factoryAddress;
+    }
+
+
+
 }
 
 
