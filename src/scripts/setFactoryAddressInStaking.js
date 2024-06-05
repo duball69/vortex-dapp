@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 
 async function main() {
   // The address of your deployed SimpleStaking contract
-  const stakingContractAddress = "0x05E658c7aDEc9ED46D95a5d4831ea090AC62b235";
+  const stakingContractAddress = "0xf234A8d33CeE3D3e084a5C47D3f87f32501BadAC";
 
   // The desired new factory address you want to set
   const newFactoryAddress = "0x6b2e54664164b146217c3cddeb1737da9c91409a"; //sepolia factory

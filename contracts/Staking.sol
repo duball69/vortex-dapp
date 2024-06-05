@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 contract SimpleStaking is ReentrancyGuard{
     mapping(address => uint256) public stakes;
     mapping(address => uint256) public rewardDebt;
+     mapping(address => uint256) public pendingUnstakes;
     address public factoryAddress;
     address public weth;
     address public owner;
@@ -17,10 +18,25 @@ contract SimpleStaking is ReentrancyGuard{
     uint256 public lastRewardTime;
     uint256 public constant REWARD_INTERVAL = 1 days; // Reward distribution interval
 
+
     event Stake(address indexed user, uint256 amount);
     event Unstake(address indexed user, uint256 amount);
     event RewardsAdded(uint256 amount);
     event RewardClaimed(address indexed user, uint256 amount);
+    event UnstakeQueued(address indexed user, uint256 amount, uint256 timestamp);
+    event UnstakeRequested(address indexed user, uint256 amount, uint256 pendingAmount);
+    event UnstakeProcessed(address indexed user, uint256 amount, uint256 pendingAmount);
+
+
+
+struct UnstakeRequest {
+    address user;
+    uint256 amount;
+    uint256 timestamp; // Optional, for tracking when the request was made
+}
+
+UnstakeRequest[] public unstakeQueue;
+
 
  
   constructor(address _weth) {
@@ -62,9 +78,10 @@ function stake() external payable nonReentrant {
 }
 
 
-
 function unstake(uint256 amount) external nonReentrant {
     require(stakes[msg.sender] >= amount, "Insufficient staked balance");
+    require(stakes[msg.sender] - pendingUnstakes[msg.sender] >= amount, "Unstake amount exceeds available balance");
+
     updatePool();
 
     uint256 wethBalance = IWETH(weth).balanceOf(address(this));
@@ -76,6 +93,7 @@ function unstake(uint256 amount) external nonReentrant {
         addToUnstakeQueue(msg.sender, amount);
     }
 }
+
 
 function processImmediateUnstake(address user, uint256 amount) internal {
     // Withdraw the WETH amount to this contract
@@ -94,9 +112,78 @@ function processImmediateUnstake(address user, uint256 amount) internal {
 
 
 function addToUnstakeQueue(address user, uint256 amount) internal {
-    // Logic to add the unstake request to a queue
-    // You might use a struct to hold unstake requests and an array to manage the queue
+    UnstakeRequest memory request = UnstakeRequest({
+        user: user,
+        amount: amount,
+        timestamp: block.timestamp  // Storing the timestamp can help with processing logic later if needed
+    });
+    unstakeQueue.push(request);
+    emit UnstakeQueued(user, amount, block.timestamp);  // Consider creating and emitting an event for a queued unstake request
 }
+
+
+function requestUnstake(uint256 amount) public nonReentrant {
+    require(stakes[msg.sender] >= amount, "Insufficient staked balance");
+    require(stakes[msg.sender] - pendingUnstakes[msg.sender] >= amount, "Unstake amount exceeds available balance");
+
+    pendingUnstakes[msg.sender] += amount; // Lock this amount for unstaking
+
+    uint256 wethBalance = IWETH(weth).balanceOf(address(this)); // Get current WETH balance
+
+    if (wethBalance < amount) {
+        addToUnstakeQueue(msg.sender, amount);
+    } else {
+        processUnstake(msg.sender, amount);
+    }
+
+    emit UnstakeRequested(msg.sender, amount, pendingUnstakes[msg.sender]);
+}
+
+
+    function processUnstake(address user, uint256 amount) internal {
+    require(pendingUnstakes[user] >= amount, "Requested amount exceeds pending unstakes.");
+    
+    uint256 amountToProcess = amount;
+    for (uint i = 0; i < unstakeQueue.length && amountToProcess > 0; i++) {
+        // Find the earliest request that matches the user and has not been fully processed
+        if (unstakeQueue[i].user == user && unstakeQueue[i].amount > 0) {
+            uint256 processAmount = (unstakeQueue[i].amount <= amountToProcess) ? unstakeQueue[i].amount : amountToProcess;
+            
+            // Process this amount
+            IWETH(weth).withdraw(processAmount);
+            payable(user).transfer(processAmount);
+
+            // Update the queue and the pending unstakes
+            unstakeQueue[i].amount -= processAmount;
+            amountToProcess -= processAmount;
+
+            emit UnstakeProcessed(user, processAmount, pendingUnstakes[user]);
+
+            // If the unstake request is fully processed, clear it
+            if (unstakeQueue[i].amount == 0) {
+                removeFromQueue(i);
+                i--; // Adjust index after removal
+            }
+        }
+    }
+
+    pendingUnstakes[user] -= amount;
+    totalStaked -= amount;
+    rewardDebt[user] = stakes[user] * accRewardPerShare / 1e12;
+}
+
+// Helper function to remove an entry from the queue by index
+function removeFromQueue(uint index) internal {
+    require(index < unstakeQueue.length, "Index out of bounds.");
+
+    for (uint i = index; i < unstakeQueue.length - 1; i++) {
+        unstakeQueue[i] = unstakeQueue[i + 1];
+    }
+    unstakeQueue.pop(); // Remove the last element after shifting
+}
+
+
+
 
     function getStake(address staker) external view returns (uint256) {
         return stakes[staker];
@@ -158,6 +245,43 @@ function addToUnstakeQueue(address user, uint256 amount) internal {
     function setFactoryAddress(address _factoryAddress) external onlyOwner {
         factoryAddress = _factoryAddress;
     }
+
+
+function handleReceivedWETH() public {
+    uint256 availableWETH = IWETH(weth).balanceOf(address(this));
+
+    // Iterate over the unstake queue to process requests.
+    uint i = 0;
+    while (i < unstakeQueue.length && availableWETH > 0) {
+        UnstakeRequest storage request = unstakeQueue[i];
+        
+        if (request.amount > 0 && pendingUnstakes[request.user] >= request.amount) {
+            uint256 amountToProcess = (availableWETH >= request.amount) ? request.amount : availableWETH;
+
+            // Process the unstake.
+            processUnstake(request.user, amountToProcess);
+
+            // Subtract the processed amount from available WETH.
+            availableWETH -= amountToProcess;
+        }
+        i++;
+    }
+
+
+}
+
+
+// Function to get the length of the unstake queue
+function getUnstakeQueueLength() public view returns (uint) {
+    return unstakeQueue.length;
+}
+
+// Function to get details of a request by index
+function getUnstakeRequest(uint index) public view returns (address user, uint256 amount, uint256 timestamp) {
+    require(index < unstakeQueue.length, "Index out of bounds");
+    UnstakeRequest storage request = unstakeQueue[index];
+    return (request.user, request.amount, request.timestamp);
+}
 
 
 
