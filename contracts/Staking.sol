@@ -64,24 +64,39 @@ function stake() external payable nonReentrant {
 
 
 function unstake(uint256 amount) external nonReentrant {
-    require(stakes[msg.sender] >= amount, "Insufficient balance to unstake");
+    require(stakes[msg.sender] >= amount, "Insufficient staked balance");
     updatePool();
 
-    uint256 pending = (stakes[msg.sender] * accRewardPerShare / 1e12) - rewardDebt[msg.sender];
-    if (pending > 0) {
-        payable(msg.sender).transfer(pending);
-        emit RewardClaimed(msg.sender, pending);
+    uint256 wethBalance = IWETH(weth).balanceOf(address(this));
+    if (wethBalance >= amount) {
+        // There is enough WETH in the pool to fulfill the unstake request immediately
+        processImmediateUnstake(msg.sender, amount);
+    } else {
+        // Not enough WETH available, add the request to the unstake queue
+        addToUnstakeQueue(msg.sender, amount);
     }
+}
 
-    stakes[msg.sender] -= amount;
+function processImmediateUnstake(address user, uint256 amount) internal {
+    // Withdraw the WETH amount to this contract
+    IWETH(weth).withdraw(amount);
+
+    // Transfer ETH to the user
+    payable(user).transfer(amount);
+
+    // Update the user's staked amount and total staked
+    stakes[user] -= amount;
     totalStaked -= amount;
-    rewardDebt[msg.sender] = stakes[msg.sender] * accRewardPerShare / 1e12;
+    rewardDebt[user] = stakes[user] * accRewardPerShare / 1e12;
 
-    payable(msg.sender).transfer(amount);
-    emit Unstake(msg.sender, amount);
+    emit Unstake(user, amount);
 }
 
 
+function addToUnstakeQueue(address user, uint256 amount) internal {
+    // Logic to add the unstake request to a queue
+    // You might use a struct to hold unstake requests and an array to manage the queue
+}
 
     function getStake(address staker) external view returns (uint256) {
         return stakes[staker];
@@ -124,7 +139,16 @@ function unstake(uint256 amount) external nonReentrant {
     }
 
 
- 
+ // Fallback function to receive Ether
+    fallback() external payable {
+        // Handle received Ether if necessary
+    }
+
+    // Receive function to handle incoming Ether
+    receive() external payable {
+        // Handle received Ether
+    }
+
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not the owner");
