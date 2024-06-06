@@ -171,80 +171,38 @@ function FactoryPage() {
 
   async function deployToken(e) {
     e.preventDefault();
-
     if (!isConnected) {
-      console.error("Wallet is not connected");
-      setError("Please connect wallet before trying to deploy a token.");
-      return; // Exits early if the wallet is not connected
+      setError(
+        "Please connect your wallet before attempting to deploy a token."
+      );
+      return;
     }
 
     setIsLoading(true);
 
-    let imageUrl = null;
-    if (tokenImage) {
-      imageUrl = await uploadImageToImgur(tokenImage); // Try uploading the image
-      if (!imageUrl) {
-        console.error("Failed to upload image to Imgur");
-        setError("Failed to upload image, proceeding without it.");
-        // Do not return here; just log the error and continue with deployment
-      } else {
-        setTokenImageUrl(imageUrl); // Store the image URL in state if upload was successful
-      }
-    }
-
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      console.log("Account:", await signer.getAddress());
-
-      const factoryAbi = MyFactoryJson.abi;
       const factoryContract = new ethers.Contract(
         factoryChainAddress,
-        factoryAbi,
+        MyFactoryJson.abi,
         signer
       );
 
-      // Create transaction data for deploying the contract
       const txResponse = await factoryContract.deployToken(
         tokenName,
         tokenSymbol,
         tokenSupply
       );
-      console.log("Transaction sent: ", txResponse.hash);
 
       // Wait for the transaction to be mined
       const receipt = await txResponse.wait();
-      console.log("Block number: ", receipt.blockNumber);
-
-      // Accessing logs for emitted events
-      const logs = receipt.logs;
-      console.log("Logs found: ", logs.length);
-
-      if (logs.length > 0) {
-        const contractAddress = logs[0].address;
-        console.log("Deployed Token Contract Address:", contractAddress);
-        setDeployedContractAddress(contractAddress);
-
-        const tokensCollection = collection(firestore, "tokens");
-        await setDoc(doc(tokensCollection, contractAddress), {
-          name: tokenName,
-          symbol: tokenSymbol,
-          supply: tokenSupply,
-          address: contractAddress,
-          imageUrl: imageUrl, // This may be null if the image failed to upload
-          deployer: connectedWallet,
-          chain: chainName,
-        });
-
-        console.log("Token data saved to Firestore");
-      } else {
-        console.error("No logs found in the transaction receipt.");
-      }
+      console.log("Transaction successful with receipt:", receipt);
     } catch (error) {
       console.error("Error during transaction:", error);
-      setError("Deployment failed: " + error.message);
+      setError("There was an error with the transaction. Please try again.");
     } finally {
-      setIsLoading(false); // Ensure loading is turned off whether there's an error or not
+      setIsLoading(false);
     }
   }
 
