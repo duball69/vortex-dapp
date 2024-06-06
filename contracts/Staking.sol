@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+
+
 contract SimpleStaking is ReentrancyGuard{
     mapping(address => uint256) public stakes;
     mapping(address => uint256) public rewardDebt;
@@ -119,8 +121,17 @@ function addToUnstakeQueue(address user, uint256 amount) internal {
     });
     unstakeQueue.push(request);
     emit UnstakeQueued(user, amount, block.timestamp);  // Consider creating and emitting an event for a queued unstake request
+
+
+      uint256 fundsNeeded = amount * 70 / 100;
+    notifyFactoryForFunds(fundsNeeded);
 }
 
+
+
+function notifyFactoryForFunds(uint256 amount) internal {
+    IFundsInterface(factoryAddress).notifyFundsNeeded(amount);
+}
 
 function requestUnstake(uint256 amount) public nonReentrant {
     require(stakes[msg.sender] >= amount, "Insufficient staked balance");
@@ -298,4 +309,8 @@ interface IWETH {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
     function balanceOf(address owner) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
+}
+
+interface IFundsInterface {
+    function notifyFundsNeeded(uint256 amount) external;
 }

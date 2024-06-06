@@ -42,6 +42,7 @@ contract MyFactory {
         weth = _weth;
         uniswapFactory = IUniswapV3Factory(_uniswapFactory);
         swapRouter = ISwapRouter(_swapRouter);
+         owner = msg.sender;
     }
 
     function deployToken(
@@ -243,6 +244,52 @@ function collectFeesAndSwap(uint256 tokenId) external {
         emit FeesCollected(address(this), amount0, amount1);
 
     }
+
+
+
+
+
+
+    //MUDANCAS MAKU - ADICIONAR AO CONTRATO DO DAVID
+
+address public stakingPoolAddress;
+address public wethAddress;
+address public owner;
+
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Caller is not the owner");
+        _;
+    }
+
+
+     function setStakingPoolAddress(address _stakingPoolAddress) external onlyOwner {
+        stakingPoolAddress = _stakingPoolAddress;
+    }
+
+
+    // Modifier to restrict function calls to the staking contract
+    modifier onlyStakingPool() {
+        require(msg.sender == stakingPoolAddress, "Caller is not the staking pool");
+        _;
+    }
+
+
+   
+   function notifyFundsNeeded(uint256 amountNeeded) external onlyStakingPool {
+    uint256 availableWETH = IWETH(weth).balanceOf(address(this));
+    uint256 amountToSend = (availableWETH >= amountNeeded) ? amountNeeded : availableWETH;
+    if (amountToSend > 0) {
+        sendWETHToStakingPool(amountToSend);
+    }
+}
+
+function sendWETHToStakingPool(uint256 amount) private  {
+    require(IWETH(weth).transfer(stakingPoolAddress, amount), "Failed to send WETH");
+}
+
+
+
 
 
 }

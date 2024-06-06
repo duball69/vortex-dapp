@@ -10,7 +10,7 @@ import SimpleStakingJson from "../contracts/SimpleStaking.json";
 import { firestore } from "../components/firebaseConfig.js";
 import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0xf234A8d33CeE3D3e084a5C47D3f87f32501BadAC";
+const STAKING_POOL_ADDRESS = "0x3787dA2ed434f4953251CC81767ED110C4ABC59B";
 
 const CHAIN_NAMES = {
   56: "BSC",

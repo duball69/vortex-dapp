@@ -27,12 +27,12 @@ const networkConfig = {
   // Example Chain IDs for Base and Sepolia
   8453: {
     // Mainnet (as an example; replace with the correct ID for "base")
-    factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x6b2e54664164b146217c3cddeb1737da9c91409a",
+    factoryAddress: "0xF0bb4F85F7EBAdF619EE149B296462df76F7256e",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
   },
 };
@@ -171,18 +171,28 @@ function FactoryPage() {
 
   async function deployToken(e) {
     e.preventDefault();
+
     if (!isConnected) {
-      setError(
-        "Please connect your wallet before attempting to deploy a token."
-      );
+      setError("Please connect your wallet before trying to deploy a token.");
       return;
     }
 
     setIsLoading(true);
 
+    let imageUrl = null;
+    if (tokenImage) {
+      imageUrl = await uploadImageToImgur(tokenImage);
+      if (!imageUrl) {
+        setError("Failed to upload image, proceeding without it.");
+      } else {
+        setTokenImageUrl(imageUrl);
+      }
+    }
+
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
+
       const factoryContract = new ethers.Contract(
         factoryChainAddress,
         MyFactoryJson.abi,
@@ -194,10 +204,25 @@ function FactoryPage() {
         tokenSymbol,
         tokenSupply
       );
-
-      // Wait for the transaction to be mined
       const receipt = await txResponse.wait();
-      console.log("Transaction successful with receipt:", receipt);
+
+      const logs = receipt.logs;
+      if (logs.length > 0) {
+        const deployedAddress = logs[0].address;
+        setDeployedContractAddress(deployedAddress);
+
+        // Save to Firestore
+        const tokensCollection = collection(firestore, "tokens");
+        await setDoc(doc(tokensCollection, deployedAddress), {
+          name: tokenName,
+          symbol: tokenSymbol,
+          supply: tokenSupply,
+          address: deployedAddress,
+          imageUrl: imageUrl,
+          deployer: connectedWallet,
+          chain: CHAIN_NAMES[chainId],
+        });
+      }
     } catch (error) {
       console.error("Error during transaction:", error);
       setError("There was an error with the transaction. Please try again.");
