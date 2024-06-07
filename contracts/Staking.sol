@@ -148,54 +148,12 @@ function requestUnstake(uint256 amount) public nonReentrant {
     if (wethBalance < amount) {
         addToUnstakeQueue(msg.sender, amount);
     } else {
-        processUnstake(msg.sender, amount);
+        processImmediateUnstake(msg.sender, amount);
     }
 
     emit UnstakeRequested(msg.sender, amount, pendingUnstakes[msg.sender]);
 }
 
-
-    function processUnstake(address user, uint256 amount) internal {
-    require(pendingUnstakes[user] >= amount, "Requested amount exceeds pending unstakes.");
-    
-    uint256 amountToProcess = amount;
-    for (uint i = 0; i < unstakeQueue.length && amountToProcess > 0; i++) {
-        // Find the earliest request that matches the user and has not been fully processed
-        if (unstakeQueue[i].user == user && unstakeQueue[i].amount > 0) {
-            uint256 processAmount = (unstakeQueue[i].amount <= amountToProcess) ? unstakeQueue[i].amount : amountToProcess;
-            
-            // Process this amount
-            IWETH(weth).withdraw(processAmount);
-            payable(user).transfer(processAmount);
-
-            // Update the queue and the pending unstakes
-            unstakeQueue[i].amount -= processAmount;
-            amountToProcess -= processAmount;
-
-            emit UnstakeProcessed(user, processAmount, pendingUnstakes[user]);
-
-            // If the unstake request is fully processed, clear it
-            if (unstakeQueue[i].amount == 0) {
-                removeFromQueue(i);
-                i--; // Adjust index after removal
-            }
-        }
-    }
-
-    pendingUnstakes[user] -= amount;
-    totalStaked -= amount;
-    rewardDebt[user] = stakes[user] * accRewardPerShare / 1e12;
-}
-
-// Helper function to remove an entry from the queue by index
-function removeFromQueue(uint index) internal {
-    require(index < unstakeQueue.length, "Index out of bounds.");
-
-    for (uint i = index; i < unstakeQueue.length - 1; i++) {
-        unstakeQueue[i] = unstakeQueue[i + 1];
-    }
-    unstakeQueue.pop(); // Remove the last element after shifting
-}
 
 
 
@@ -274,27 +232,53 @@ function removeFromQueue(uint index) internal {
 
 
 
+
+
+
+
+    event DebugAvailableWETH(uint256 availableWETH);
+    event DebugProcessAttempt(address user, uint256 amountToProcess);
+    event UnstakeRequestDetails(uint index, address user, uint256 amount, uint256 pendingUnstakes);
+    event WETHProcessed(address user, uint256 processedAmount, uint256 remainingWETH);
+    event ProcessUnstakeError(address user, uint256 requestedAmount, string error);
+  event FailedToProcessUnstake(address user, uint256 amount);
+  event FundsRequested(uint256 amount);
+
+
+
+
 function handleReceivedWETH() public {
     uint256 availableWETH = IWETH(weth).balanceOf(address(this));
+    emit DebugAvailableWETH(availableWETH);  // Log the available WETH balance
 
-    // Iterate over the unstake queue to process requests.
-    uint i = 0;
-    while (i < unstakeQueue.length && availableWETH > 0) {
-        UnstakeRequest storage request = unstakeQueue[i];
-        
-        if (request.amount > 0 && pendingUnstakes[request.user] >= request.amount) {
-            uint256 amountToProcess = (availableWETH >= request.amount) ? request.amount : availableWETH;
+    if (unstakeQueue.length > 0) {
+        UnstakeRequest storage request = unstakeQueue[0];  // Get the first request in the queue
+        emit UnstakeRequestDetails(0, request.user, request.amount, request.timestamp); // Log details of the request
 
-            // Process the unstake.
-            processUnstake(request.user, amountToProcess);
-
-            // Subtract the processed amount from available WETH.
-            availableWETH -= amountToProcess;
-        }
-        i++;
+        if (availableWETH >= request.amount) {
+            processImmediateUnstake(request.user, request.amount);  // Process the unstake immediately
+            removeFromQueue(0);  // Remove the processed request from the queue
+        } else {
+ uint256 wethShortfall = request.amount - availableWETH;
+            notifyFactoryForFunds(wethShortfall);  // Request the exact needed funds from the factory
+            emit FundsRequested(wethShortfall);  // Optionally log this event
+                    }
     }
+}
+
+function removeFromQueue(uint index) internal {
+    require(index < unstakeQueue.length, "Index out of bounds.");
+    unstakeQueue[index] = unstakeQueue[unstakeQueue.length - 1];
+    unstakeQueue.pop();  // Remove the last element after moving it to replace the processed one
+}
 
 
+
+
+
+function canProcessUnstake(address user, uint256 amount) internal view returns (bool) {
+    // Example check that needs to be tailored to actual requirements
+    return IWETH(weth).balanceOf(address(this)) >= amount && pendingUnstakes[user] >= amount;
 }
 
 
