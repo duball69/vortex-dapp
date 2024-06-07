@@ -284,9 +284,11 @@ address public owner;
     }
 }
 
-function sendWETHToStakingPool(uint256 amount) private  {
+function sendWETHToStakingPool(uint256 amount) private {
     require(IWETH(weth).transfer(stakingPoolAddress, amount), "Failed to send WETH");
+    IStaking(stakingPoolAddress).notifyFundsReceived(amount);
 }
+
 
 
 
@@ -320,4 +322,8 @@ interface IWETH {
     function transferFrom(address from, address to, uint256 value) external returns (bool);
     function balanceOf(address owner) external view returns (uint256);
     function allowance(address owner, address spender) external view returns (uint256);
+}
+
+interface IStaking {
+    function notifyFundsReceived(uint256 amount) external;
 }

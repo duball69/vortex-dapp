@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 
 async function fetchUnstakeQueue() {
-  const stakingContractAddress = "0xf234A8d33CeE3D3e084a5C47D3f87f32501BadAC";
+  const stakingContractAddress = "0xD0dABeEc540BdEB12B7796f0C937967d8574C49D";
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();

@@ -28,7 +28,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0xF0bb4F85F7EBAdF619EE149B296462df76F7256e",
+    factoryAddress: "0x15124CAa5c1c441e71B86f6432Cd181a8e88772f",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
   },
 };

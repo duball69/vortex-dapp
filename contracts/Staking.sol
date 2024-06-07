@@ -28,6 +28,8 @@ contract SimpleStaking is ReentrancyGuard{
     event UnstakeQueued(address indexed user, uint256 amount, uint256 timestamp);
     event UnstakeRequested(address indexed user, uint256 amount, uint256 pendingAmount);
     event UnstakeProcessed(address indexed user, uint256 amount, uint256 pendingAmount);
+    event FundsReceived(uint256 amount, uint256 timestamp);
+
 
 
 
@@ -132,6 +134,8 @@ function addToUnstakeQueue(address user, uint256 amount) internal {
 function notifyFactoryForFunds(uint256 amount) internal {
     IFundsInterface(factoryAddress).notifyFundsNeeded(amount);
 }
+
+
 
 function requestUnstake(uint256 amount) public nonReentrant {
     require(stakes[msg.sender] >= amount, "Insufficient staked balance");
@@ -256,6 +260,18 @@ function removeFromQueue(uint index) internal {
     function setFactoryAddress(address _factoryAddress) external onlyOwner {
         factoryAddress = _factoryAddress;
     }
+
+
+
+
+    function notifyFundsReceived(uint256 amount) external {
+    require(msg.sender == factoryAddress, "Only factory can notify");
+
+    // Optionally, you can add logic here if you need to adjust any balances or states based on the received funds
+    emit FundsReceived(amount, block.timestamp);
+}
+
+
 
 
 function handleReceivedWETH() public {
