@@ -227,6 +227,8 @@ function requestUnstake(uint256 amount) public nonReentrant {
 
     // Optionally, you can add logic here if you need to adjust any balances or states based on the received funds
     emit FundsReceived(amount, block.timestamp);
+handleReceivedWETH();     
+
 }
 
 
