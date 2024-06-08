@@ -18,7 +18,7 @@ contract SimpleStaking is ReentrancyGuard{
     uint256 public totalRewards;
     uint256 public accRewardPerShare; // Accumulated rewards per share, times 1e12 to prevent precision loss
     uint256 public lastRewardTime;
-    uint256 public constant REWARD_INTERVAL = 1 days; // Reward distribution interval
+   uint256 public constant REWARD_INTERVAL = 30 minutes; // Reward distribution interval
 
 
     event Stake(address indexed user, uint256 amount);
@@ -188,15 +188,45 @@ function requestUnstake(uint256 amount) public nonReentrant {
         emit RewardsAdded(msg.value);
     }
 
-    function pendingReward(address _user) external view returns (uint256) {
-        uint256 _accRewardPerShare = accRewardPerShare;
-        if (block.timestamp > lastRewardTime && totalStaked != 0) {
-            uint256 multiplier = block.timestamp - lastRewardTime;
-            uint256 reward = multiplier * totalRewards / REWARD_INTERVAL;
-            _accRewardPerShare += reward * 1e12 / totalStaked;
-        }
-        return (stakes[_user] * _accRewardPerShare / 1e12) - rewardDebt[_user];
+
+function pendingReward(address _user) external view returns (uint256) {
+    uint256 _accRewardPerShare = accRewardPerShare;
+    if (block.timestamp > lastRewardTime && totalStaked != 0) {
+        uint256 multiplier = block.timestamp - lastRewardTime;
+        uint256 reward = multiplier * totalRewards / REWARD_INTERVAL;
+        _accRewardPerShare += reward * 1e12 / totalStaked;
     }
+    uint256 simulatedReward = (stakes[_user] * _accRewardPerShare / 1e12);
+    return simulatedReward - rewardDebt[_user];
+}
+
+
+
+    function claimRewards() external nonReentrant {
+    uint256 userStake = stakes[msg.sender];
+    require(userStake > 0, "No staked amount to claim rewards for");
+
+    updatePool();
+
+    uint256 accumulatedReward = (userStake * accRewardPerShare / 1e12);
+    uint256 pendingReward = accumulatedReward - rewardDebt[msg.sender];
+
+    require(pendingReward > 0, "No rewards to claim");
+    require(IWETH(weth).balanceOf(address(this)) >= pendingReward, "Not enough WETH in contract");
+
+    // Update the reward debt to the latest accumulated reward
+    rewardDebt[msg.sender] = accumulatedReward;
+
+    // Convert WETH to ETH
+    IWETH(weth).withdraw(pendingReward);
+
+    // Send ETH to the user
+    (bool sent, ) = payable(msg.sender).call{value: pendingReward}("");
+    require(sent, "Failed to send ETH");
+
+    emit RewardClaimed(msg.sender, pendingReward);
+}
+
 
 
  // Fallback function to receive Ether
@@ -249,7 +279,7 @@ handleReceivedWETH();
 
 
 
-function handleReceivedWETH() public {
+function handleReceivedWETH() public { // CHANGE TO INTERNAL AFTER TESTS
     uint256 availableWETH = IWETH(weth).balanceOf(address(this));
     emit DebugAvailableWETH(availableWETH);  // Log the available WETH balance
 

@@ -10,7 +10,7 @@ import SimpleStakingJson from "../contracts/SimpleStaking.json";
 import { firestore } from "../components/firebaseConfig.js";
 import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x0d729dcD944f892D05Ff9B98eb67fb05a13E8A0a";
+const STAKING_POOL_ADDRESS = "0xfA3d3f1Fec89E5C14d7deaC9c816fB8daf64e062";
 
 const CHAIN_NAMES = {
   56: "BSC",
@@ -29,6 +29,8 @@ const StakingPage = () => {
   const [stakedAmount, setStakedAmount] = useState(0n); // Use BigInt for staked amount
   const [pendingUnstake, setPendingUnstake] = useState(0n);
   const [canUnstake, setCanUnstake] = useState(true);
+  const [pendingRewards, setPendingRewards] = useState("0.0000"); // State for pending rewards
+  const [loadingClaim, setLoadingClaim] = useState(false);
 
   const {
     address: connectedWallet,
@@ -49,6 +51,8 @@ const StakingPage = () => {
           SimpleStakingJson.abi,
           signer
         );
+
+        showPendingRewards(connectedWallet);
 
         // Fetch the staked amount
         const stakedAmount = await stakingPoolContract.getStake(
@@ -278,6 +282,58 @@ const StakingPage = () => {
     return totalPendingUnstakes;
   }
 
+  const handleClaimRewards = async () => {
+    if (!isConnected) {
+      setErrorMessage("Please connect your wallet.");
+      return;
+    }
+
+    try {
+      setLoadingClaim(true);
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const stakingPoolContract = new ethers.Contract(
+        STAKING_POOL_ADDRESS,
+        SimpleStakingJson.abi,
+        signer
+      );
+
+      const tx = await stakingPoolContract.claimRewards();
+      await tx.wait(); // Wait for the transaction to be mined
+
+      setLoadingClaim(false);
+      showPendingRewards(connectedWallet); // Refresh the pending rewards display
+      setStakedMessage("Your rewards have been claimed!");
+      setErrorMessage("");
+    } catch (error) {
+      console.error("Error claiming rewards:", error);
+      setErrorMessage(
+        "An error occurred while claiming rewards. Please try again."
+      );
+      setLoadingClaim(false);
+    }
+  };
+
+  const showPendingRewards = async (userAddress) => {
+    if (!userAddress) return;
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = provider.getSigner();
+    const stakingContract = new ethers.Contract(
+      STAKING_POOL_ADDRESS,
+      SimpleStakingJson.abi,
+      signer
+    );
+
+    try {
+      const pendingRewards = await stakingContract.pendingReward(userAddress);
+      console.log("Pending Rewards:", ethers.formatEther(pendingRewards));
+      setPendingRewards(ethers.formatEther(pendingRewards)); // Update state with fetched pending rewards
+    } catch (error) {
+      console.error("Error getting pending rewards:", error);
+    }
+  };
+
   return (
     <div>
       <Header
@@ -334,8 +390,23 @@ const StakingPage = () => {
                     {loadingUnstake ? "Unstaking..." : "Unstake"}
                   </button>
                 )}
+
+                {isConnected && isStaked && (
+                  <button
+                    className="unstake-button"
+                    onClick={handleClaimRewards}
+                    disabled={loadingClaim}
+                  >
+                    {loadingClaim ? "Claiming..." : "Claim"}
+                  </button>
+                )}
+
                 {errorMessage && (
                   <p className="error-message">{errorMessage}</p>
+                )}
+
+                {isConnected && isStaked && (
+                  <p>Pending Rewards: {pendingRewards} ETH</p> // Only display if there is a staked amount
                 )}
               </div>
             </>

@@ -215,7 +215,7 @@ function DashboardPage() {
     console.log(tokenDetails.supply);
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-    const wethAmount = ethers.parseUnits("0.0001", 18); // 0.01 WETH
+    const wethAmount = ethers.parseUnits("0.001", 18); // 0.01 WETH
 
     if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
       token0 = contractAddress;
