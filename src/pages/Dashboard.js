@@ -28,7 +28,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x15124CAa5c1c441e71B86f6432Cd181a8e88772f",
+    factoryAddress: "0x13679f5B2b553d95e41549279841258be3Fb1830",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
   },
 };
@@ -114,67 +114,6 @@ function DashboardPage() {
     });
   }
 
-  async function createPair() {
-    if (!contractAddress || !isConnected) {
-      console.error(
-        "createPair called without a connected wallet or valid contract address."
-      );
-      return;
-    }
-
-    setIsCreatingPair(true);
-
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      console.log("Using account:", await signer.getAddress());
-
-      const factoryContract = new ethers.Contract(
-        factoryChainAddress,
-        MyFactoryJson.abi,
-        signer
-      );
-
-      let token0, token1;
-
-      if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
-        token0 = contractAddress;
-        token1 = WETH_ChainAddress;
-      } else {
-        token0 = WETH_ChainAddress;
-        token1 = contractAddress;
-      }
-
-      console.log(
-        `Attempting to create pool with token0: ${token0} and token1: ${token1}`
-      );
-      const txResponse = await factoryContract.createPoolForToken(
-        token0,
-        token1
-      );
-      // Wait for the transaction to be mined
-      const receipt = await txResponse.wait();
-
-      // Accessing logs for emitted events
-      const logs = receipt.logs;
-      console.log("Logs found: ", logs.length);
-      setIsCreatingPair(false);
-
-      if (logs && logs.length > 0) {
-        // Process the logs if needed
-        console.log("Logs:", logs);
-        const poolAddress = receipt.logs[1].args[1];
-        console.log("Deployed Pool Address:", poolAddress);
-        setDeployedPoolAddress(poolAddress);
-      } else {
-        console.error("No logs found in the transaction receipt.");
-      }
-    } catch (error) {
-      console.error("Error creating pair:", error);
-      setIsCreatingPair(false);
-    }
-  }
-
   function calculateSqrtPriceX96(token1Amount, token0Amount) {
     console.log("Token0amount:", token0Amount);
     console.log("Token1amount:", token1Amount);
@@ -199,20 +138,8 @@ function DashboardPage() {
     return sqrtPriceX96.toString(); // Return as string to avoid further BigInt conversion issues in ethers.js
   }
 
-  async function initializePool() {
-    if (!deployedPoolAddress || !tokenDetails.supply) {
-      console.error("Both pool address and token supply are required.");
-
-      setIsPoolInitializing(false);
-
-      return;
-    }
-
-    setIsPoolInitializing(true);
-
-    let token0, token1, token0Amount, token1Amount;
-
-    console.log(tokenDetails.supply);
+  async function handleMulticall() {
+    let token0, token1, token0amount, token1amount;
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
     const wethAmount = ethers.parseUnits("0.001", 18); // 0.01 WETH
@@ -220,49 +147,37 @@ function DashboardPage() {
     if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
       token0 = contractAddress;
       token1 = WETH_ChainAddress;
-      token0Amount = tokenAmount;
-      token1Amount = wethAmount;
+      token0amount = tokenAmount;
+      token1amount = wethAmount;
     } else {
       token0 = WETH_ChainAddress;
       token1 = contractAddress;
-      token0Amount = wethAmount;
-      token1Amount = tokenAmount;
+      token0amount = wethAmount;
+      token1amount = tokenAmount;
     }
 
-    const sqrtPriceX96 = calculateSqrtPriceX96(
-      token1Amount.toString(),
-      token0Amount.toString()
+    // Calculate sqrtPriceX96
+    const priceRatio =
+      (BigInt(token1amount) * BigInt(10 ** 18)) / BigInt(token0amount);
+    const sqrtPriceRatio = sqrt(priceRatio);
+    const sqrtPriceX96 = (sqrtPriceRatio * BigInt(2 ** 96)) / BigInt(10 ** 9);
+
+    const iface = new ethers.Interface([
+      "function createAndInitializePoolIfNecessary(address,address,uint160) external returns (address pool)",
+      "function addInitialLiquidity(address,address,address,uint256,uint256) external",
+    ]);
+
+    const createPoolData = iface.encodeFunctionData(
+      "createAndInitializePoolIfNecessary",
+      [token0, token1, sqrtPriceX96]
     );
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const factoryContract = new ethers.Contract(
-        factoryChainAddress,
-        MyFactoryJson.abi,
-        signer
-      );
-      const txResponse = await factoryContract.initializePool(
-        deployedPoolAddress,
-        sqrtPriceX96
-      );
-      await txResponse.wait();
-      console.log("Pool initialized successfully!");
-    } catch (error) {
-      console.error("Failed to initialize pool:", error);
-      setIsPoolInitializing(false);
-
-      // Handle specific failure actions here if necessary
-    } finally {
-      // Always stop showing "Initializing..." regardless of success or failure
-      setIsPoolInitializing(false);
-    }
-  }
-
-  async function addLiquidity() {
-    if (!deployedPoolAddress || !isConnected) {
-      console.error("Deployed pool address not set or wallet not connected");
-      return;
-    }
+    const addLiquidityData = iface.encodeFunctionData("addInitialLiquidity", [
+      token0,
+      token1,
+      factoryChainAddress,
+      token0amount,
+      token1amount,
+    ]);
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -273,61 +188,28 @@ function DashboardPage() {
         signer
       );
 
-      // Determine tokens and their amounts based on address comparison
-      let token0, token1, token0Amount, token1Amount;
-
-      const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-      const wethAmount = ethers.parseUnits("0.0001", 18); // 0.01 WETH
-
-      if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
-        token0 = contractAddress;
-        token1 = WETH_ChainAddress;
-        token0Amount = tokenAmount;
-        token1Amount = wethAmount;
-      } else {
-        token0 = WETH_ChainAddress;
-        token1 = contractAddress;
-        token0Amount = wethAmount;
-        token1Amount = tokenAmount;
-      }
-
-      console.log(
-        `Adding liquidity with token0: ${token0} (amount: ${token0Amount.toString()}) and token1: ${token1} (amount: ${token1Amount.toString()})`
-      );
-
-      // Approve the tokens for the factory contract
-      await factoryContract.approveToken(
-        token0,
-        deployedPoolAddress,
-        token0Amount
-      );
-      await factoryContract.approveToken(
-        token1,
-        deployedPoolAddress,
-        token1Amount
-      );
-
-      // Add liquidity using the simplified method
-      const tx = await factoryContract.addInitialLiquidity(
-        token0,
-        token1,
-        deployedPoolAddress,
-        token0Amount,
-        token1Amount,
-        {
-          gasLimit: 5000000, // Higher gas limit if necessary
-        }
+      const tx = await factoryContract.multicall(
+        [createPoolData, addLiquidityData],
+        { gasLimit: 9000000 }
       );
       await tx.wait();
-      console.log("Liquidity added successfully!");
+      alert("Pool created and liquidity added successfully!");
     } catch (error) {
-      console.error("Error adding liquidity:", error);
+      console.error("Multicall transaction failed:", error);
+      alert("Transaction failed: " + error.message);
     }
   }
 
-  useEffect(() => {
-    fetchTokenDetails();
-  }, [contractAddress, isConnected]); // Re-fetch if contractAddress or connection status changes
+  // Helper function to calculate square root
+  const sqrt = (value) => {
+    let z = value;
+    let x = value / 2n + 1n;
+    while (x < z) {
+      z = x;
+      x = (value / x + x) / 2n;
+    }
+    return z;
+  };
 
   return (
     <div>
@@ -367,34 +249,10 @@ function DashboardPage() {
             </a>
           </p>
         </div>
-        <div className="create-pair-button">
-          {isConnected && (
-            <button onClick={createPair} className="deploy-button">
-              {
-                isCreatingPair
-                  ? "Loading..." // Display "Loading..." if isLoading is true
-                  : "Create Pool" // Otherwise, display the button text
-              }
-            </button>
-          )}
-        </div>
 
-        <button
-          disabled={isPoolInitializing}
-          className="deploy-button"
-          onClick={initializePool}
-        >
-          {isPoolInitializing ? "Initializing..." : "Initialize Pool"}
+        <button onClick={handleMulticall} className="deploy-button">
+          Create Pool and Add Liquidity
         </button>
-
-        <button
-          disabled={isAddingLiquidity}
-          className="deploy-button"
-          onClick={addLiquidity}
-        >
-          {isAddingLiquidity ? "Adding Liquidity..." : "Add Liquidity"}
-        </button>
-
         {deployedPoolAddress && (
           <p>
             Your new deployed pool address is:{" "}

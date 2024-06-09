@@ -31,19 +31,20 @@ contract MyFactory {
     event PoolCreated(address indexed token0, address indexed poolAddress);
     event PoolInitialized(address indexed poolAddress, uint160 sqrtPriceX96);
     event TokenApproved(address indexed tokenAddress, address indexed poolAddress);
-    event LiquidityAdded(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount);
+    event LiquidityAdded(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount, uint256 timestamp);
     event LiquidityRemoved(address indexed token, uint256 tokenId, uint256 amount0, uint256 amount1);
     event LiquidityAdditionFailed(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount, string error);
     event FeesCollected(address indexed token, uint256 amount0, uint256 amount1);
     event SwappedToWETH(address indexed token, uint256 amountIn, uint256 amountOut);
 
-    constructor(address _positionManager, address _weth, address _uniswapFactory, address _swapRouter) {
+    
+     constructor(address _positionManager, address _weth, address _uniswapFactory, address _swapRouter) {
         positionManager = INonfungiblePositionManager(_positionManager);
         weth = _weth;
         uniswapFactory = IUniswapV3Factory(_uniswapFactory);
         swapRouter = ISwapRouter(_swapRouter);
          owner = msg.sender;
-    }
+        }
 
     function deployToken(
         string calldata _name,
@@ -60,10 +61,8 @@ contract MyFactory {
         return tokenAddress;
     }
 
-    function createPoolForToken(address _token0, address _token1) external returns (address poolAddress) {
-    //require(_token0 != _token1, "Tokens must be different");
 
-    //(address token0, address token1) = _tokenA < _tokenB ? (_tokenA, _tokenB) : (_tokenB, _tokenA);
+    function createPoolForToken(address _token0, address _token1) external returns (address poolAddress) {
 
     poolAddress = uniswapFactory.getPool(_token0, _token1, 10000);
     if (poolAddress == address(0)) {
@@ -78,6 +77,27 @@ contract MyFactory {
         IUniswapV3Pool(poolAddress).initialize(sqrtPriceX96);
         emit PoolInitialized(poolAddress, sqrtPriceX96);
     }
+
+
+    function multicall(bytes[] calldata data) external payable returns (bytes[] memory results) {
+        results = new bytes[](data.length);
+        for (uint i = 0; i < data.length; i++) {
+            (bool success, bytes memory result) = address(this).delegatecall(data[i]);
+            require(success, "Transaction failed");
+            results[i] = result;
+        }
+    }
+
+
+     function createAndInitializePoolIfNecessary(
+        address token0,
+        address token1,
+        uint160 sqrtPriceX96
+    ) external returns (address pool) {
+        pool = positionManager.createAndInitializePoolIfNecessary(token0, token1, 10000, sqrtPriceX96);
+        emit PoolCreated(token0, pool);
+    }
+
 
     // Function to get the pool address
     function get_Pool(address tokenA, address tokenB, uint24 fee) external view returns (address pool) {
@@ -133,13 +153,51 @@ contract MyFactory {
                 deadline: block.timestamp + 5 minutes
             })
         ) returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
-            emit LiquidityAdded(_token0, address(positionManager), _token0Amount, _token1Amount);
+            emit LiquidityAdded(_token0, address(positionManager), _token0Amount, _token1Amount, block.timestamp);
         } catch Error(string memory reason) {
             emit LiquidityAdditionFailed(_token0, address(positionManager), _token0Amount, _token1Amount, reason);
         } catch (bytes memory lowLevelData) {
             emit LiquidityAdditionFailed(_token0, address(positionManager), _token0Amount, _token1Amount, "Low-level error");
         }
     }
+
+
+
+    function calculateLiquidityToRemove(uint256 wethAmountToRemove, uint160 sqrtPriceX96, uint128 totalLiquidity) public pure returns (uint128 liquidityToRemove) {
+    require(sqrtPriceX96 > 0, "sqrtPriceX96 is zero");
+
+    // Calculate the price P from sqrtPriceX96
+    uint256 price = uint256(sqrtPriceX96) * uint256(sqrtPriceX96) / (1 << 192);
+
+    // Ensure price is not zero to avoid division by zero errors
+    require(price > 0, "Price calculation resulted in zero");
+
+    // Calculate the corresponding amount of tokens to remove
+    uint256 tokensToRemove = wethAmountToRemove / price;
+
+    // Calculate the liquidity to remove
+    uint256 liquidityToRemoveCalc = sqrt(wethAmountToRemove * tokensToRemove);
+    
+    // Cast the calculated liquidity to the required type
+    liquidityToRemove = uint128(liquidityToRemoveCalc);
+
+    return liquidityToRemove;
+}
+
+// Babylonian method for calculating the square root
+function sqrt(uint256 y) internal pure returns (uint256 z) {
+    if (y > 3) {
+        z = y;
+        uint256 x = y / 2 + 1;
+        while (x < z) {
+            z = x;
+            x = (y / x + x) / 2;
+        }
+    } else if (y != 0) {
+        z = 1;
+    }
+}
+
 
     function removeLiquidity(uint256 tokenId, uint128 liquidityToRemove) external {
         // Decrease liquidity
@@ -231,26 +289,23 @@ contract MyFactory {
     }
 
 
-function collectFeesAndSwap(uint256 tokenId) external {
-        // Collect the fees from the position
-        (uint256 amount0, uint256 amount1) = positionManager.collect(
+function collectFees(uint256 tokenId) external {
+        INonfungiblePositionManager.CollectParams memory params =
             INonfungiblePositionManager.CollectParams({
                 tokenId: tokenId,
                 recipient: address(this),
                 amount0Max: type(uint128).max,
                 amount1Max: type(uint128).max
-            })
-        );
-        emit FeesCollected(address(this), amount0, amount1);
+            });
 
+        (uint256 amount0, uint256 amount1) = positionManager.collect(params);
+
+        //emit FeesCollected(amount0, amount1);
     }
 
 
 
-
-
-
-    //MUDANCAS MAKU - ADICIONAR AO CONTRATO DO DAVID
+        //STAKING CONNECTION
 
 address public stakingPoolAddress;
 address public wethAddress;
@@ -294,6 +349,8 @@ function sendWETHToStakingPool(uint256 amount) private {
 
 
 
+
+
 }
 
 
@@ -327,3 +384,10 @@ interface IWETH {
 interface IStaking {
     function notifyFundsReceived(uint256 amount) external;
 }
+
+
+
+
+
+
+
