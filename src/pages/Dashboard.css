@@ -6,12 +6,23 @@
     border-radius: 10px;
     text-align: center;
   }
-  
+
+
+  .subtitledashboard{
+    margin:20px;
+    color:white;
+  }
+ 
+
+  .connected-wallet{font-size:12px;}
+
   .dashboard-container h1 {
     font-size: 24px;
     margin-bottom: 20px;
     color: #fff;
   }
+
+  .a{color:white;}
 
   .white-text {
     color: white;
@@ -39,15 +50,16 @@ padding:10px;}
   
   .wallet-status {
     margin-bottom: 20px;
-    margin-top:50px;
+    margin-top:20px;
+  
   }
   
   .wallet-status p {
-    font-size: 18px;
+    font-size: 15px;
   }
   
   .token-info p {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 10px;
   }
   

@@ -44,9 +44,7 @@ function HomePage() {
         <h5 className="subtitlehome">
           We help you create tokens for free and loan you initial liquidity!
         </h5>
-        <h6 className="texthome">
-          Currently only on Sepolia Testnet. IN DEVELOPMENT
-        </h6>
+        <h6 className="texthome">Currently only on Sepolia Testnet.</h6>
 
         <Link to="/factory" className="start-button2">
           Let's Start

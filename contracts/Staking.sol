@@ -18,7 +18,7 @@ contract SimpleStaking is ReentrancyGuard{
     uint256 public totalRewards;
     uint256 public accRewardPerShare; // Accumulated rewards per share, times 1e12 to prevent precision loss
     uint256 public lastRewardTime;
-   uint256 public constant REWARD_INTERVAL = 30 minutes; // Reward distribution interval
+   uint256 public constant REWARD_INTERVAL = 5 minutes; // Reward distribution interval
 
 
     event Stake(address indexed user, uint256 amount);
@@ -163,30 +163,32 @@ function requestUnstake(uint256 amount) public nonReentrant {
     }
 
 
-    function updatePool() internal {
-        if (block.timestamp <= lastRewardTime) {
-            return;
-        }
+function updatePool() internal {
+    if (block.timestamp <= lastRewardTime) {
+        return;
+    }
 
-        if (totalStaked == 0) {
-            lastRewardTime = block.timestamp;
-            return;
-        }
-
-        uint256 multiplier = block.timestamp - lastRewardTime;
-        uint256 reward = multiplier * totalRewards / REWARD_INTERVAL;
-
-        totalRewards -= reward;
-        accRewardPerShare += reward * 1e12 / totalStaked;
+    if (totalStaked == 0) {
         lastRewardTime = block.timestamp;
+        return;
     }
 
-    function addRewards() external payable {
-        require(msg.value > 0, "No rewards to add");
-        updatePool();
-        totalRewards += msg.value;
-        emit RewardsAdded(msg.value);
+    uint256 multiplier = block.timestamp - lastRewardTime;
+    if (totalRewards > 0) {
+        uint256 reward = multiplier * totalRewards / REWARD_INTERVAL;
+        totalRewards = totalRewards > reward ? totalRewards - reward : 0;
+        accRewardPerShare += reward * 1e12 / totalStaked;
     }
+
+    lastRewardTime = block.timestamp;
+}
+
+function addRewards() external payable {
+    require(msg.value > 0, "No rewards to add");
+    totalRewards += msg.value;
+    updatePool();  // Update the pool after changing the totalRewards
+    emit RewardsAdded(msg.value);
+}
 
 
 function pendingReward(address _user) external view returns (uint256) {
@@ -205,7 +207,7 @@ function pendingReward(address _user) external view returns (uint256) {
     function claimRewards() external nonReentrant {
     uint256 userStake = stakes[msg.sender];
     require(userStake > 0, "No staked amount to claim rewards for");
-
+ 
     updatePool();
 
     uint256 accumulatedReward = (userStake * accRewardPerShare / 1e12);
@@ -279,7 +281,7 @@ handleReceivedWETH();
 
 
 
-function handleReceivedWETH() public { // CHANGE TO INTERNAL AFTER TESTS
+function handleReceivedWETH() internal{ // CHANGE TO INTERNAL AFTER TESTS
     uint256 availableWETH = IWETH(weth).balanceOf(address(this));
     emit DebugAvailableWETH(availableWETH);  // Log the available WETH balance
 

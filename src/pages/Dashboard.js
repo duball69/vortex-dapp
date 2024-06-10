@@ -23,13 +23,15 @@ const networkConfig = {
   // Example Chain IDs for Base and Sepolia
   8453: {
     // Mainnet (as an example; replace with the correct ID for "base")
-    factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://basescan.org",
   },
   11155111: {
     // Sepolia Testnet Chain ID
     factoryAddress: "0x13679f5B2b553d95e41549279841258be3Fb1830",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+    explorerUrl: "https://sepolia.etherscan.io",
   },
 };
 
@@ -47,14 +49,20 @@ function DashboardPage() {
   } = useWeb3ModalAccount();
   const { open, close } = useWeb3Modal();
   const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [isCreatingPair, setIsCreatingPair] = useState(false);
   const [isPoolInitializing, setIsPoolInitializing] = useState(false);
   const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const factoryChainAddress =
     networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
   const WETH_ChainAddress =
     networkConfig[chainId]?.WETH_address || "DefaultWETHAddress";
+  const explorerUrl =
+    networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
 
   // Effect to log and set factory address only when chainId changes
   useEffect(() => {
@@ -139,6 +147,8 @@ function DashboardPage() {
   }
 
   async function handleMulticall() {
+    setIsLoading(true);
+    setSuccessMessage("");
     let token0, token1, token0amount, token1amount;
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
@@ -193,10 +203,16 @@ function DashboardPage() {
         { gasLimit: 9000000 }
       );
       await tx.wait();
-      alert("Pool created and liquidity added successfully!");
+      setSuccessMessage(
+        "Your token is now launched on Uniswap with liquidity added!"
+      );
+      setErrorMessage("");
     } catch (error) {
       console.error("Multicall transaction failed:", error);
-      alert("Transaction failed: " + error.message);
+      setErrorMessage("Transaction failed: " + error.message);
+      setSuccessMessage(""); // Clear any previous success messages
+    } finally {
+      setIsLoading(false); // Reset loading state after operation is complete
     }
   }
 
@@ -218,11 +234,19 @@ function DashboardPage() {
         isConnected={isConnected}
         chainId={chainId}
       />
+
       <div className="dashboard-container">
-        <h1>Dashboard</h1>
+        <div>
+          <h1 className="titledashboard">Get Initial LP for your token.</h1>
+          <h4 className="subtitledashboard">
+            Click to launch your token with 0.3 ETH of liquidity.
+          </h4>
+        </div>
         <div className="wallet-status">
           {isConnected ? (
-            <p>Connected Wallet: {connectedWallet}</p>
+            <p className="connected-wallet">
+              Connected Wallet: {connectedWallet}
+            </p>
           ) : (
             <button onClick={connectWallet}>Connect Wallet</button>
           )}
@@ -241,32 +265,34 @@ function DashboardPage() {
           <p>
             Your Deployed Token Contract Address:{" "}
             <a
-              href={`https://sepolia.etherscan.io/address/${contractAddress}`}
+              href={`${explorerUrl}/address/${contractAddress}`}
               target="_blank"
               rel="noopener noreferrer"
+              className="a"
             >
               {contractAddress}
             </a>
           </p>
         </div>
 
-        <button onClick={handleMulticall} className="deploy-button">
-          Create Pool and Add Liquidity
-        </button>
-        {deployedPoolAddress && (
-          <p>
-            Your new deployed pool address is:{" "}
-            <a
-              href={`https://sepolia.etherscan.io/address/${deployedPoolAddress}`}
-              target="_blank"
-            >
-              {deployedPoolAddress}
-            </a>
-          </p>
+        {!successMessage && (
+          <button
+            onClick={handleMulticall}
+            className="deploy-button"
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : "Launch Token"}
+          </button>
         )}
-        <div className="navigation-links">
-          <Link to="/factory">Back to Factory</Link>
-        </div>
+        {successMessage && (
+          <div className="success-message">{successMessage}</div>
+        )}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {successMessage && (
+          <Link className="start-button" to={`/token/${contractAddress}`}>
+            Next
+          </Link>
+        )}
       </div>
       <Footer />
     </div>

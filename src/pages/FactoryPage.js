@@ -29,11 +29,13 @@ const networkConfig = {
     // Mainnet (as an example; replace with the correct ID for "base")
     factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://basescan.org",
   },
   11155111: {
     // Sepolia Testnet Chain ID
     factoryAddress: "0x13679f5B2b553d95e41549279841258be3Fb1830",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+    explorerUrl: "https://sepolia.etherscan.io",
   },
 };
 
@@ -145,7 +147,11 @@ function FactoryPage() {
   const [deployedContractAddress, setDeployedContractAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [isInitialized, setIsInitialized] = useState(false);
+  const explorerUrl =
+    networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
   const factoryChainAddress =
     networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
 
@@ -320,8 +326,9 @@ function FactoryPage() {
               <p className="token_address_message">
                 Your new token address is:{" "}
                 <a
-                  href={`https://sepolia.etherscan.io/address/${deployedContractAddress}`}
+                  href={`${explorerUrl}/address/${deployedContractAddress}`}
                   target="_blank"
+                  className="a"
                 >
                   {deployedContractAddress}
                 </a>
