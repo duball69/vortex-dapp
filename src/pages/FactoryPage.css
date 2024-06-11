@@ -122,6 +122,10 @@ button.deploy-button {
 
 button.deploy-button:hover {
     background-color: #ffffff;
+    font-style: normal;
+    font-size: 16px;
+    font-weight: 400;
+    font-family: "Lexend Deca", sans-serif;
 }
 
 

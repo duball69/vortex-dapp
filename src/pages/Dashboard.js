@@ -285,13 +285,13 @@ function DashboardPage() {
           </button>
         )}
         {successMessage && (
-          <div className="success-message">{successMessage}</div>
+          <div className="success-message2">{successMessage}</div>
         )}
         {errorMessage && <div className="error-message">{errorMessage}</div>}
         {successMessage && (
-          <Link className="start-button" to={`/token/${contractAddress}`}>
-            Next
-          </Link>
+          <button to={`/token/${contractAddress}`} className="deploy-button">
+            Get LP
+          </button>
         )}
       </div>
       <Footer />

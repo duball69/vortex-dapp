@@ -1,15 +1,36 @@
-// Footer.js
-import React from 'react';
-import './Footer.css'; // Assuming you create a separate CSS file for the footer styles
+import React from "react";
+import "./Footer.css"; // Ensure this is correctly importing your styles
+import { FaXTwitter, FaTelegram, FaEnvelope } from "react-icons/fa6"; // Ensure correct import statements
 
 function Footer() {
   return (
     <footer className="footer">
       <div className="footer-content">
         <p>Vortex © 2024. All rights reserved.</p>
-        <p>Contact us: <a href="mailto:team@vortexdapp.com">team@vortexdapp.com</a></p>
-        <a href="https://x.com/vortexdapp" className="icon-link">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cc/X_icon.svg" alt="X icon" className="x-icon" />
+
+        {/* Twitter Link */}
+        <a
+          href="https://x.com/vortexdapp"
+          className="icon-link"
+          aria-label="Twitter"
+        >
+          <FaXTwitter className="icon twitter" />
+        </a>
+        {/* Telegram Link */}
+        <a
+          href="https://t.me/vortexdapp"
+          className="icon-link"
+          aria-label="Telegram"
+        >
+          <FaTelegram className="icon telegram" />
+        </a>
+        {/* Email Link */}
+        <a
+          href="mailto:hello@vortexdapp.com"
+          className="icon-link"
+          aria-label="Mail"
+        >
+          <FaEnvelope className="icon mail" />
         </a>
       </div>
     </footer>

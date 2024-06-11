@@ -147,8 +147,6 @@ function FactoryPage() {
   const [deployedContractAddress, setDeployedContractAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
   const [isInitialized, setIsInitialized] = useState(false);
   const explorerUrl =
     networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
@@ -333,12 +331,12 @@ function FactoryPage() {
                   {deployedContractAddress}
                 </a>
               </p>
-              <Link
-                className="start-button"
+              <button
                 to={`/dashboard/${deployedContractAddress}`}
+                className="deploy-button"
               >
-                Go to Dashboard
-              </Link>
+                Get LP
+              </button>
             </>
           )}
         </div>

@@ -16,8 +16,29 @@
     text-decoration: none;
 }
 
-.x-icon {
-    margin-top:10px;
-    width: 30px;  /* Adjust size as needed */
-    height: 30px; /* Adjust size as needed */
+
+.icon-link {
+    margin-right: 10px; 
+    margin-left:10px;/* Adjust space between icons */
+    display: inline-block; /* Ensures margin applies correctly */
+    vertical-align: middle; /* Aligns icons nicely if text is also in line */
+  }
+  
+  .icon {
+    font-size: 22px; /* Adjusts the size of the icons */
+    color: #ffffff; /* Example to set the color, adjust as needed */
+    margin-top:15px;
+  }
+  
+  /* Specific styles for each icon type can be added if needed */
+  .twitter {
+    color: #ffffff; /* Twitter's brand color, adjust as needed */
+  }
+  
+  .telegram {
+    color: #ffffff; /* Telegram's brand color, adjust as needed */
+  }
+  
+  .mail {
+    color: #ffffff; /* Mail icon color, adjust as needed */
   }

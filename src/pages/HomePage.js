@@ -40,15 +40,20 @@ function HomePage() {
       <div className="centered-content">
         <img src="logo512.png" alt="Logo" className="logo2" />
 
-        <h1 className="titlehome">Create your own token with 1 ETH of LP</h1>
+        <h1 className="titlehome">Create your own token with 0.5 ETH of LP</h1>
         <h5 className="subtitlehome">
-          We help you create tokens for free and loan you initial liquidity!
+          We help you create tokens and loan you initial liquidity for free!
         </h5>
         <h6 className="texthome">Currently only on Sepolia Testnet.</h6>
+        <div>
+          <Link to="/factory">
+            <button className="home-button">Launch</button>
+          </Link>
 
-        <Link to="/factory" className="start-button2">
-          Let's Start
-        </Link>
+          <Link to="/staking">
+            <button className="home-button">Stake</button>
+          </Link>
+        </div>
       </div>
 
       <TokensList />

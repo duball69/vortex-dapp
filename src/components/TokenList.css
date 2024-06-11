@@ -10,6 +10,20 @@
     gap: 20px;
 }
 
+.icon-link2 {
+    margin-right: 10px; 
+    margin-left:10px;/* Adjust space between icons */
+    
+    display: inline-block; /* Ensures margin applies correctly */
+    vertical-align: middle; /* Aligns icons nicely if text is also in line */
+  }
+  
+  .icon2 {
+    font-size: 18px; /* Adjusts the size of the icons */
+    color: #ffffff; /* Example to set the color, adjust as needed */
+    margin-top:15px;
+  }
+
 
 .deployedtokenstitle {
   margin-bottom:10px;
