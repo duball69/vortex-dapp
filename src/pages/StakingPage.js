@@ -359,7 +359,7 @@ const StakingPage = () => {
           {isConnected && (
             <>
               <div>
-                <p>Wallet Connected: {connectedWallet}</p>
+                <p> Connected Wallet: {connectedWallet}</p>
                 {pendingUnstake > 0n && ( // Only display if there are pending unstakes
                   <p>
                     Pending amount unstaking:{" "}

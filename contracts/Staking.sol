@@ -221,7 +221,7 @@ function pendingReward(address _user) external view returns (uint256) {
 
     // Convert WETH to ETH
     IWETH(weth).withdraw(pendingReward);
-
+ 
     // Send ETH to the user
     (bool sent, ) = payable(msg.sender).call{value: pendingReward}("");
     require(sent, "Failed to send ETH");
@@ -281,7 +281,7 @@ handleReceivedWETH();
 
 
 
-function handleReceivedWETH() internal{ // CHANGE TO INTERNAL AFTER TESTS
+function handleReceivedWETH() internal{ 
     uint256 availableWETH = IWETH(weth).balanceOf(address(this));
     emit DebugAvailableWETH(availableWETH);  // Log the available WETH balance
 

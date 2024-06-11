@@ -235,64 +235,67 @@ function DashboardPage() {
         chainId={chainId}
       />
 
-      <div className="dashboard-container">
-        <div>
-          <h1 className="titledashboard">Get Initial LP for your token.</h1>
-          <h4 className="subtitledashboard">
-            Click to launch your token with 0.3 ETH of liquidity.
-          </h4>
-        </div>
-        <div className="wallet-status">
-          {isConnected ? (
-            <p className="connected-wallet">
-              Connected Wallet: {connectedWallet}
-            </p>
-          ) : (
-            <button onClick={connectWallet}>Connect Wallet</button>
-          )}
-        </div>
-        <div className="token-info">
-          {tokenDetails.imageUrl && (
-            <img
-              src={tokenDetails.imageUrl}
-              alt={tokenDetails.name}
-              className="token-image"
-            />
-          )}
-          <p>Token Name: {tokenDetails.name}</p>
-          <p>Token Symbol: {tokenDetails.symbol}</p>
-          <p>Total Supply: {tokenDetails.supply}</p>
-          <p>
-            Your Deployed Token Contract Address:{" "}
-            <a
-              href={`${explorerUrl}/address/${contractAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="a"
-            >
-              {contractAddress}
-            </a>
-          </p>
-        </div>
+      <h1 className="titlefactory">Get Initial LP for your token</h1>
+      <h3 className="subtitlefactory">
+        Click to launch your token with 0.3 ETH of liquidity.
+      </h3>
 
-        {!successMessage && (
-          <button
-            onClick={handleMulticall}
-            className="deploy-button"
-            disabled={isLoading}
-          >
-            {isLoading ? "Loading..." : "Launch Token"}
-          </button>
-        )}
-        {successMessage && (
-          <div className="success-message2">{successMessage}</div>
-        )}
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
-        {successMessage && (
-          <button to={`/token/${contractAddress}`} className="deploy-button">
-            Get LP
-          </button>
-        )}
+      <div className="center-container">
+        <div className="factory-container">
+          <div></div>
+          <div className="wallet-status">
+            {isConnected ? (
+              <p className="connected-wallet">
+                Connected Wallet: {connectedWallet}
+              </p>
+            ) : (
+              <button onClick={connectWallet}>Connect Wallet</button>
+            )}
+          </div>
+          <div className="token-info">
+            {tokenDetails.imageUrl && (
+              <img
+                src={tokenDetails.imageUrl}
+                alt={tokenDetails.name}
+                className="token-image"
+              />
+            )}
+            <h5 className="your-token">Your token:</h5>
+            <p>Token Name: {tokenDetails.name}</p>
+            <p>Token Symbol: {tokenDetails.symbol}</p>
+            <p>Total Supply: {tokenDetails.supply}</p>
+            <p>
+              Contract Address:{" "}
+              <a
+                href={`${explorerUrl}/address/${contractAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="a"
+              >
+                {contractAddress}
+              </a>
+            </p>
+          </div>
+
+          {!successMessage && (
+            <button
+              onClick={handleMulticall}
+              className="deploy-button"
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Launch Token"}
+            </button>
+          )}
+          {successMessage && (
+            <div className="success-message2">{successMessage}</div>
+          )}
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
+          {successMessage && (
+            <button to={`/token/${contractAddress}`} className="deploy-button">
+              Get LP
+            </button>
+          )}
+        </div>
       </div>
       <Footer />
     </div>
