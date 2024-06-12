@@ -29,7 +29,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x13679f5B2b553d95e41549279841258be3Fb1830",
+    factoryAddress: "0xe402bbd03968316cc42F6EA33E4a5291E18fC2C4",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -184,7 +184,7 @@ function DashboardPage() {
     const addLiquidityData = iface.encodeFunctionData("addInitialLiquidity", [
       token0,
       token1,
-      factoryChainAddress,
+      contractAddress,
       token0amount,
       token1amount,
     ]);
@@ -237,7 +237,7 @@ function DashboardPage() {
 
       <h1 className="titlefactory">Get Initial LP for your token</h1>
       <h3 className="subtitlefactory">
-        Click to launch your token with 0.3 ETH of liquidity.
+        Click to launch your token with 1000$ of liquidity.
       </h3>
 
       <div className="center-container">
@@ -291,9 +291,9 @@ function DashboardPage() {
           )}
           {errorMessage && <div className="error-message">{errorMessage}</div>}
           {successMessage && (
-            <button to={`/token/${contractAddress}`} className="deploy-button">
-              Get LP
-            </button>
+            <Link to={`/token/${contractAddress}`}>
+              <button className="deploy-button">Next</button>
+            </Link>
           )}
         </div>
       </div>

@@ -27,13 +27,29 @@
     }
   }
 
-  
-.titlehome {
+  .titlehome {
     font-size: 42px; /* Larger font size for heading */
-margin-bottom:-20px;
-margin-top:10px;
-  }
+    margin-bottom: -20px;
+    margin-top: 10px;
+    opacity: 0; /* Start with the text being invisible */
+    transform: translateY(20px); /* Start 20px below the final position */
+    animation: fadeInUp 1s ease forwards; /* Animation to fade in and move up */
+}
 
+/* Fade in and move up effect */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+  
   .subtitlehome {font-size:20px;
     margin-top:25px;
     font-weight: 300;
@@ -41,6 +57,7 @@ margin-top:10px;
   
 .texthome {font-size:16px;
   font-weight: 200;
+  margin-bottom:20px;
 }
 
 

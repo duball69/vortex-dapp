@@ -40,7 +40,9 @@ function HomePage() {
       <div className="centered-content">
         <img src="logo512.png" alt="Logo" className="logo2" />
 
-        <h1 className="titlehome">Create your own token with 0.5 ETH of LP</h1>
+        <h1 className="titlehome">
+          Create a token with 1000$ of initial liquidity
+        </h1>
         <h5 className="subtitlehome">
           We help you create tokens and loan you initial liquidity for free!
         </h5>

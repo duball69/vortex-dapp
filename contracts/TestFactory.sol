@@ -34,10 +34,28 @@ contract MyFactory {
     event LiquidityAdded(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount, uint256 timestamp);
     event LiquidityRemoved(address indexed token, uint256 tokenId, uint256 amount0, uint256 amount1);
     event LiquidityAdditionFailed(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount, string error);
-    event FeesCollected(address indexed token, uint256 amount0, uint256 amount1);
+   event FeesCollected(uint256 indexed tokenId, uint256 amount0, uint256 amount1);
+
     event SwappedToWETH(address indexed token, uint256 amountIn, uint256 amountOut);
+        event ZeroFeesDays(uint256 tokenId, bool isTokenDead);
+    event ResetFeesDays(uint256 tokenId, bool isTokenDead);
+
 
     
+    struct TokenDetails {
+        address tokenAddress;
+        uint256 timeStamp;
+        uint256 tokenId;
+        bool liquidityRemoved;
+        uint256 zerofeedays;
+        bool isTokenDEAD;
+    }
+
+    TokenDetails[] public allTokens;
+
+    mapping(uint256 => uint256) private tokenIndex; // Maps tokenId to index in allTokens array
+
+
      constructor(address _positionManager, address _weth, address _uniswapFactory, address _swapRouter) {
         positionManager = INonfungiblePositionManager(_positionManager);
         weth = _weth;
@@ -54,8 +72,7 @@ contract MyFactory {
         MyToken token = new MyToken(_name, _symbol, _supply);
         address tokenAddress = address(token);
         
-        tokens.push(tokenAddress);
-        tokenCount++;
+       
         emit TokenDeployed(tokenAddress);
 
         return tokenAddress;
@@ -129,16 +146,13 @@ contract MyFactory {
 }
     
 
-    function addInitialLiquidity(address _token0, address _token1, address factory_addy, uint256 _token0Amount, uint256 _token1Amount) external {
+function addInitialLiquidity(address _token0, address _token1, address tokenAddress, uint256 _token0Amount, uint256 _token1Amount) external returns (uint256 tokenId) {
 
     // Approve the position manager to spend tokens
     TransferHelper.safeApprove(_token0, address(positionManager), _token0Amount);
     TransferHelper.safeApprove(_token1, address(positionManager), _token1Amount);
 
-    // Log the parameters before attempting to mint
-    //emit LiquidityAdded(_token0, _token1, _tokenAmount, _wethAmount);
-
-    try positionManager.mint(
+    INonfungiblePositionManager.MintParams memory params =
             INonfungiblePositionManager.MintParams({
                 token0: _token0,
                 token1: _token1,
@@ -149,18 +163,57 @@ contract MyFactory {
                 amount1Desired: _token1Amount,
                 amount0Min: 0,
                 amount1Min: 0,
-                recipient: factory_addy,
+                recipient: address(this),
                 deadline: block.timestamp + 5 minutes
-            })
-        ) returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
-            emit LiquidityAdded(_token0, address(positionManager), _token0Amount, _token1Amount, block.timestamp);
-        } catch Error(string memory reason) {
-            emit LiquidityAdditionFailed(_token0, address(positionManager), _token0Amount, _token1Amount, reason);
-        } catch (bytes memory lowLevelData) {
-            emit LiquidityAdditionFailed(_token0, address(positionManager), _token0Amount, _token1Amount, "Low-level error");
-        }
+            });
+
+        (tokenId,,,) = positionManager.mint(params);
+
+        // Store the token details in the array
+    allTokens.push(TokenDetails({
+        tokenAddress: tokenAddress,  // Storing _token0 as an example, store _token1 similarly if needed
+        tokenId: tokenId,
+        timeStamp: block.timestamp,
+        liquidityRemoved: false,
+        zerofeedays: 0,
+        isTokenDEAD: false
+    }));
+
+    // Save the index of the new token details in the mapping
+    tokenIndex[tokenId] = allTokens.length - 1;
+
+    emit LiquidityAdded(_token0, address(positionManager), _token0Amount, _token1Amount, block.timestamp);
+    return tokenId;
     }
 
+
+
+function updateNoFeeDays(uint256 tokenId) external { 
+
+
+    uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+    allTokens[index].zerofeedays++;
+
+    if (allTokens[index].zerofeedays >= 3){
+
+        allTokens[index].isTokenDEAD = true;
+
+    }
+
+    emit ZeroFeesDays(allTokens[index].zerofeedays, allTokens[index].isTokenDEAD );
+    
+}
+
+
+function resetNoFeeDays(uint256 tokenId) external { 
+
+
+    uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+    allTokens[index].zerofeedays=0;
+
+    emit ResetFeesDays(allTokens[index].zerofeedays, allTokens[index].isTokenDEAD );
+    
+}
 
 
     function calculateLiquidityToRemove(uint256 wethAmountToRemove, uint160 sqrtPriceX96, uint128 totalLiquidity) public pure returns (uint128 liquidityToRemove) {
@@ -199,7 +252,11 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
 }
 
 
-    function removeLiquidity(uint256 tokenId, uint128 liquidityToRemove) external {
+       function removeLiquidity(uint256 tokenId, uint128 liquidityToRemove, address tokenAddress) external onlyOwner {
+
+        uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+        require(!allTokens[index].liquidityRemoved, "Liquidity already removed");
+
         // Decrease liquidity
         (uint256 amount0, uint256 amount1) = positionManager.decreaseLiquidity(
             INonfungiblePositionManager.DecreaseLiquidityParams({
@@ -221,8 +278,10 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
             })
         );
 
+        allTokens[index].liquidityRemoved = true; // Update the liquidity removed status
         emit LiquidityRemoved(msg.sender, tokenId, collectedAmount0, collectedAmount1);
     }
+
 
 
     function getPosition(uint256 tokenId) external view returns (
@@ -289,7 +348,7 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
     }
 
 
-function collectFees(uint256 tokenId) external {
+function collectFees(uint256 tokenId) external onlyOwner {
         INonfungiblePositionManager.CollectParams memory params =
             INonfungiblePositionManager.CollectParams({
                 tokenId: tokenId,
@@ -300,8 +359,9 @@ function collectFees(uint256 tokenId) external {
 
         (uint256 amount0, uint256 amount1) = positionManager.collect(params);
 
-        //emit FeesCollected(amount0, amount1);
+        emit FeesCollected(tokenId, amount0, amount1);
     }
+
 
 
 
@@ -384,10 +444,3 @@ interface IWETH {
 interface IStaking {
     function notifyFundsReceived(uint256 amount) external;
 }
-
-
-
-
-
-
-
