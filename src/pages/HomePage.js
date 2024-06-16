@@ -41,10 +41,10 @@ function HomePage() {
         <img src="logo512.png" alt="Logo" className="logo2" />
 
         <h1 className="titlehome">
-          Create a token with 1000$ of initial liquidity
+          Launch your token with initial liquidity for free
         </h1>
         <h5 className="subtitlehome">
-          We help you create tokens and loan you initial liquidity for free!
+          A code free tool to create tokens with 0.5 ETH of LP
         </h5>
         <h6 className="texthome">Currently only on Sepolia Testnet.</h6>
         <div>
