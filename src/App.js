@@ -6,6 +6,7 @@ import StakingPage from "./pages/StakingPage";
 import DashboardPage from "./pages/Dashboard";
 import FactoryPage from "./pages/FactoryPage";
 import AfterLaunch from "./pages/AfterLaunch";
+import Trade from "./pages/Trade";
 import { Web3ModalProvider } from "./Web3ModalContext";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             path="/dashboard/:contractAddress"
             element={<DashboardPage />}
           />
+          <Route path="/trade" element={<Trade />} />
           <Route path="/token/:contractAddress" element={<AfterLaunch />} />
 
           <Route path="/staking" element={<StakingPage />} />

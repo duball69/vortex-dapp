@@ -20,40 +20,43 @@ function Header({ connectWallet, isConnected, chainId }) {
   return (
     <header>
       <div className="header-content">
-        <Link to="/">
-          <img
-            src="https://i.imgur.com/aDk96bW.png"
-            alt="VortexLogo png"
-            className="logo"
-          />
-        </Link>
+        <div className="div-logo">
+          <Link to="/">
+            <img
+              src="https://i.imgur.com/aDk96bW.png"
+              alt="VortexLogo png"
+              className="logo"
+            />
+          </Link>
+        </div>
+        <div className="div-burger">
+          {/* Burger Icon */}
+          <button className="burger-menu" onClick={toggleMenu}>
+            &#9776;
+          </button>
 
-        {/* Burger Icon */}
-        <button className="burger-menu" onClick={toggleMenu}>
-          &#9776;
-        </button>
-
-        {/* Navigation Menu */}
-        <nav className={`menu ${isOpen ? "open" : ""}`}>
-          <Link to="/" onClick={() => setIsOpen(false)}>
-            Home
-          </Link>
-          <Link to="/factory" onClick={() => setIsOpen(false)}>
-            Launch
-          </Link>
-          <Link to="/staking" onClick={() => setIsOpen(false)}>
-            Stake
-          </Link>
-          <a
-            href="https://docs.vortexdapp.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setIsOpen(false)}
-          >
-            Docs
-          </a>
-        </nav>
-        <div>
+          {/* Navigation Menu */}
+          <nav className={`menu ${isOpen ? "open" : ""}`}>
+            <Link to="/" onClick={() => setIsOpen(false)}>
+              Home
+            </Link>
+            <Link to="/factory" onClick={() => setIsOpen(false)}>
+              Launch
+            </Link>
+            <Link to="/staking" onClick={() => setIsOpen(false)}>
+              Stake
+            </Link>
+            <a
+              href="https://docs.vortexdapp.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+            >
+              Docs
+            </a>
+          </nav>
+        </div>
+        <div className="div-button">
           {" "}
           {isConnected ? (
             <button onClick={connectWallet}>Options</button>

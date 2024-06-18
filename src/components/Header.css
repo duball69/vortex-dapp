@@ -1,115 +1,125 @@
 /* Header.css */
 .header {
-    background-color: #00000000;
-    padding: 10px 20px;
-    color: white;
-       display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .logo {
-    width: 80px; /* Adjust the width according to your preference */
-    height: auto; /* Maintain aspect ratio */
-    
-  }
-
-
-  
-  /* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
-  @media only screen and (max-width: 600px) {
-    .logo {
-      width: 50px; /* Adjust the width for smaller screens */
-      align-items: center;
-      display:flex;
-      
-    }
-  }
-  
-  .header-content {
-    padding: 10px 20px;
-    max-width: 100%; /* Ensure content does not exceed viewport width */
-    margin: 0 auto; /* Center the content horizontally */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  button {
-    padding: 7px 25px;
-    margin-top: 30px;
-    font-size: 16px;
-    border-radius: 30px;
-    /* Gradient background */
-    background: linear-gradient(38deg, #0000007c, /* purple */ #fb00dec5); /* Replace #FF5733 with your desired color */
-    border: 1px solid rgba(255, 255, 255, 0.519);
-    color: #ffffff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-style: normal;
-    font-weight: 400;
-    font-family: "Lexend Deca", sans-serif;
+  background-color: #00000000;
+  padding: 10px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.logo {
+  width: 80px; /* Adjust the width according to your preference */
+  height: auto; /* Maintain aspect ratio */
+}
+
+/* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
+@media only screen and (max-width: 600px) {
+  .logo {
+      width: 70px; /* Adjust the width for smaller screens */
+      align-items: center;
+      display: flex;
+  }
+
+  .div-logo, .div-burger, .div-button {
+    max-width: 33%; /* Each div takes 33% of the width */
+}
+
+  /* Ensure each column occupies 33% of the screen width */
+  .header-content > * {
+      width: 33%;
+      text-align: center; /* Center content within each column */
+  }
+
+  .burger-menu {
+
+      text-align: center; /* Align burger menu to the right */
+  }
+
+
+}
+
+.header-content {
+  padding: 10px 20px;
+  max-width: 100%; /* Ensure content does not exceed viewport width */
+  margin: 0 auto; /* Center the content horizontally */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  padding: 7px 25px;
+  margin-top: 30px;
+  font-size: 16px;
+  border-radius: 30px;
+  /* Gradient background */
+  background: linear-gradient(38deg, #0000007c, #fb00dec5); /* Replace #FF5733 with your desired color */
+  border: 1px solid rgba(255, 255, 255, 0.519);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-style: normal;
+  font-weight: 400;
+  font-family: "Lexend Deca", sans-serif;
+}
 
 button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
-
-
-
 .burger-menu {
-    display: none; /* Hide burger menu on desktop */
-    font-size: 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
+  display: none; /* Hide burger menu on desktop */
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .menu {
-    display: flex; /* Horizontal menu on desktop */
-    gap: 20px; /* Space between links */
+  display: flex; /* Horizontal menu on desktop */
+  gap: 20px; /* Space between links */
 }
 
 .menu a {
-    text-decoration: none;
-    color: #ffffff; /* Adjust color as needed */
-    font-weight: 500;
+  text-decoration: none;
+  color: #ffffff; /* Adjust color as needed */
+  font-weight: 500;
 }
 
-.connected-chain {color:white;
-margin-top:10px;
-font-size: 12px;
-text-align: center;}
+.connected-chain {
+  color: white;
+  margin-top: 10px;
+  font-size: 12px;
+  text-align: center;
+}
 
 .menu a:hover {
-    color: #a333ff; /* Change to your desired hover color */
+  color: #a333ff; /* Change to your desired hover color */
 }
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-    .burger-menu {
-        display: block; /* Show burger menu on mobile */
-      margin-top:0px;
+  .burger-menu {
+      display: block; /* Show burger menu on mobile */
+      margin-top: 0px;
+    
 
-    }
+  }
 
-    .menu {
-        display: none; /* Hide horizontal menu on mobile */
-        flex-direction: column; /* Stack links vertically */
-        position: absolute;
-        right: 0;
-        top: 60px; /* Adjust based on header height */
-        background-color: rgba(0, 0, 0, 0.436); /* Adjust color as needed */
-        width: 100%;
-        text-align: center;
-        padding: 10px 0;
-    }
+  .menu {
+      display: none; /* Hide horizontal menu on mobile */
+      flex-direction: column; /* Stack links vertically */
+      position: absolute;
+      right: 0;
+      top: 60px; /* Adjust based on header height */
+      background-color: rgba(0, 0, 0, 0.436); /* Adjust color as needed */
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+  }
 
-    .menu.open {
-        display: flex; /* Show menu when burger is clicked */
-    }
+  .menu.open {
+      display: flex; /* Show menu when burger is clicked */
+  }
 }
-
- 

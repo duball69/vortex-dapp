@@ -23,7 +23,7 @@
 
   @media only screen and (max-width: 600px) {
     .centered-content {
-      height: 80vh; /* Add margin-bottom of at least 200px for mobile devices */
+      height: 600px; /* Add margin-bottom of at least 200px for mobile devices */
     }
   }
 

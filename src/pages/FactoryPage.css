@@ -7,7 +7,7 @@ html, body {
     background-attachment: fixed;
 }
 
-.titlefactory {font-size:35px;
+.titlefactory {font-size:30px;
     text-align: center;
     color: white;
     padding-right:250px;
@@ -16,7 +16,7 @@ html, body {
     }
 
 .subtitlefactory {font-size:18px;
-    margin-top:10px;
+    margin-top:5px;
     font-weight: 300;
 }
 
@@ -28,7 +28,7 @@ html, body {
     padding: 70px 70px 100px 70px;
     border: 1px solid #cccccc81;
     border-radius: 30px;
-    margin-top:40px;
+    margin-top:100px;
     background-color: #0000006c;
     color:white;
     display: flex;
@@ -42,14 +42,13 @@ html, body {
 
 @media only screen and (max-width: 600px) {
     .factory-container {
-      margin: 10px 20px 60px 20px; /* Add margin for mobile devices */
+      margin: 20px 20px 20px 20px; /* Add margin for mobile devices */
       height:60%;
-      margin-top:140px;
+      
+    
     }
-    .center-container{margin:50px 50px 50px 50px;
-    margin-top:30px;
-margin-left:10px;
-margin-right:10px;}
+    .center2-container{margin:0px;
+   }
 
     .titlefactory {font-size:23px;
         text-align: center;
@@ -135,11 +134,13 @@ button.deploy-button:hover {
     font-style: italic;
 }
 
-.center-container {
+.center2-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+
+
 }
 
 
@@ -148,7 +149,7 @@ button.deploy-button:hover {
     text-align: center;
     color: white;
     margin-bottom:-60px;
-    margin-top:-80px;
+    
     font-size: 16px;
     
   }
