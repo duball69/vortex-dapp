@@ -58,7 +58,12 @@ function HomePage() {
         </div>
       </div>
 
-      <TokensList />
+      <TokensList limit={6} />
+      <div className="container">
+        <Link to="/tokens">
+          <button>View All </button>
+        </Link>
+      </div>
       <Footer />
     </div>
   );

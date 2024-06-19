@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig";
 import Header from "../components/Header.js";
@@ -91,7 +91,7 @@ function AfterLaunch() {
     const tokenDoc = doc(firestore, "tokens", contractAddress);
     await updateDoc(tokenDoc, tokenDetails);
     setIsLoading(false);
-    alert("Token details updated successfully!");
+    window.location.href = "/";
   };
 
   return (
@@ -104,6 +104,7 @@ function AfterLaunch() {
       <div className="center-container">
         <div className="factory-container">
           <h1>Update your Token Details</h1>
+
           {isLoaded ? (
             <form onSubmit={handleUpdate} className="token-form">
               <input
@@ -130,6 +131,7 @@ function AfterLaunch() {
                 onChange={handleChange}
                 placeholder="Telegram URL"
               />
+
               <button
                 className="deploy-button"
                 type="submit"

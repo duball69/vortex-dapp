@@ -224,6 +224,7 @@ function FactoryPage() {
           address: deployedAddress,
           imageUrl: imageUrl,
           deployer: connectedWallet,
+          timestamp: new Date(),
           chain: CHAIN_NAMES[chainId],
         });
       }

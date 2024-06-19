@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
-import { FaTwitter, FaXTwitter, FaTelegram, FaGlobe } from "react-icons/fa6"; // Importing specific icons
-import "./TokenList.css"; // Assuming you have a separate CSS file
+import { FaTwitter, FaXTwitter, FaTelegram, FaGlobe } from "react-icons/fa6";
+import "./TokenList.css";
 
-function TokensList() {
+function TokensList({ limit }) {
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,11 +12,27 @@ function TokensList() {
     const fetchTokens = async () => {
       try {
         const querySnapshot = await getDocs(collection(firestore, "tokens"));
-        const tokensArray = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTokens(tokensArray);
+        const tokensArray = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            timestamp: data.timestamp ? data.timestamp.toDate() : null, // Convert Firestore Timestamp to JavaScript Date
+          };
+        });
+
+        // Log tokens before sorting
+        console.log("Tokens before sorting:", tokensArray);
+
+        // Sort tokens by timestamp in descending order (most recent first)
+        const sortedTokens = tokensArray.sort(
+          (a, b) => b.timestamp - a.timestamp
+        );
+
+        // Log tokens after sorting
+        console.log("Tokens after sorting:", sortedTokens);
+
+        setTokens(sortedTokens);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching tokens:", error);
@@ -30,12 +46,14 @@ function TokensList() {
   if (loading) return <p>Loading tokens...</p>;
   if (!tokens.length) return <p>No tokens found.</p>;
 
+  const displayedTokens = limit ? tokens.slice(0, limit) : tokens;
+
   return (
     <div className="tokens-container">
       <h3 className="deployedtokenstitle">Deployed Tokens</h3>
       <h5 className="subtitletokens">Trade them directly on Uniswap</h5>
       <div className="tokens-grid">
-        {tokens.map((token) => (
+        {displayedTokens.map((token) => (
           <div key={token.id} className="token-card">
             {token.imageUrl && (
               <img
