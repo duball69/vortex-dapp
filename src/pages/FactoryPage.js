@@ -227,6 +227,17 @@ function FactoryPage() {
           timestamp: new Date(),
           chain: CHAIN_NAMES[chainId],
         });
+
+        // Update Points
+        const userPointsDoc = doc(firestore, "userPoints", connectedWallet);
+        const userPointsSnapshot = await getDoc(userPointsDoc);
+
+        if (userPointsSnapshot.exists()) {
+          const currentPoints = userPointsSnapshot.data().points;
+          await updateDoc(userPointsDoc, { points: currentPoints + 1 });
+        } else {
+          await setDoc(userPointsDoc, { points: 1 });
+        }
       }
     } catch (error) {
       console.error("Error during transaction:", error);

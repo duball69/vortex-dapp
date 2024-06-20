@@ -1,0 +1,21 @@
+/* styles.css */
+
+.table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Optional: Align items vertically in center */
+    height: 100vh; /* Optional: Ensure full viewport height */
+  }
+  
+  .custom-table {
+    color: white;
+    width: 80%; /* Adjust width as needed */
+    margin-top: 20px; /* Example margin */
+  }
+  
+  .custom-table th,
+  .custom-table td {
+    padding: 10px;
+    text-align: center;
+  }
+  

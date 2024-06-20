@@ -8,7 +8,14 @@ import Footer from "../components/Footer.js";
 import { ethers, BrowserProvider } from "ethers";
 import SimpleStakingJson from "../contracts/SimpleStaking.json";
 import { firestore } from "../components/firebaseConfig.js";
-import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  increment,
+  gt,
+} from "firebase/firestore";
 
 const STAKING_POOL_ADDRESS = "0x9D56153550a39385F2d5DC09D08a81B2aA2C18F3";
 
@@ -156,6 +163,13 @@ const StakingPage = () => {
         value: ethers.parseUnits(amount, 18),
       });
       await tx.wait(); // Ensure you wait for the transaction to be mined
+
+      // Check if the amount staked is greater than 0.01 ETH before updating points
+
+      if (amount > 0.01) {
+        const userPointsDoc = doc(firestore, "userPoints", connectedWallet);
+        await updateDoc(userPointsDoc, { points: increment(1) });
+      }
 
       // After successful staking, refetch the relevant data
       const newStakedAmount = await stakingPoolContract.getStake(
