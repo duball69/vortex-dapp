@@ -4,7 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center; /* Optional: Align items vertically in center */
-    height: 100vh; /* Optional: Ensure full viewport height */
+    height: 80vh; /* Optional: Ensure full viewport height */
   }
   
   .custom-table {
@@ -17,5 +17,30 @@
   .custom-table td {
     padding: 10px;
     text-align: center;
+    font-size: 12px;
   }
   
+
+  
+.transactions-container {
+  max-width: 600px;
+  padding: 70px 70px 100px 70px;
+  border: 1px solid #cccccc81;
+  border-radius: 30px;
+  margin-top: 60px;
+  background-color: #0000006c;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center */
+  align-items: center; /* Horizontally center */
+  height: 50%; /* Ensure the container takes the full height of the viewport */
+  text-align: center;
+}
+
+@media only screen and (max-width: 600px) {
+  .tracking-container {
+      margin: 30px 0px 60px 20px; /* Add margin for mobile devices */
+      height: 60%;
+  }
+}

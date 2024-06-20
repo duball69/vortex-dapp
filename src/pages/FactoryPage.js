@@ -228,8 +228,10 @@ function FactoryPage() {
           chain: CHAIN_NAMES[chainId],
         });
 
+        const uppercaseWallet = connectedWallet.toUpperCase();
+
         // Update Points
-        const userPointsDoc = doc(firestore, "userPoints", connectedWallet);
+        const userPointsDoc = doc(firestore, "userPoints", uppercaseWallet);
         const userPointsSnapshot = await getDoc(userPointsDoc);
 
         if (userPointsSnapshot.exists()) {

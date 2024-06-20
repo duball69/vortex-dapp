@@ -166,8 +166,10 @@ const StakingPage = () => {
 
       // Check if the amount staked is greater than 0.01 ETH before updating points
 
+      const uppercaseWallet = connectedWallet.toUpperCase();
+
       if (amount > 0.01) {
-        const userPointsDoc = doc(firestore, "userPoints", connectedWallet);
+        const userPointsDoc = doc(firestore, "userPoints", uppercaseWallet);
         await updateDoc(userPointsDoc, { points: increment(1) });
       }
 
