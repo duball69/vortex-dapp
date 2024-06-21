@@ -10,6 +10,7 @@ import {
   getDoc,
   updateDoc,
   increment,
+  runTransaction,
   exists,
   gt,
 } from "firebase/firestore";
@@ -83,8 +84,9 @@ const TokenBuyTrackerPage = () => {
 
           setTransactions(filteredTransfers);
 
-          // Save each transaction to Firestore
-          filteredTransfers.forEach(saveTransaction);
+          for (const tx of filteredTransfers) {
+            saveTransaction(tx);
+          }
         } else {
           setError("No transactions found.");
         }
@@ -100,61 +102,41 @@ const TokenBuyTrackerPage = () => {
   }, []);
 
   const saveTransaction = async (tx) => {
-    const txDocRef = doc(firestore, "transactions", tx.hash); // Create a document reference with tx.hash as the document ID
-
+    const txDocRef = doc(firestore, "transactions", tx.hash);
     try {
-      await setDoc(txDocRef, {
-        hash: tx.hash, // Transaction hash
-        to: tx.to.toUpperCase(), // Transaction to address, stored in uppercase
+      await runTransaction(firestore, async (transaction) => {
+        const txDoc = await transaction.get(txDocRef);
+        if (!txDoc.exists()) {
+          transaction.set(txDocRef, {
+            hash: tx.hash,
+            to: tx.to.toUpperCase(),
+          });
+          console.log("Transaction saved:", tx.hash);
+          // Update points
+          await updatePoints(tx.to, tx.hash);
+        } else {
+          console.log(
+            "Transaction already exists, skipping points update:",
+            tx.hash
+          );
+        }
       });
-      console.log("Transaction saved:", tx.hash);
-      // Update points for the wallet address in 'to'
-      await updatePoints(tx.to, tx.hash);
     } catch (error) {
-      console.error("Error saving transaction or updating points:", error);
+      console.error("Transaction failure:", error);
     }
   };
 
-  const updatePoints = async (to, transactionHash) => {
-    const txDocRef = doc(firestore, "transactions", transactionHash);
-    const txSnap = await getDoc(txDocRef);
+  const updatePoints = async (to) => {
+    console.log("Attempting to update points for:", to); // Log every attempt
+    const userPointsDoc = doc(firestore, "userPoints", to.toUpperCase()); // Normalize the address format
 
-    if (txSnap.exists() && txSnap.data().pointsAwarded) {
-      console.log(
-        "Points already awarded for this transaction:",
-        transactionHash
-      );
-      return; // Exit if points were already awarded
-    }
-
-    const userPointsDoc = doc(firestore, "userPoints", to);
-    const userPointsSnap = await getDoc(userPointsDoc);
-
-    // Start a batch to ensure atomic operations
-    const batch = firestore.batch();
-
-    if (!userPointsSnap.exists()) {
-      console.log("Creating new points document for wallet:", to);
-      batch.set(userPointsDoc, { points: 1 });
-    } else {
+    try {
       console.log("Incrementing points for wallet:", to);
-      batch.update(userPointsDoc, { points: increment(1) });
+      await updateDoc(userPointsDoc, { points: increment(1) });
+      console.log("Points successfully incremented for wallet:", to);
+    } catch (error) {
+      console.error("Failed to increment points for wallet:", to, error);
     }
-
-    console.log(
-      "Setting pointsAwarded to true for transaction:",
-      transactionHash
-    );
-    batch.update(txDocRef, { pointsAwarded: true });
-
-    // Commit the batch
-    await batch.commit();
-    console.log(
-      "Batch committed for wallet:",
-      to,
-      " and transaction:",
-      transactionHash
-    );
   };
 
   return (
@@ -171,7 +153,6 @@ const TokenBuyTrackerPage = () => {
                 <th>From</th>
                 <th>To</th>
                 <th>Amount</th>
-                <th>Hash</th>
               </tr>
             </thead>
             <tbody>
@@ -180,7 +161,6 @@ const TokenBuyTrackerPage = () => {
                   <td>{tx.from}</td>
                   <td>{tx.to}</td>
                   <td>{formatTokenValue(tx.value)}</td>
-                  <td>{tx.hash}</td>
                 </tr>
               ))}
             </tbody>
