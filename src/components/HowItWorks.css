@@ -1,0 +1,62 @@
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-image: url('https://i.imgur.com/3lmoXpI.jpeg');
+    background-size: cover;
+    background-attachment: fixed;
+    
+  }
+  
+  .how-it-works {
+    background-color: #0000006c; /* Semi-transparent black background */
+    color: white;
+    border-radius: 30px;
+    padding: 150px 20px 150px 20px;
+    margin:50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto; /* Adjust width to fit content */
+  }
+  
+  .steps-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure full width */
+  }
+  
+  .step-box {
+    padding: 50px 20px 50px 20px;
+    margin: 10px;
+    border: 1px solid #cccccc81; /* Subtle border */
+    background-color: transparent; /* Keep it transparent or use a light opacity background */
+    border-radius: 10px;
+    text-align: center;
+    min-width: 150px; /* Ensure all boxes have at least the minimum width */
+    flex: 1; /* Ensure boxes take equal space */
+  }
+  
+  .titlefactory {
+    font-size: 30px;
+    margin-bottom: 30px; /* Space below the title */
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .titlefactory {
+      font-size: 23px;
+      text-align: center;
+    }
+  
+    .how-it-works, .steps-container {
+      flex-direction: column; /* Stack vertically on small screens */
+    }
+  
+    .step-box {
+      min-width: 0; /* Allow boxes to fit content on smaller screens */
+      width: 100%; /* Full width on small screens */
+    }
+  }
+  

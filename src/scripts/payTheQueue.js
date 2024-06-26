@@ -1,8 +1,8 @@
 // Importing ethers from Hardhat environment
 const { ethers } = require("hardhat");
 
-async function handleReceivedWETH() {
-  const stakingContractAddress = "  0x3A01F3F17cda50C9072F082e370b8c3Ac3057CfB";
+async function handleReceivedWETHDELETE() {
+  const stakingContractAddress = "0x753Aa0565505B73b0471a6b9638841A4e884F4b9";
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();
@@ -16,7 +16,7 @@ async function handleReceivedWETH() {
 
   try {
     // Sending a transaction to handle received WETH and process the unstake queue
-    const tx = await stakingContract.handleReceivedWETH();
+    const tx = await stakingContract.handleReceivedWETHDELETE();
     console.log("Transaction sent:", tx.hash);
 
     // Wait for the transaction to be mined
@@ -30,7 +30,7 @@ async function handleReceivedWETH() {
 
 async function main() {
   try {
-    await handleReceivedWETH();
+    await handleReceivedWETHDELETE();
   } catch (error) {
     console.error(error);
     process.exit(1); // Exit with failure in case of an error

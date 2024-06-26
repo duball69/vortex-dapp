@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./HomePage.css"; // Import the CSS file for styling
 import Header from "../components/Header.js";
+import HowItWorks from "../components/HowItWorks";
+import Features from "../components/Features";
+import FAQ from "../components/Faqs.js";
+import Contact from "../components/Contacts";
 import {
   createWeb3Modal,
   defaultConfig,
@@ -64,6 +68,9 @@ function HomePage() {
           <button>View All </button>
         </Link>
       </div>
+
+      <HowItWorks />
+
       <Footer />
     </div>
   );

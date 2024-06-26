@@ -1,7 +1,4 @@
-// Array to store deployed token contract addresses
-const deployedTokenAddresses = [];
-
-async function getTokenDeployedEvent(token, factoryAddress) {
+async function getTokenDeployedEvent(token) {
   // Get the filter for the TokenDeployed event
   const filter = token.filters.TokenDeployed();
 
@@ -12,22 +9,6 @@ async function getTokenDeployedEvent(token, factoryAddress) {
   const tokenDeployedEvent = events[events.length - 1]; // Get the latest event
 
   return tokenDeployedEvent;
-}
-
-async function getPoolCreatedEvent(factory, tokenAddress) {
-  // Get the filter for the PoolCreated event
-  const filter = factory.filters.PoolCreated();
-
-  // Query the filter for events emitted by the factory contract
-  const events = await factory.queryFilter(filter);
-
-  // Log the events array to inspect its contents
-  //console.log("Events array:", events);
-
-  // Find the PoolCreated event matching the token address
-  const poolCreatedEvent = events[events.length - 1]; // Assuming the latest event corresponds to the pool creation
-
-  return poolCreatedEvent;
 }
 
 // Babylonian method for square root calculation using BigInt
@@ -54,38 +35,37 @@ async function main() {
   );
 
   // Replace these with your desired token name, symbol, and total supply
-  const tokenName = "SwapCoin";
-  const tokenSymbol = "SWAP";
+  const tokenName = "PoopCoin";
+  const tokenSymbol = "Poop";
   const tokenSupply = "100";
 
   // Replace this with the address of the deployed factory contract
-  const factoryAddress = "0x3168e66eC3fa850C9B24E5e39890Bc29F6159071";
+  const factoryAddress = "0x75085f466Eb0a88a3faF8E6E8eBcD19348726a4f";
 
-  //SEPOLIA
+  const swapRouterAddress = "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E";
+  const abi = require("../scripts/swapRouterABI.json");
+  const swapRouter = new ethers.Contract(swapRouterAddress, abi, deployer);
+
+  const lockerAddress = "0xc4d1Fad3e2f86ec002368E79f88C68B2aE03d18b";
+  const nftAddress = "0x1238536071E1c677A632429e3655c799b22cDA52";
+
   const WETH_address = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14";
-
-  //BASE
-  /*  const WETH_address = "0x4200000000000000000000000000000000000006";
-   */
-
-  //const tokenAddress = "0x90950111fcfF15474c670aA44890561F9624866C";
-  //const pool_Address = "0xc28FE4D9ecd71A3B71FF469cE4C23671cd6dc180";
 
   // Connect to the factory contract using its ABI and address
   const Factory = await ethers.getContractFactory("MyFactory");
   const factory = await Factory.attach(factoryAddress);
 
-  // Retrieve the contract address of the deployed token
-  const provider = ethers.getDefaultProvider(); // Update with your WebSocket provider URL
-
   const tokenAmount = ethers.parseUnits(tokenSupply, 18); // 1,000,000 tokens with 18 decimals
   const wethAmount = ethers.parseUnits("0.0001", 18); // 0.01 WETH
+
+  // Amount of ETH to swap
+  const amountIn = ethers.parseUnits("0.0005", 18); // 0.01 ETH
 
   // Call the deployToken function of the factory contract
   const tx = await factory.deployToken(tokenName, tokenSymbol, tokenSupply); //DEPLOY
 
   // Wait for the transaction to be mined
-  const receipt = await tx.wait();
+  await tx.wait();
   console.log("Token deployed successfully!");
 
   // Get the TokenDeployed event emitted by the token contract
@@ -107,22 +87,18 @@ async function main() {
     token1amount = tokenAmount;
   }
 
-  //console.log(`Creating pool with token0: ${token0} and token1: ${token1}, token0amount: ${token0amount}, token1amount: ${token1amount}...`);
-
   // Calculate sqrtPriceX96 considering both tokens have 18 decimals
   const priceRatio =
     (BigInt(token1amount) * BigInt(10 ** 18)) / BigInt(token0amount);
   const sqrtPriceRatio = sqrt(priceRatio);
   const sqrtPriceX96 = (sqrtPriceRatio * 2n ** 96n) / 10n ** 9n; // Scale to 2^96
-  //const sqrtPriceX96 = sqrtPriceRatio * BigInt(2 ** 96)/BigInt(10 ** 9);
-  console.log(`Calculated price ratio: ${priceRatio}`);
-  console.log(`Calculated sqrt price ratio: ${sqrtPriceRatio}`);
-  console.log(`Calculated sqrtPriceX96: ${sqrtPriceX96.toString()}`);
+  //console.log(`Calculated sqrtPriceX96: ${sqrtPriceX96.toString()}`);
 
   // Encode the calls
   const iface = new ethers.Interface([
     "function createAndInitializePoolIfNecessary(address,address,uint160) external returns (address pool)",
     "function addInitialLiquidity(address,address,address,uint256,uint256) external",
+    "function swapETHforTokens(uint256, address) external payable returns (uint256 )",
   ]);
 
   const createPoolData = iface.encodeFunctionData(
@@ -132,40 +108,27 @@ async function main() {
   const addLiquidityData = iface.encodeFunctionData("addInitialLiquidity", [
     token0,
     token1,
-    factoryAddress,
+    tokenAddress,
     token0amount,
     token1amount,
   ]);
+  //const swapData = iface.encodeFunctionData("swapETHforTokens", [amountIn, tokenAddress]);
 
   // Multicall
   const tx2 = await factory.multicall([createPoolData, addLiquidityData], {
+    //value: amountIn,
     gasLimit: 9000000,
   });
 
   await tx2.wait();
+  console.log("Multi-call successful!");
 
-  console.log("Pool created, initialized, and liquidity added successfully!");
-  /*
-    // Create and initialize the pool
-    const createPoolTx = await factory.createAndInitializePoolIfNecessary(token0, token1, sqrtPriceX96);
-    await createPoolTx.wait();
-    console.log("Pool created and initialized successfully!");
-
-    // Get the PoolCreated event emitted by the factory contract
-    const poolCreatedEvent = await getPoolCreatedEvent(factory, tokenAddress);
-
-    const pool_Address = poolCreatedEvent.args[1];
-    console.log("Pool Address: ",pool_Address);
-
-
-    console.log("Adding liquidity to the pool...");
-    const tx2 = await factory.addInitialLiquidity(token0, token1, factoryAddress, token0amount, token1amount,{
-        gasLimit: 5000000 // Set a higher gas limit for adding liquidity
-    });
-
-    await tx2.wait();
-
-    console.log("Liquidity added successfully!");*/
+  console.log("Buying tokens for the team...");
+  tx1 = await factory.swapETHforTokens(amountIn, tokenAddress, {
+    value: amountIn,
+  });
+  receipt = await tx1.wait();
+  console.log("Swap performed successfully!");
 }
 
 main()

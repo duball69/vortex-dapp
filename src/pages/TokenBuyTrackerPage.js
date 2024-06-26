@@ -3,6 +3,7 @@ import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
 import "./TokenBuyTrackerPage.css";
 import { firestore } from "../components/firebaseConfig.js";
+import { useWeb3ModalAccount, useWeb3Modal } from "@web3modal/ethers/react";
 import {
   collection,
   doc,
@@ -23,6 +24,13 @@ const TokenBuyTrackerPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const {
+    address: connectedWallet,
+    chainId,
+    isConnected,
+  } = useWeb3ModalAccount();
+  const { open } = useWeb3Modal();
+
   const DECIMALS = 18;
 
   function formatTokenValue(rawValue) {
@@ -30,6 +38,14 @@ const TokenBuyTrackerPage = () => {
     const value = rawValue / factor; // Adjust raw value by the token's decimals
     return Number(value.toFixed(3)); // Convert to number again to remove any trailing zeros
   }
+
+  const connectWallet = async () => {
+    try {
+      await open();
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchTokenTransfers = async () => {
@@ -141,7 +157,11 @@ const TokenBuyTrackerPage = () => {
 
   return (
     <div>
-      <Header />
+      <Header
+        connectWallet={connectWallet}
+        isConnected={isConnected}
+        chainId={chainId}
+      />
       <div className="center2-container">
         <div className="transactions-container">
           <h1 className="titlestake">Token Buy Tracker Page</h1>

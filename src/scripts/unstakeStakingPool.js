@@ -38,7 +38,7 @@ async function unstakeEthFromStakingPool(stakingPoolAddress, amountToUnstake) {
 }
 
 async function main() {
-  const stakingPoolAddress = "0xfBfa6aE669D6f7Dd2572e5D91119e080EFde479C"; // Replace with your actual contract address
+  const stakingPoolAddress = "0x8f6D16Da0639584F5E85456943dB135c8cA10F59"; // Replace with your actual contract address
   const amountToUnstake = "0.01"; // Replace with the amount you want to unstake
 
   await unstakeEthFromStakingPool(stakingPoolAddress, amountToUnstake);

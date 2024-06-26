@@ -29,7 +29,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0xe402bbd03968316cc42F6EA33E4a5291E18fC2C4",
+    factoryAddress: "0xC66fE2126725b3F40F5810cBc59F8dbeFdf1FEeF",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -152,7 +152,7 @@ function DashboardPage() {
     let token0, token1, token0amount, token1amount;
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-    const wethAmount = ethers.parseUnits("0.001", 18); // 0.01 WETH
+    const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
 
     if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
       token0 = contractAddress;
@@ -175,6 +175,7 @@ function DashboardPage() {
     const iface = new ethers.Interface([
       "function createAndInitializePoolIfNecessary(address,address,uint160) external returns (address pool)",
       "function addInitialLiquidity(address,address,address,uint256,uint256) external",
+      "function swapETHforTokens(uint256,address) payable returns (bool)",
     ]);
 
     const createPoolData = iface.encodeFunctionData(
@@ -206,9 +207,25 @@ function DashboardPage() {
       setSuccessMessage(
         "Your token is now launched on Uniswap with liquidity added!"
       );
+      // Perform the token purchase after liquidity is added
+      console.log("Buying tokens for the team...");
+      const amountIn = ethers.parseUnits("0.001", 18); // Define the ETH amount to use in token purchase
+      const tx1 = await factoryContract.swapETHforTokens(
+        amountIn,
+        contractAddress,
+        {
+          value: amountIn,
+        }
+      );
+      const receipt = await tx1.wait();
+      console.log("Swap performed successfully!");
+      setSuccessMessage(
+        "Your token is now launched on Uniswap with liquidity added, and tokens purchased!"
+      );
+
       setErrorMessage("");
     } catch (error) {
-      console.error("Multicall transaction failed:", error);
+      console.error("Transaction failed:", error);
       setErrorMessage("Transaction failed: " + error.message);
       setSuccessMessage(""); // Clear any previous success messages
     } finally {

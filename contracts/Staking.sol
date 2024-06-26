@@ -110,6 +110,7 @@ function processImmediateUnstake(address user, uint256 amount) internal {
     stakes[user] -= amount;
     totalStaked -= amount;
     rewardDebt[user] = stakes[user] * accRewardPerShare / 1e12;
+    
 
     emit Unstake(user, amount);
 }
@@ -299,6 +300,27 @@ function handleReceivedWETH() internal{
                     }
     }
 }
+
+
+function handleReceivedWETHDELETE() external{ 
+    uint256 availableWETH = IWETH(weth).balanceOf(address(this));
+    emit DebugAvailableWETH(availableWETH);  // Log the available WETH balance
+
+    if (unstakeQueue.length > 0) {
+        UnstakeRequest storage request = unstakeQueue[0];  // Get the first request in the queue
+        emit UnstakeRequestDetails(0, request.user, request.amount, request.timestamp); // Log details of the request
+
+        if (availableWETH >= request.amount) {
+            processImmediateUnstake(request.user, request.amount);  // Process the unstake immediately
+            removeFromQueue(0);  // Remove the processed request from the queue
+        } else {
+ uint256 wethShortfall = request.amount - availableWETH;
+            notifyFactoryForFunds(wethShortfall);  // Request the exact needed funds from the factory
+            emit FundsRequested(wethShortfall);  // Optionally log this event
+                    }
+    }
+}
+
 
 function removeFromQueue(uint index) internal {
     require(index < unstakeQueue.length, "Index out of bounds.");

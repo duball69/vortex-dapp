@@ -24,10 +24,10 @@ h5 {
 
 .staking-container {
   max-width: 600px;
-  padding: 20px 70px 100px 70px;
+  padding: 30px 70px 30px 70px;
   border: 1px solid #cccccc81;
   border-radius: 30px;
-  margin-top: 60px;
+  margin-top: 0px;
   background-color: #0000006c;
   color: white;
   display: flex;
@@ -65,7 +65,7 @@ h5 {
   }
 
   center2-container {
-      margin-top: 20px;
+      margin-top: 10px;
   }
 }
 
