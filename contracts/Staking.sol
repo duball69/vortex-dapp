@@ -82,22 +82,6 @@ function stake() external payable nonReentrant {
 }
 
 
-function unstake(uint256 amount) external nonReentrant {
-    require(stakes[msg.sender] >= amount, "Insufficient staked balance");
-    require(stakes[msg.sender] - pendingUnstakes[msg.sender] >= amount, "Unstake amount exceeds available balance");
-
-    updatePool();
-
-    uint256 wethBalance = IWETH(weth).balanceOf(address(this));
-    if (wethBalance >= amount) {
-        // There is enough WETH in the pool to fulfill the unstake request immediately
-        processImmediateUnstake(msg.sender, amount);
-    } else {
-        // Not enough WETH available, add the request to the unstake queue
-        addToUnstakeQueue(msg.sender, amount);
-    }
-}
-
 
 function processImmediateUnstake(address user, uint256 amount) internal {
     // Withdraw the WETH amount to this contract
@@ -116,6 +100,8 @@ function processImmediateUnstake(address user, uint256 amount) internal {
 }
 
 
+uint256 public totalFundsNeeded;
+
 function addToUnstakeQueue(address user, uint256 amount) internal {
     UnstakeRequest memory request = UnstakeRequest({
         user: user,
@@ -125,9 +111,10 @@ function addToUnstakeQueue(address user, uint256 amount) internal {
     unstakeQueue.push(request);
     emit UnstakeQueued(user, amount, block.timestamp);  // Consider creating and emitting an event for a queued unstake request
 
-
-      uint256 fundsNeeded = amount * 70 / 100;
-    notifyFactoryForFunds(fundsNeeded);
+// Update the total funds needed to include this new request
+    totalFundsNeeded += (amount * 70 / 100);
+    notifyFactoryForFunds(totalFundsNeeded);
+     
 }
 
 
@@ -293,6 +280,10 @@ function handleReceivedWETH() internal{
         if (availableWETH >= request.amount) {
             processImmediateUnstake(request.user, request.amount);  // Process the unstake immediately
             removeFromQueue(0);  // Remove the processed request from the queue
+            totalFundsNeeded -= (request.amount * 70 / 100);  // Reduce the total funds needed
+                   // Update available WETH after processing this unstake
+                   availableWETH = IWETH(weth).balanceOf(address(this));
+
         } else {
  uint256 wethShortfall = request.amount - availableWETH;
             notifyFactoryForFunds(wethShortfall);  // Request the exact needed funds from the factory
@@ -370,3 +361,4 @@ interface IWETH {
 interface IFundsInterface {
     function notifyFundsNeeded(uint256 amount) external;
 }
+

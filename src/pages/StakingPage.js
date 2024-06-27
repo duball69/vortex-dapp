@@ -17,7 +17,7 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x8f6D16Da0639584F5E85456943dB135c8cA10F59";
+const STAKING_POOL_ADDRESS = "0x4e49908aE2AAD9Fcb498029a4A403aA994A3aFE6";
 
 const CHAIN_NAMES = {
   56: "BSC",
@@ -202,9 +202,28 @@ const StakingPage = () => {
     }
   };
 
+  const calculateMaxUnstakable = (stakedAmount, pendingUnstake) => {
+    const maxUnstake = stakedAmount - pendingUnstake;
+    return maxUnstake > 0n ? maxUnstake : 0n;
+  };
+
   const handleUnstake = async () => {
     if (!amount) {
       setErrorMessage("Please enter an amount to unstake.");
+      return;
+    }
+
+    const unstakeAmount = ethers.parseUnits(amount, 18);
+    const availableForUnstake = stakedAmount - pendingUnstake;
+
+    if (unstakeAmount > availableForUnstake) {
+      setErrorMessage(
+        setErrorMessage(
+          `You can only unstake up to ${ethers.formatEther(
+            availableForUnstake
+          )} ETH.`
+        )
+      );
       return;
     }
 
@@ -223,12 +242,10 @@ const StakingPage = () => {
         signer
       );
 
-      const txResponse = await stakingPoolContract.unstake(
-        ethers.parseUnits(amount, 18)
-      );
-      const receipt = await txResponse.wait(); // Wait for transaction to be mined
+      const txResponse = await stakingPoolContract.unstake(unstakeAmount);
+      await txResponse.wait(); // Wait for transaction to be mined
 
-      // Fetch the updated staked amount and pending unstakes
+      // Fetch the updated staked amount and pending unstakes immediately after the transaction
       const updatedStakedAmount = await stakingPoolContract.getStake(
         connectedWallet
       );
@@ -236,35 +253,36 @@ const StakingPage = () => {
         connectedWallet
       );
 
-      setStakedAmount(BigInt(updatedStakedAmount.toString()));
-      setPendingUnstake(BigInt(updatedPendingUnstakes.toString()));
+      const updatedStakedAmountBN = BigInt(updatedStakedAmount.toString());
+      const updatedPendingUnstakesBN = BigInt(
+        updatedPendingUnstakes.toString()
+      );
+
+      setStakedAmount(updatedStakedAmountBN);
+      setPendingUnstake(updatedPendingUnstakesBN);
 
       const availableForUnstake =
-        BigInt(updatedStakedAmount) - BigInt(updatedPendingUnstakes);
+        updatedStakedAmountBN - updatedPendingUnstakesBN;
 
-      // Check the logs to determine the correct event
-      const unstakeQueuedEvent = receipt.events?.find(
-        (e) => e.event === "UnstakeQueued"
-      );
-      const unstakeProcessedEvent = receipt.events?.find(
-        (e) => e.event === "UnstakeProcessed"
-      );
+      setIsStaked(updatedStakedAmountBN > 0n);
+      setCanUnstake(availableForUnstake > 0n);
 
-      if (unstakeProcessedEvent) {
-        setStakedMessage(`You have successfully unstaked ${amount} ETH.`);
-      } else if (unstakeQueuedEvent) {
+      setLoadingUnstake(false);
+      setErrorMessage(""); // Clear any previous error messages
+
+      if (txResponse.events?.find((e) => e.event === "UnstakeProcessed")) {
+        setStakedMessage(
+          `You have successfully unstaked ${ethers.formatEther(amount)} ETH.`
+        );
+      } else if (txResponse.events?.find((e) => e.event === "UnstakeQueued")) {
         setStakedMessage(
           "Your unstake request is queued. It will be processed as funds become available."
         );
       } else {
         setStakedMessage(
-          "You have pending unstake requests that exceed or match your staked amount. You cannot unstake more ETH at this time."
+          "Unstaking operation was performed, please check your wallet."
         );
       }
-
-      setIsStaked(updatedStakedAmount > 0n);
-      setLoadingUnstake(false);
-      setErrorMessage(""); // Clear any previous error messages
     } catch (error) {
       console.error("Error unstaking ETH:", error);
       setErrorMessage("An error occurred while unstaking. Please try again.");
@@ -401,7 +419,12 @@ const StakingPage = () => {
                   <button
                     className="unstake-button"
                     onClick={handleUnstake}
-                    disabled={loadingStake || loadingUnstake || !canUnstake}
+                    disabled={
+                      loadingStake ||
+                      loadingUnstake ||
+                      !canUnstake ||
+                      calculateMaxUnstakable(stakedAmount, pendingUnstake) <= 0n
+                    }
                   >
                     {loadingUnstake ? "Unstaking..." : "Unstake"}
                   </button>

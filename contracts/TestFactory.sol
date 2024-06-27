@@ -142,10 +142,7 @@ contract MyFactory {
         // Handle received Ether if necessary
     }
 
-    // Receive function to handle incoming Ether
-    receive() external payable {
-        // Handle received Ether
-    }
+    
 
     function approveToken(address token, address spender, uint256 amount) internal onlyOwner {
     require(IERC20(token).approve(spender, amount), "Approval failed");
@@ -398,8 +395,47 @@ function collectFees(uint256 tokenId) external onlyOwner {
     }
 
 
+
+//new changes regarding unstaking queue
+
+ uint256 public pendingFunds; 
+
+event FundsNeeded(uint256 amount);
+    event FundsSent(uint256 amount);
+
+//function called by the staking pool to ask factory for funds to process pending unstaking
+function notifyFundsNeeded(uint256 amount) external {
+        require(msg.sender == stakingAddress, "Only staking contract can notify.");
+        pendingFunds += amount;
+        emit FundsNeeded(amount);
+        tryToSendFunds();
+    }
+
+
+    // Attempt to send funds to the staking contract
+    function tryToSendFunds() public {
+        uint256 availableWETH = IERC20(weth).balanceOf(address(this));
+        if (availableWETH >= pendingFunds && pendingFunds > 0) {
+            IERC20(weth).transfer(stakingAddress, pendingFunds);
+            ISimpleStaking(stakingAddress).notifyFundsReceived(pendingFunds);
+            emit FundsSent(pendingFunds);
+            pendingFunds = 0;
+        }
+    }
+
+    // Fallback function to handle incoming Ether
+    receive() external payable {
+        // Optionally convert ETH to WETH here
+        tryToSendFunds();
+    }
+
+
 }
 
+
+interface ISimpleStaking {
+    function notifyFundsReceived(uint256 amount) external;
+}
 
 interface ISwapRouter {
     struct ExactInputSingleParams {
@@ -419,13 +455,7 @@ interface ISwapRouter {
 }
 
 
-/* interface IWETH {
-    function deposit() external payable;
-    function deposit(uint256 amount) external payable;
-    function withdraw(uint256 amount) external;
-    function approve(address spender, uint256 amount) external returns (bool);
-    function transfer(address to, uint256 value) external returns (bool);
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
-    function balanceOf(address owner) external view returns (uint256);
-    function allowance(address owner, address spender) external view returns (uint256);
-} */
+
+
+
+ 

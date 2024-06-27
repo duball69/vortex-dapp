@@ -29,7 +29,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0xC66fE2126725b3F40F5810cBc59F8dbeFdf1FEeF",
+    factoryAddress: "0x63Cdbb5B9420d8795Bc78c2096755E62d4BA0fcc",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -152,7 +152,7 @@ function DashboardPage() {
     let token0, token1, token0amount, token1amount;
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-    const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
+    const wethAmount = ethers.parseUnits("0.1", 18); // 0.01 WETH
 
     if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
       token0 = contractAddress;
@@ -207,23 +207,28 @@ function DashboardPage() {
       setSuccessMessage(
         "Your token is now launched on Uniswap with liquidity added!"
       );
-      // Perform the token purchase after liquidity is added
-      console.log("Buying tokens for the team...");
-      const amountIn = ethers.parseUnits(tokenAmountToBuy, 18); // Define the ETH amount to use in token purchase
 
-      const tx1 = await factoryContract.swapETHforTokens(
-        amountIn,
-        contractAddress,
-        {
-          value: amountIn,
-          gasLimit: 9000000,
-        }
-      );
-      const receipt = await tx1.wait();
-      console.log("Swap performed successfully!");
-      setSuccessMessage(
-        "Your token is now launched on Uniswap with liquidity added, and tokens purchased!"
-      );
+      if (parseFloat(tokenAmountToBuy) > 0) {
+        // Perform the token purchase after liquidity is added
+        console.log("Buying tokens for the team...");
+        const amountIn = ethers.parseUnits(tokenAmountToBuy, 18); // Define the ETH amount to use in token purchase
+
+        const tx1 = await factoryContract.swapETHforTokens(
+          amountIn,
+          contractAddress,
+          {
+            value: amountIn,
+            gasLimit: 9000000,
+          }
+        );
+        const receipt = await tx1.wait();
+        console.log("Swap performed successfully!");
+        setSuccessMessage(
+          "Your token is now launched on Uniswap with liquidity added, and tokens purchased!"
+        );
+      } else {
+        console.log("No tokens purchased as the input amount was zero.");
+      }
 
       setErrorMessage("");
     } catch (error) {
@@ -256,7 +261,7 @@ function DashboardPage() {
 
       <h1 className="titlefactory">Get Initial LP for your token</h1>
       <h3 className="subtitlefactory">
-        Click to launch your token with 1000$ of liquidity.
+        Click to launch your token with initial liquidity for free.
       </h3>
 
       <div className="center-container">
