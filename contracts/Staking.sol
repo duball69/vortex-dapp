@@ -22,7 +22,7 @@ contract SimpleStaking is ReentrancyGuard{
 
 
     event Stake(address indexed user, uint256 amount);
-    event Unstake(address indexed user, uint256 amount);
+     event Unstake(address indexed user, uint256 amount);
     event RewardsAdded(uint256 amount);
     event RewardClaimed(address indexed user, uint256 amount);
     event UnstakeQueued(address indexed user, uint256 amount, uint256 timestamp);
@@ -124,19 +124,27 @@ function notifyFactoryForFunds(uint256 amount) internal {
 }
 
 
-
 function requestUnstake(uint256 amount) public nonReentrant {
     require(stakes[msg.sender] >= amount, "Insufficient staked balance");
     require(stakes[msg.sender] - pendingUnstakes[msg.sender] >= amount, "Unstake amount exceeds available balance");
 
     pendingUnstakes[msg.sender] += amount; // Lock this amount for unstaking
 
-    uint256 wethBalance = IWETH(weth).balanceOf(address(this)); // Get current WETH balance
+    uint256 wethBalance = IWETH(weth).balanceOf(address(this));
 
-    if (wethBalance < amount) {
-        addToUnstakeQueue(msg.sender, amount);
-    } else {
+    if (wethBalance >= amount) {
         processImmediateUnstake(msg.sender, amount);
+    } else {
+        // Try to get funds from the factory before queuing
+        IFundsInterface(factoryAddress).provideFundsIfNeeded(address(this), amount);
+        // Check balance again after factory interaction
+        wethBalance = IWETH(weth).balanceOf(address(this));
+     
+     if (wethBalance >= amount) {
+            processImmediateUnstake(msg.sender, amount);
+        } else {
+            addToUnstakeQueue(msg.sender, amount);
+        }
     }
 
     emit UnstakeRequested(msg.sender, amount, pendingUnstakes[msg.sender]);
@@ -360,5 +368,6 @@ interface IWETH {
 
 interface IFundsInterface {
     function notifyFundsNeeded(uint256 amount) external;
+      function provideFundsIfNeeded(address stakingContract, uint256 amountRequested) external;
 }
 

@@ -17,7 +17,7 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x4e49908aE2AAD9Fcb498029a4A403aA994A3aFE6";
+const STAKING_POOL_ADDRESS = "0x94531f59F809cadA2069d706E78137fE769Dac9D";
 
 const CHAIN_NAMES = {
   56: "BSC",
@@ -242,7 +242,9 @@ const StakingPage = () => {
         signer
       );
 
-      const txResponse = await stakingPoolContract.unstake(unstakeAmount);
+      const txResponse = await stakingPoolContract.requestUnstake(
+        unstakeAmount
+      );
       await txResponse.wait(); // Wait for transaction to be mined
 
       // Fetch the updated staked amount and pending unstakes immediately after the transaction
