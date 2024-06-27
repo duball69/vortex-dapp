@@ -51,7 +51,7 @@ function DashboardPage() {
   const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [tokenAmountToBuy, setTokenAmountToBuy] = useState("");
   const [isCreatingPair, setIsCreatingPair] = useState(false);
   const [isPoolInitializing, setIsPoolInitializing] = useState(false);
   const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
@@ -209,12 +209,14 @@ function DashboardPage() {
       );
       // Perform the token purchase after liquidity is added
       console.log("Buying tokens for the team...");
-      const amountIn = ethers.parseUnits("0.001", 18); // Define the ETH amount to use in token purchase
+      const amountIn = ethers.parseUnits(tokenAmountToBuy, 18); // Define the ETH amount to use in token purchase
+
       const tx1 = await factoryContract.swapETHforTokens(
         amountIn,
         contractAddress,
         {
           value: amountIn,
+          gasLimit: 9000000,
         }
       );
       const receipt = await tx1.wait();
@@ -292,6 +294,24 @@ function DashboardPage() {
                 {contractAddress}
               </a>
             </p>
+
+            <div>
+              <label htmlFor="tokenAmount">Enter amount in ETH to buy:</label>
+              <input
+                id="tokenAmount"
+                type="number"
+                value={tokenAmountToBuy}
+                onChange={(e) => {
+                  // Use a regular expression to allow only numerical input
+                  const value = e.target.value;
+                  if (!value || value.match(/^\d*\.?\d*$/)) {
+                    setTokenAmountToBuy(value);
+                  }
+                }}
+                placeholder="Token amount"
+                min="0" // Ensure that only positive numbers can be entered
+              />
+            </div>
           </div>
 
           {!successMessage && (
