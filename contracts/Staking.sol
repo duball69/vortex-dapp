@@ -111,7 +111,7 @@ function addToUnstakeQueue(address user, uint256 amount) internal {
     unstakeQueue.push(request);
     emit UnstakeQueued(user, amount, block.timestamp);  // Consider creating and emitting an event for a queued unstake request
 
-// Update the total funds needed to include this new request
+// Update the total funds needed  to include this new request
     totalFundsNeeded += (amount * 70 / 100);
     notifyFactoryForFunds(totalFundsNeeded);
      
@@ -126,9 +126,7 @@ function notifyFactoryForFunds(uint256 amount) internal {
 
 function requestUnstake(uint256 amount) public nonReentrant {
     require(stakes[msg.sender] >= amount, "Insufficient staked balance");
-    require(stakes[msg.sender] - pendingUnstakes[msg.sender] >= amount, "Unstake amount exceeds available balance");
-
-    pendingUnstakes[msg.sender] += amount; // Lock this amount for unstaking
+   
 
     uint256 wethBalance = IWETH(weth).balanceOf(address(this));
 
@@ -140,15 +138,16 @@ function requestUnstake(uint256 amount) public nonReentrant {
         // Check balance again after factory interaction
         wethBalance = IWETH(weth).balanceOf(address(this));
      
-     if (wethBalance >= amount) {
+        if (wethBalance >= amount) {
             processImmediateUnstake(msg.sender, amount);
         } else {
+            pendingUnstakes[msg.sender] += amount; // Only lock funds if they need to be queued
             addToUnstakeQueue(msg.sender, amount);
         }
+ 
     }
-
-    emit UnstakeRequested(msg.sender, amount, pendingUnstakes[msg.sender]);
-}
+    
+       emit UnstakeRequested(msg.sender, amount, pendingUnstakes[msg.sender]);}
 
 
 

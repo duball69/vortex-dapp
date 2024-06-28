@@ -6,7 +6,7 @@ async function main() {
   const factoryContractAddress = "0x4178dAC8B36172A7CED03dB5fcaEAedf19F04462"; // Sepolia factory
 
   // The address of your deployed SimpleStaking contract
-  const stakingContractAddress = "0x94531f59F809cadA2069d706E78137fE769Dac9D";
+  const stakingContractAddress = "0xaC0ee7386123077dc6e8CaB58037294D49c52023";
 
   // Get signer information from the default account
   const [signer] = await ethers.getSigners();
