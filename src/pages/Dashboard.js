@@ -309,8 +309,16 @@ function DashboardPage() {
                 onChange={(e) => {
                   // Use a regular expression to allow only numerical input
                   const value = e.target.value;
-                  if (!value || value.match(/^\d*\.?\d*$/)) {
+                  if (!value) {
+                    setTokenAmountToBuy("0"); // Set to '0' if the input is empty
+                  } else if (value.match(/^\d*\.?\d*$/)) {
                     setTokenAmountToBuy(value);
+                  }
+                }}
+                onBlur={(e) => {
+                  // Ensure that empty fields are set to '0' when the user leaves the input
+                  if (!e.target.value) {
+                    setTokenAmountToBuy("0");
                   }
                 }}
                 placeholder="Token amount"

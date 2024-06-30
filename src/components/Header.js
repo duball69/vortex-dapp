@@ -23,7 +23,7 @@ function Header({ connectWallet, isConnected, chainId }) {
         <div className="div-logo">
           <Link to="/">
             <img
-              src="https://i.imgur.com/aDk96bW.png"
+              src="https://i.imgur.com/XDHnW0R.png"
               alt="VortexLogo png"
               className="logo"
             />

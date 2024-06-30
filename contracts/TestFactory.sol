@@ -155,7 +155,7 @@ contract MyFactory {
 
 
     function setStakingAddress(address payable _stakingAddress) external onlyOwner {
-        stakingAddress = _stakingAddress;
+          stakingAddress = payable(_stakingAddress); 
     }
 
     function callAddRewards (uint256 amount ) external payable onlyOwner {
@@ -366,7 +366,7 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
     address token0,
     address token1,
     uint24 fee,
-    int24 tickLower,
+     int24 tickLower,
     int24 tickUpper,
     uint128 liquidity,
     uint256 feeGrowthInside0LastX128,
@@ -413,6 +413,10 @@ function notifyFundsNeeded(uint256 amount) external {
 
 
     // Attempt to send funds to the staking contract
+
+  
+
+    
     function tryToSendFunds() public {
         uint256 availableWETH = IERC20(weth).balanceOf(address(this));
         if (availableWETH >= pendingFunds && pendingFunds > 0) {
@@ -423,11 +427,22 @@ function notifyFundsNeeded(uint256 amount) external {
         }
     }
 
-    // Fallback function to handle incoming Ether
-    receive() external payable {
-        // Optionally convert ETH to WETH here
-        tryToSendFunds();
+//if factory has funds, and is requested by the staking pool - change visibility
+
+    function provideFundsIfNeeded(address _stakingContract, uint256 amountRequested) public {
+    uint256 availableWETH = IWETH(weth).balanceOf(address(this));
+    if (availableWETH >= amountRequested) {
+        IWETH(weth).transfer(_stakingContract, amountRequested);
+        ISimpleStaking(payable(_stakingContract)).notifyFundsReceived(amountRequested);
     }
+}
+
+
+
+
+        // Fallback function to handle incoming Ether
+        receive() external payable {
+           }
 
 
 }
