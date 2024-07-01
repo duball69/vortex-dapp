@@ -109,19 +109,22 @@ function addToUnstakeQueue(address user, uint256 amount) internal {
         timestamp: block.timestamp  // Storing the timestamp can help with processing logic later if needed
     });
     unstakeQueue.push(request);
-    emit UnstakeQueued(user, amount, block.timestamp);  // Consider creating and emitting an event for a queued unstake request
+    emit UnstakeQueued(user, amount, block.timestamp);  // Emit an event for a queued unstake request
 
-// Update the total funds needed  to include this new request
-    totalFundsNeeded += (amount * 70 / 100);
-    notifyFactoryForFunds(totalFundsNeeded);
-     
+    // Update the total funds needed to include the total amount needed in the queue
+    uint256 totalQueueAmount = getTotalUnstakeQueueAmount();
+    
+    notifyFactoryForFunds(totalQueueAmount);
 }
 
+event NotifyFactoryForFunds(uint256 amountNeeded);
 
 
-function notifyFactoryForFunds(uint256 amount) internal {
-    IFundsInterface(factoryAddress).notifyFundsNeeded(amount);
+function notifyFactoryForFunds(uint256 amountNeeded) internal {
+     emit NotifyFactoryForFunds(amountNeeded); 
+    IFundsInterface(factoryAddress).notifyFundsNeeded(amountNeeded);
 }
+
 
 
 function requestUnstake(uint256 amount) public nonReentrant {
@@ -346,6 +349,16 @@ function getUnstakeRequest(uint index) public view returns (address user, uint25
     require(index < unstakeQueue.length, "Index out of bounds");
     UnstakeRequest storage request = unstakeQueue[index];
     return (request.user, request.amount, request.timestamp);
+}
+
+
+// know the total amount in weth on the unstake queue
+function getTotalUnstakeQueueAmount() public view returns (uint256 totalAmount) {
+    uint256 total = 0;
+    for (uint i = 0; i < unstakeQueue.length; i++) {
+        total += unstakeQueue[i].amount;
+    }
+    return total;
 }
 
 

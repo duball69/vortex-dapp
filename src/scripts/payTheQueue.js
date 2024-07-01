@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 
 async function handleReceivedWETHDELETE() {
-  const stakingContractAddress = "0xaC0ee7386123077dc6e8CaB58037294D49c52023";
+  const stakingContractAddress = "0x827e607409E019bacd714d1D386Eb0e59d104Cf6";
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();

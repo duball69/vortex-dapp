@@ -6,7 +6,7 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-content">
-        <p>Vortex © 2024. All rights reserved.</p>
+        <p>Vortex Labs © 2024. All rights reserved.</p>
 
         {/* Twitter Link */}
         <a

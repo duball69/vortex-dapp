@@ -2,7 +2,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-image: url('https://i.imgur.com/3lmoXpI.jpeg'); /* Background image */
+    background-image: url('https://i.imgur.com/EeSiiMV.jpeg'); /* Background image */
     background-size: cover;
     background-attachment: fixed;
 }
@@ -116,7 +116,7 @@ button.deploy-button {
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
-    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6); /* Replace #FF5733 with your desired color */
+    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #00CDFFF6); /* Replace #FF5733 with your desired color */
     border: 1px solid rgba(255, 255, 255, 0.519);
     color: #ffffff;
     cursor: pointer;
@@ -169,7 +169,7 @@ button.deploy-button:hover {
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
-    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #ff6f00f6); /* Replace #FF5733 with your desired color */
+    background: linear-gradient(38deg, #ef10ffe1, /* purple */ #00CDFFF6); /* Replace #FF5733 with your desired color */
     border: 1px solid rgba(255, 255, 255, 0.519);
     color: #ffffff;
     cursor: pointer;

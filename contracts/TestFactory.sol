@@ -400,14 +400,14 @@ function collectFees(uint256 tokenId) external onlyOwner {
 
  uint256 public pendingFunds; 
 
-event FundsNeeded(uint256 amount);
+event FundsRequested(uint256 amountNeeded);
     event FundsSent(uint256 amount);
 
 //function called by the staking pool to ask factory for funds to process pending unstaking
 function notifyFundsNeeded(uint256 amount) external {
         require(msg.sender == stakingAddress, "Only staking contract can notify.");
         pendingFunds += amount;
-        emit FundsNeeded(amount);
+        emit FundsRequested(amount);
         tryToSendFunds();
     }
 

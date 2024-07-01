@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 
 async function fetchUnstakeQueue() {
-  const stakingContractAddress = "0xaC0ee7386123077dc6e8CaB58037294D49c52023";
+  const stakingContractAddress = "0x2F3e5b80653260eC9d12Bd15f37ea127F6322fC3";
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();
@@ -18,6 +18,7 @@ async function fetchUnstakeQueue() {
     // Assume getUnstakeQueueLength and getUnstakeRequest are implemented in your contract
     const queueLength = await stakingContract.getUnstakeQueueLength();
     const queue = [];
+    const totalAmountWei = await stakingContract.getTotalUnstakeQueueAmount(); // Call the getTotalUnstakeQueueAmount method
 
     for (let i = 0; i < queueLength; i++) {
       const request = await stakingContract.getUnstakeRequest(i);
@@ -28,7 +29,7 @@ async function fetchUnstakeQueue() {
       });
     }
 
-    return queue;
+    return { queue, totalAmount: ethers.formatEther(totalAmountWei) }; // Return both queue and formatted total amount
   } catch (error) {
     console.error("Error fetching unstake queue:", error);
     throw error; // rethrow to catch in main
@@ -37,8 +38,9 @@ async function fetchUnstakeQueue() {
 
 async function main() {
   try {
-    const unstakeQueue = await fetchUnstakeQueue();
-    console.log("Unstake Queue:", unstakeQueue);
+    const { queue, totalAmount } = await fetchUnstakeQueue();
+    console.log("Unstake Queue:", queue);
+    console.log("Total Unstake Amount:", totalAmount + " ETH"); // Display the total amount in Ether
   } catch (error) {
     console.error(error);
     process.exit(1);

@@ -33,7 +33,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x4178dAC8B36172A7CED03dB5fcaEAedf19F04462",
+    factoryAddress: "0xb852A73BD5aD3c131F520430902512fb935Db187",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },

@@ -54,7 +54,7 @@ button {
   font-size: 16px;
   border-radius: 30px;
   /* Gradient background */
-  background: linear-gradient(38deg, #0000007c, #fb00dec5); /* Replace #FF5733 with your desired color */
+  background: linear-gradient(38deg, #00CDFFF6, #fb00dec5); /* Replace #FF5733 with your desired color */
   border: 1px solid rgba(255, 255, 255, 0.519);
   color: #ffffff;
   cursor: pointer;

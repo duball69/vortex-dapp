@@ -29,7 +29,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x4178dAC8B36172A7CED03dB5fcaEAedf19F04462",
+    factoryAddress: "0xb852A73BD5aD3c131F520430902512fb935Db187",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -152,7 +152,7 @@ function DashboardPage() {
     let token0, token1, token0amount, token1amount;
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-    const wethAmount = ethers.parseUnits("0.03", 18); // 0.01 WETH
+    const wethAmount = ethers.parseUnits("0.04", 18); // 0.01 WETH
 
     if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
       token0 = contractAddress;
@@ -305,24 +305,29 @@ function DashboardPage() {
               <input
                 id="tokenAmount"
                 type="number"
+                step="0.01"
                 value={tokenAmountToBuy}
                 onChange={(e) => {
-                  // Use a regular expression to allow only numerical input
-                  const value = e.target.value;
+                  // Use a regular expression to allow only numerical input with both comma and point as decimal separators
+                  let value = e.target.value;
                   if (!value) {
                     setTokenAmountToBuy("0"); // Set to '0' if the input is empty
-                  } else if (value.match(/^\d*\.?\d*$/)) {
-                    setTokenAmountToBuy(value);
+                  } else {
+                    // Replace commas with periods to standardize the input as a number
+                    value = value.replace(/,/g, ".");
+                    if (value.match(/^\d*\.?\d*$/)) {
+                      setTokenAmountToBuy(value);
+                    }
                   }
                 }}
                 onBlur={(e) => {
                   // Ensure that empty fields are set to '0' when the user leaves the input
                   if (!e.target.value) {
-                    setTokenAmountToBuy("0");
+                    setTokenAmountToBuy("0.00");
                   }
                 }}
                 placeholder="Token amount"
-                min="0" // Ensure that only positive numbers can be entered
+                min="0.00" // Ensure that only positive numbers can be entered
               />
             </div>
           </div>
