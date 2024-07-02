@@ -172,19 +172,26 @@ function updatePool() internal {
     }
 
     uint256 multiplier = block.timestamp - lastRewardTime;
-    if (totalRewards > 0) {
-        uint256 reward = multiplier * totalRewards / REWARD_INTERVAL;
-        totalRewards = totalRewards > reward ? totalRewards - reward : 0;
-        accRewardPerShare += reward * 1e12 / totalStaked;
+    uint256 reward = (multiplier * totalRewards) / REWARD_INTERVAL;
+
+    if (totalRewards > 0 && reward > 0) {
+        accRewardPerShare += (reward * 1e12) / totalStaked;
     }
 
     lastRewardTime = block.timestamp;
 }
 
+
 function addRewards() external payable {
     require(msg.value > 0, "No rewards to add");
-    totalRewards += msg.value;
+
+    // Deposit the received ETH and mint WETH
+    IWETH(weth).deposit{value: msg.value}();
+
+    // Update the total rewards with the newly minted WETH amount
+    totalRewards += msg.value;  // Assuming the WETH value is 1:1 with ETH
     updatePool();  // Update the pool after changing the totalRewards
+
     emit RewardsAdded(msg.value);
 }
 
@@ -201,31 +208,35 @@ function pendingReward(address _user) external view returns (uint256) {
 }
 
 
+function getTotalStaked() public view returns (uint256) {
+    return totalStaked;
+}
 
-    function claimRewards() external nonReentrant {
+
+function claimRewards() external nonReentrant {
+    updatePool();  // Ensure rewards are calculated with the latest info
+
     uint256 userStake = stakes[msg.sender];
     require(userStake > 0, "No staked amount to claim rewards for");
- 
-    updatePool();
 
-    uint256 accumulatedReward = (userStake * accRewardPerShare / 1e12);
+    uint256 accumulatedReward = (userStake * accRewardPerShare) / 1e12;
     uint256 pendingReward = accumulatedReward - rewardDebt[msg.sender];
 
     require(pendingReward > 0, "No rewards to claim");
-    require(IWETH(weth).balanceOf(address(this)) >= pendingReward, "Not enough WETH in contract");
+    require(totalRewards >= pendingReward, "Not enough rewards in pool");
 
-    // Update the reward debt to the latest accumulated reward
+    // Deduct from total rewards pool only on successful claim
+    totalRewards -= pendingReward;
     rewardDebt[msg.sender] = accumulatedReward;
 
-    // Convert WETH to ETH
+    // Convert and send the reward
     IWETH(weth).withdraw(pendingReward);
- 
-    // Send ETH to the user
     (bool sent, ) = payable(msg.sender).call{value: pendingReward}("");
     require(sent, "Failed to send ETH");
 
     emit RewardClaimed(msg.sender, pendingReward);
 }
+
 
 
 

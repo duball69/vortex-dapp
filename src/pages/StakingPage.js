@@ -17,7 +17,7 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x2F3e5b80653260eC9d12Bd15f37ea127F6322fC3";
+const STAKING_POOL_ADDRESS = "0x5c9e1e018Bbd2f8Fa868a5AAd02930DCc1dd2494";
 
 const CHAIN_NAMES = {
   56: "BSC",
@@ -334,7 +334,7 @@ const StakingPage = () => {
         signer
       );
 
-      const tx = await stakingPoolContract.claimRewards();
+      const tx = await stakingPoolContract.claimRewards({ gasLimit: 900000 });
       await tx.wait(); // Wait for the transaction to be mined
 
       setLoadingClaim(false);

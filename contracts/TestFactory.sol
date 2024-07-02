@@ -416,7 +416,9 @@ function notifyFundsNeeded(uint256 amount) external {
 
   
 
-    
+    // if unstaking queue is too long, only pay the first in the line
+
+
     function tryToSendFunds() public {
         uint256 availableWETH = IERC20(weth).balanceOf(address(this));
         if (availableWETH >= pendingFunds && pendingFunds > 0) {
