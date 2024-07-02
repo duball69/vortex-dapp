@@ -17,7 +17,7 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x5c9e1e018Bbd2f8Fa868a5AAd02930DCc1dd2494";
+const STAKING_POOL_ADDRESS = "0x2B2643e0914e07b33cE23C14c8e48F4993A9FFf9";
 
 const CHAIN_NAMES = {
   56: "BSC",
@@ -38,6 +38,7 @@ const StakingPage = () => {
   const [canUnstake, setCanUnstake] = useState(true);
   const [pendingRewards, setPendingRewards] = useState("0.0000"); // State for pending rewards
   const [loadingClaim, setLoadingClaim] = useState(false);
+  const [apy, setApy] = useState("Calculating...");
 
   const {
     address: connectedWallet,
@@ -47,6 +48,39 @@ const StakingPage = () => {
   const { open } = useWeb3Modal();
 
   useEffect(() => {
+    const calculateAPY = async () => {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const stakingPoolContract = new ethers.Contract(
+          STAKING_POOL_ADDRESS,
+          SimpleStakingJson.abi,
+          signer
+        );
+
+        // Fetch staking details necessary for APY calculation
+        const totalStaked = await stakingPoolContract.totalStaked();
+        const totalRewards = await stakingPoolContract.totalRewards();
+        const rewardIntervalSeconds =
+          await stakingPoolContract.REWARD_INTERVAL();
+        const rewardIntervalMinutes = Number(rewardIntervalSeconds) / 60;
+
+        const intervalsPerYear = (365 * 24 * 60) / rewardIntervalMinutes;
+        const rewardPerInterval =
+          Number(ethers.formatEther(totalRewards)) / intervalsPerYear;
+        const ratePerInterval =
+          rewardPerInterval / Number(ethers.formatEther(totalStaked));
+        const apy = (1 + ratePerInterval) ** intervalsPerYear - 1;
+
+        // Set the APY state to display in the component
+        setApy(`${(apy * 100).toFixed(2)}%`); // Update APY display
+        console.log("APY:", (apy * 100).toFixed(2) + "%");
+      } catch (error) {
+        console.error("Error calculating APY:", error);
+        setApy("Error calculating APY"); // Set APY state to an error message or similar
+      }
+    };
+
     const checkStakingStatus = async () => {
       if (!connectedWallet) return;
 
@@ -111,6 +145,7 @@ const StakingPage = () => {
     };
 
     checkStakingStatus();
+    calculateAPY();
   }, [connectedWallet]); // Removed `amount` from dependencies if it's not needed
 
   const connectWallet = async () => {
@@ -334,7 +369,7 @@ const StakingPage = () => {
         signer
       );
 
-      const tx = await stakingPoolContract.claimRewards({ gasLimit: 900000 });
+      const tx = await stakingPoolContract.claimRewards({ gasLimit: 500000 });
       await tx.wait(); // Wait for the transaction to be mined
 
       setLoadingClaim(false);
@@ -396,6 +431,9 @@ const StakingPage = () => {
             <>
               <div>
                 <p> Connected Wallet: {connectedWallet}</p>
+                <div>
+                  <h4>APY: {apy}</h4>
+                </div>
                 {pendingUnstake > 0n && ( // Only display if there are pending unstakes
                   <p>
                     Pending amount unstaking:{" "}

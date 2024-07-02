@@ -18,7 +18,7 @@ contract SimpleStaking is ReentrancyGuard{
     uint256 public totalRewards;
     uint256 public accRewardPerShare; // Accumulated rewards per share, times 1e12 to prevent precision loss
     uint256 public lastRewardTime;
-   uint256 public constant REWARD_INTERVAL = 5 minutes; // Reward distribution interval
+   uint256 public constant REWARD_INTERVAL = 1 minutes; // Reward distribution interval
 
 
     event Stake(address indexed user, uint256 amount);
@@ -160,7 +160,6 @@ function requestUnstake(uint256 amount) public nonReentrant {
         return stakes[staker];
     }
 
-
 function updatePool() internal {
     if (block.timestamp <= lastRewardTime) {
         return;
@@ -174,12 +173,14 @@ function updatePool() internal {
     uint256 multiplier = block.timestamp - lastRewardTime;
     uint256 reward = (multiplier * totalRewards) / REWARD_INTERVAL;
 
-    if (totalRewards > 0 && reward > 0) {
+    if (reward > 0) {
         accRewardPerShare += (reward * 1e12) / totalStaked;
+        // Do not deduct from totalRewards here; only deduct when rewards are claimed
     }
 
     lastRewardTime = block.timestamp;
 }
+
 
 
 function addRewards() external payable {
@@ -213,8 +214,9 @@ function getTotalStaked() public view returns (uint256) {
 }
 
 
+
 function claimRewards() external nonReentrant {
-    updatePool();  // Ensure rewards are calculated with the latest info
+    updatePool();  // Make sure the pool is updated before claiming
 
     uint256 userStake = stakes[msg.sender];
     require(userStake > 0, "No staked amount to claim rewards for");
@@ -225,11 +227,10 @@ function claimRewards() external nonReentrant {
     require(pendingReward > 0, "No rewards to claim");
     require(totalRewards >= pendingReward, "Not enough rewards in pool");
 
-    // Deduct from total rewards pool only on successful claim
+    // Deduct from total rewards only when actually claiming them
     totalRewards -= pendingReward;
-    rewardDebt[msg.sender] = accumulatedReward;
+    rewardDebt[msg.sender] = accumulatedReward;  // Update the reward debt post-claim
 
-    // Convert and send the reward
     IWETH(weth).withdraw(pendingReward);
     (bool sent, ) = payable(msg.sender).call{value: pendingReward}("");
     require(sent, "Failed to send ETH");

@@ -1,10 +1,9 @@
 body {
   margin: 0;
-  font-family: "Lexend Deca", sans-serif; /* Updated font-family */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  font-family: "Space Grotesk", sans-serif;
+  font-optical-sizing: auto;
+  }
 
 code {
-  font-family: "Lexend Deca", sans-serif; /* Updated font-family */
+  font-family: "Space Grotesk", sans-serif;/* Updated font-family */
 }

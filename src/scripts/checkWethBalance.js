@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 
 async function checkWETHBalance() {
-  const stakingContractAddress = "0xF284F05D6aA6b3Ff87BE619C50C091EDE3f590F5"; // Your staking contract address
+  const stakingContractAddress = "0x3E6D86CB4933068B522EB6DEc26AcC0D8132a402"; // Your staking contract address
   const wethAddress = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; // Mainnet WETH address, replace if using a different network
 
   // Get the first signer for demonstration purposes
