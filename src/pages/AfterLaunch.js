@@ -5,6 +5,29 @@ import { firestore } from "../components/firebaseConfig";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
 import { useWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react";
+import { ethers } from "ethers";
+import LiquidityLockerJson from "../contracts/LiquidityLocker.json";
+import MyFactoryJson from "../contracts/MyFactory.json";
+
+const networkConfig = {
+  // Example Chain IDs for Base and Sepolia
+  8453: {
+    // Mainnet (as an example; replace with the correct ID for "base")
+    factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
+    WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://basescan.org",
+    nftAddress: "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
+    lockerAddress: "0x31828AAC589e46549F3980912A6a8001F81a9eD5",
+  },
+  11155111: {
+    // Sepolia Testnet Chain ID
+    factoryAddress: "0x1a9EF94197D2b0a39D922dbEe0b87F8c973b85dd",
+    lockerAddress: "0x31828AAC589e46549F3980912A6a8001F81a9eD5",
+    WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+    explorerUrl: "https://sepolia.etherscan.io",
+    nftAddress: "0x1238536071E1c677A632429e3655c799b22cDA52",
+  },
+};
 
 function AfterLaunch() {
   const {
@@ -12,6 +35,7 @@ function AfterLaunch() {
     chainId,
     isConnected,
   } = useWeb3ModalAccount();
+
   const { open } = useWeb3Modal();
   const { contractAddress } = useParams();
   const [tokenDetails, setTokenDetails] = useState({
@@ -23,19 +47,34 @@ function AfterLaunch() {
   const [deployer, setDeployer] = useState(null);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const factoryChainAddress =
+    networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
+  const lockerChainAddress =
+    networkConfig[chainId]?.lockerAddress || "DefaultLockerAddress";
+  const positionManagerChainAddress =
+    networkConfig[chainId]?.nftAddress || "DefaultNFTAddress";
 
   useEffect(() => {
     const fetchTokenDetails = async () => {
-      const tokenDoc = doc(firestore, "tokens", contractAddress);
-      const docSnap = await getDoc(tokenDoc);
+      if (!contractAddress) return;
+
+      const tokenDocRef = doc(firestore, "tokens", contractAddress);
+      const docSnap = await getDoc(tokenDocRef);
+
       if (docSnap.exists()) {
-        setTokenDetails(docSnap.data());
+        const data = docSnap.data();
+        setTokenDetails(data);
         setIsLoaded(true);
-        setDeployer(docSnap.data().deployer);
+        setDeployer(data.deployer);
+
+        // Assuming you need the tokenId for further processing
+        const tokenId = data.tokenId; // Here's where you retrieve the tokenId
+        console.log("Token ID:", tokenId); // Log or use the tokenId as needed
       } else {
         console.log("No such document!");
       }
     };
+
     fetchTokenDetails();
   }, [contractAddress]);
 
@@ -94,6 +133,59 @@ function AfterLaunch() {
     window.location.href = "/";
   };
 
+  const lockLiquidity = async () => {
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+
+    const factory = new ethers.Contract(
+      factoryChainAddress,
+      MyFactoryJson.abi,
+      signer
+    );
+    const locker = new ethers.Contract(
+      "0x31828AAC589e46549F3980912A6a8001F81a9eD5",
+      LiquidityLockerJson.abi,
+      signer
+    );
+
+    try {
+      // Assume tokenId and nftAddress are fetched or set elsewhere in your component
+      console.log("Locker Address:", lockerChainAddress);
+      console.log("Chain:", chainId);
+
+      console.log("Approving LiquidityLocker to manage the NFT...");
+      const approveTx = await factory.approveNFT(
+        positionManagerChainAddress,
+        tokenDetails.tokenId, // Assuming the tokenId is stored in state after fetching
+        "0x31828AAC589e46549F3980912A6a8001F81a9eD5"
+      );
+      await approveTx.wait();
+      console.log("Approval successful.");
+
+      // Lock the liquidity
+      console.log("Locking liquidity...");
+      const duration = 3600 * 24 * 7; // Example duration: 1 week in seconds
+      const lockLiquidityTx = await locker.lockLiquidity(
+        positionManagerChainAddress,
+        tokenDetails.tokenId,
+        duration,
+        factoryChainAddress
+      );
+      const receipt = await lockLiquidityTx.wait();
+      console.log("Liquidity locked.");
+
+      // Optionally, handle the liquidity locked event
+      const liquidityLockedEvent = receipt.events.find(
+        (event) => event.event === "LiquidityLocked"
+      );
+      if (liquidityLockedEvent) {
+        console.log("Lock ID:", liquidityLockedEvent.args[0]);
+      }
+    } catch (error) {
+      console.error("Failed to lock liquidity:", error);
+    }
+  };
+
   return (
     <div>
       <Header
@@ -103,6 +195,22 @@ function AfterLaunch() {
       />
       <div className="center-container">
         <div className="factory-container">
+          <h1>Token Management</h1>
+          {isLoaded ? (
+            <div>
+              <button
+                onClick={lockLiquidity}
+                disabled={
+                  isLoading || !isConnected || connectedWallet !== deployer
+                }
+              >
+                Lock Liquidity
+              </button>
+            </div>
+          ) : (
+            <p>Loading token details...</p>
+          )}
+
           <h1>Update your Token Details</h1>
 
           {isLoaded ? (

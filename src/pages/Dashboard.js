@@ -14,7 +14,14 @@ import { Link, useParams } from "react-router-dom";
 import "./Dashboard.css";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
 import { typeImplementation } from "@testing-library/user-event/dist/type/typeImplementation.js";
 /* global BigInt */
@@ -29,7 +36,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0xb852A73BD5aD3c131F520430902512fb935Db187",
+    factoryAddress: "0x1a9EF94197D2b0a39D922dbEe0b87F8c973b85dd",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -152,7 +159,7 @@ function DashboardPage() {
     let token0, token1, token0amount, token1amount;
 
     const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-    const wethAmount = ethers.parseUnits("0.04", 18); // 0.01 WETH
+    const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
 
     if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
       token0 = contractAddress;
@@ -203,7 +210,25 @@ function DashboardPage() {
         [createPoolData, addLiquidityData],
         { gasLimit: 9000000 }
       );
-      await tx.wait();
+      const txReceipt = await tx.wait();
+      console.log("Transaction Receipt:", txReceipt);
+
+      // Assuming the LiquidityAdded event returns tokenId
+
+      // Make sure there are enough logs
+      if (txReceipt.logs && txReceipt.logs.length > 10) {
+        const tokenIdLog = txReceipt.logs[10].data; // accessing the 10th log
+
+        const tokenIdDec = parseInt(tokenIdLog, 16); //save token Id as decimal
+
+        console.log("Liquidity Token ID:", tokenIdDec);
+
+        const tokenDocRef = doc(firestore, "tokens", contractAddress);
+        await updateDoc(tokenDocRef, {
+          tokenId: tokenIdDec,
+        });
+      }
+
       setSuccessMessage(
         "Your token is now launched on Uniswap with liquidity added!"
       );

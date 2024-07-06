@@ -97,6 +97,7 @@ input[type="number"] {
     border-radius: 30px;
     box-sizing: border-box;
     font-family: "Space Grotesk", sans-serif;
+
 }
 
 input[type="text"]:focus,
@@ -122,8 +123,8 @@ button.deploy-button {
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-style: normal;
-    font-weight: 400;
     font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
 }
 
 
@@ -131,8 +132,8 @@ button.deploy-button:hover {
     background-color: #ffffff;
     font-style: normal;
     font-size: 16px;
-    font-weight: 400;
     font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
 }
 
 

@@ -1,0 +1,122 @@
+{
+    "_format": "hh-sol-artifact-1",
+    "contractName": "Treasury",
+    "sourceName": "contracts/VortexTreasury.sol",
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "factory",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "FundsReceived",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "FundsWithdrawn",
+        "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "factoryAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getBalance",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address payable",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdrawFunds",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "stateMutability": "payable",
+        "type": "receive"
+      }
+    ],
+    "bytecode": "0x60803461007a57601f6102f938819003918201601f19168301916001600160401b0383118484101761007f5780849260209460405283398101031261007a57516001600160a01b0381169081900361007a5760018060a01b031933816000541617600055600154161760015560405161026390816100968239f35b600080fd5b634e487b7160e01b600052604160045260246000fdfe60806040908082526004361015610049575b50361561001d57600080fd5b513481527f8e47b87b0ef542cdfa1659c551d88bad38aa7f452d2bbb349ab7530dfec8be8f60203392a2005b600090813560e01c90816312065fe014610213575080638da5cb5b146101e0578063966dae0e146101ab5763c1075329036100115790346101a757806003193601126101a7576004359073ffffffffffffffffffffffffffffffffffffffff908183168093036101a3576024359184541633036101605781471061011d57838284828215610114575b839283928392f11561010b577feaff4b37086828766ad3268786972c0cd24259d4c87a80f9d3963a3c3d999b0d9160209151908152a280f35b513d84823e3d90fd5b506108fc6100d2565b6064905162461bcd60e51b815260206004820152601460248201527f496e73756666696369656e742062616c616e63650000000000000000000000006044820152fd5b6064905162461bcd60e51b815260206004820152601760248201527f43616c6c6572206973206e6f7420746865206f776e65720000000000000000006044820152fd5b8380fd5b5080fd5b5090346101a757816003193601126101a75760209073ffffffffffffffffffffffffffffffffffffffff600154169051908152f35b5090346101a757816003193601126101a75773ffffffffffffffffffffffffffffffffffffffff60209254169051908152f35b9050346101a757816003193601126101a757602090478152f3fea2646970667358221220f340bcf8a866231f4d22628bace7821621db7307befd8cc0978ac1932617bdaa64736f6c63430008180033",
+    "deployedBytecode": "0x60806040908082526004361015610049575b50361561001d57600080fd5b513481527f8e47b87b0ef542cdfa1659c551d88bad38aa7f452d2bbb349ab7530dfec8be8f60203392a2005b600090813560e01c90816312065fe014610213575080638da5cb5b146101e0578063966dae0e146101ab5763c1075329036100115790346101a757806003193601126101a7576004359073ffffffffffffffffffffffffffffffffffffffff908183168093036101a3576024359184541633036101605781471061011d57838284828215610114575b839283928392f11561010b577feaff4b37086828766ad3268786972c0cd24259d4c87a80f9d3963a3c3d999b0d9160209151908152a280f35b513d84823e3d90fd5b506108fc6100d2565b6064905162461bcd60e51b815260206004820152601460248201527f496e73756666696369656e742062616c616e63650000000000000000000000006044820152fd5b6064905162461bcd60e51b815260206004820152601760248201527f43616c6c6572206973206e6f7420746865206f776e65720000000000000000006044820152fd5b8380fd5b5080fd5b5090346101a757816003193601126101a75760209073ffffffffffffffffffffffffffffffffffffffff600154169051908152f35b5090346101a757816003193601126101a75773ffffffffffffffffffffffffffffffffffffffff60209254169051908152f35b9050346101a757816003193601126101a757602090478152f3fea2646970667358221220f340bcf8a866231f4d22628bace7821621db7307befd8cc0978ac1932617bdaa64736f6c63430008180033",
+    "linkReferences": {},
+    "deployedLinkReferences": {}
+  }
+  

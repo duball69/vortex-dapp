@@ -18,7 +18,7 @@ contract SimpleStaking is ReentrancyGuard{
     uint256 public totalRewards;
     uint256 public accRewardPerShare; // Accumulated rewards per share, times 1e12 to prevent precision loss
     uint256 public lastRewardTime;
-   uint256 public constant REWARD_INTERVAL = 1 minutes; // Reward distribution interval
+   uint256 public constant REWARD_INTERVAL = 10 minutes; // Reward distribution interval
 
 
     event Stake(address indexed user, uint256 amount);
@@ -43,10 +43,11 @@ UnstakeRequest[] public unstakeQueue;
 
 
  
-  constructor(address _weth) {
+  constructor(address _weth, address factory) {
         owner = msg.sender;  // Set the deployer as the owner
         lastRewardTime = block.timestamp;
         weth = _weth;
+        factoryAddress=factory;
     }
 
 
@@ -227,7 +228,6 @@ function claimRewards() external nonReentrant {
     require(pendingReward > 0, "No rewards to claim");
     require(totalRewards >= pendingReward, "Not enough rewards in pool");
 
-    // Deduct from total rewards only when actually claiming them
     totalRewards -= pendingReward;
     rewardDebt[msg.sender] = accumulatedReward;  // Update the reward debt post-claim
 
@@ -269,7 +269,7 @@ function claimRewards() external nonReentrant {
 
     // Optionally, you can add logic here if you need to adjust any balances or states based on the received funds
     emit FundsReceived(amount, block.timestamp);
-handleReceivedWETH();     
+handleReceivedWETHALLQUEUE();     
 
 }
 
@@ -313,7 +313,7 @@ function handleReceivedWETH() internal{
                     }
     }
 }
-
+ 
 
 function handleReceivedWETHDELETE() external{ 
     uint256 availableWETH = IWETH(weth).balanceOf(address(this));
@@ -333,6 +333,35 @@ function handleReceivedWETHDELETE() external{
                     }
     }
 }
+
+
+function handleReceivedWETHALLQUEUE() internal {
+    uint256 availableWETH = IWETH(weth).balanceOf(address(this));
+    emit DebugAvailableWETH(availableWETH);  // Log the available WETH balance
+
+    uint256 fundsNeeded = 0;
+
+    for (uint i = 0; i < unstakeQueue.length && availableWETH > 0;) {
+        UnstakeRequest storage request = unstakeQueue[i];
+
+        if (availableWETH >= request.amount) {
+            processImmediateUnstake(request.user, request.amount);
+            availableWETH -= request.amount;  // Update available WETH after processing this unstake
+
+            unstakeQueue[i] = unstakeQueue[unstakeQueue.length - 1];  // Efficient removal of processed request
+            unstakeQueue.pop();  // Adjust the length of the queue
+        } else {
+            fundsNeeded += request.amount - availableWETH;
+            i++;  // Only increment if the unstake is not processed
+        }
+    }
+
+    if (fundsNeeded > 0) {
+        notifyFactoryForFunds(fundsNeeded);
+        emit FundsRequested(fundsNeeded);
+    }
+}
+
 
 
 function removeFromQueue(uint index) internal {

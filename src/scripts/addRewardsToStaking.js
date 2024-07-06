@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 
 async function addRewards() {
-  const stakingContractAddress = "0xFE19688801b0813b14884bc89541F51A0B3a886D";
+  const stakingContractAddress = "0xa84f8900B1662da14A87Dc670dFcca273be2c45b";
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();
@@ -19,7 +19,7 @@ async function addRewards() {
 
   try {
     // Define the amount of ETH to send as rewards
-    const rewardAmount = ethers.parseEther("0.01"); // e.g., 1 ETH
+    const rewardAmount = ethers.parseEther("0.05"); // e.g., 1 ETH
 
     // Sending a transaction to add rewards
     const tx = await stakingContract.addRewards({ value: rewardAmount });

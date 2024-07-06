@@ -27,6 +27,7 @@ contract MyFactory {
     address public owner;
     address payable public stakingAddress;
     uint256 wethProvided = 0.0001 ether;
+    bool removeEarlier;
 
     struct TokenDetails {
         address tokenAddress;
@@ -35,6 +36,7 @@ contract MyFactory {
         bool liquidityRemoved;
         uint256 zerofeedays;
         bool isTokenDEAD;
+        uint256 feeFromSwap;
     }
 
     TokenDetails[] public allTokens;
@@ -46,7 +48,7 @@ contract MyFactory {
     event PoolCreated(address indexed token0, address indexed poolAddress);
     event PoolInitialized(address indexed poolAddress, uint160 sqrtPriceX96);
     event TokenApproved(address indexed tokenAddress, address indexed poolAddress);
-    event LiquidityAdded(uint256 tokenId, address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount);
+    event LiquidityAdded(uint256 tokenId);
     event LiquidityRemoved(address indexed token, uint256 tokenId, uint256 amount0, uint256 amount1);
     event LiquidityAdditionFailed(address indexed token, address indexed pool, uint256 tokenAmount, uint256 wethAmount, string error);
     event FeesCollected(uint256 tokenId, uint256 amount0, uint256 amount1);
@@ -54,6 +56,7 @@ contract MyFactory {
     event ZeroFeesDays(uint256 tokenId, bool isTokenDead);
     event ResetFeesDays(uint256 tokenId, bool isTokenDead);
     event TokensSwapped(uint256 amount);
+    event RemoveTime (uint256 yesOrNo);
     
 
     modifier onlyOwner() {
@@ -72,13 +75,15 @@ contract MyFactory {
 
 
     // Method to get all token addresses
-    function getAllTokens() public view onlyOwner returns (address[] memory addresses, uint256[] memory tokenIds, uint256[] memory timestamps, bool[] memory liquidityRemovedStatus, uint256[] memory zerofeesdays, bool[] memory isTokenDead) {
+    function getAllTokens() public view onlyOwner returns (address[] memory addresses, uint256[] memory tokenIds, uint256[] memory timestamps, bool[] memory liquidityRemovedStatus, uint256[] memory zerofeesdays, bool[] memory isTokenDead, uint256[] memory feefromswap) {
     addresses = new address[](allTokens.length);
     tokenIds = new uint256[](allTokens.length);
     timestamps = new uint256[](allTokens.length);
     liquidityRemovedStatus = new bool[](allTokens.length);
     zerofeesdays = new uint256[](allTokens.length);
     isTokenDead = new bool[](allTokens.length);
+    feefromswap = new uint256[](allTokens.length);
+    //userTradeFees = new uint256[](allTokens.length);
 
     for (uint i = 0; i < allTokens.length; i++) {
         addresses[i] = allTokens[i].tokenAddress;
@@ -87,9 +92,11 @@ contract MyFactory {
         liquidityRemovedStatus[i] = allTokens[i].liquidityRemoved;
         zerofeesdays[i] = allTokens[i].zerofeedays;
         isTokenDead[i] = allTokens[i].isTokenDEAD;
+        feefromswap[i] = allTokens[i].feeFromSwap;
+        //userTradeFees[i] = allTokens[i].userTradeFees;
     }
 
-    return (addresses, tokenIds, timestamps, liquidityRemovedStatus, zerofeesdays, isTokenDead);
+    return (addresses, tokenIds, timestamps, liquidityRemovedStatus, zerofeesdays, isTokenDead, feefromswap);
 }
 
     function deployToken( string calldata _name, string calldata _symbol, uint256 _supply) external returns (address) {
@@ -142,7 +149,6 @@ contract MyFactory {
         // Handle received Ether if necessary
     }
 
-    
 
     function approveToken(address token, address spender, uint256 amount) internal onlyOwner {
     require(IERC20(token).approve(spender, amount), "Approval failed");
@@ -155,12 +161,12 @@ contract MyFactory {
 
 
     function setStakingAddress(address payable _stakingAddress) external onlyOwner {
-          stakingAddress = payable(_stakingAddress); 
+        stakingAddress = _stakingAddress;
     }
 
     function callAddRewards (uint256 amount ) external payable onlyOwner {
 
-        //require(msg.value > 0, "No rewards to add bro");
+        //require(msg.value > 0, "No rewards to add");
         approveToken(weth, stakingAddress, amount);
 
         SimpleStaking(stakingAddress).addRewards{value: amount}();
@@ -176,6 +182,11 @@ contract MyFactory {
         IERC20(tokenAddress).transfer(to, amount);
 
     }
+
+    function burnPositionNFT(uint256 tokenId) external {
+    // Ensure all liquidity has been removed and fees collected
+    positionManager.burn(tokenId);
+}
 
 
     function convertWETHToETH(uint256 amount) external onlyOwner {
@@ -206,14 +217,9 @@ contract MyFactory {
         return amountOut;
     }
 
-    function swapTokensForWETH(uint256 amountIn, address tokenAddress) external payable onlyOwner returns (uint256 amountOut) {
+    function swapTokensForWETH(uint256 amountIn, address tokenAddress, uint256 tokenId) external payable onlyOwner returns (uint256 amountOut) {
         
         require(amountIn > 0, "Amount must be greater than zero");
-
-        IERC20 token = IERC20(tokenAddress);
-
-        uint256 factoryBalance = token.balanceOf(address(this));
-        require(factoryBalance >= amountIn, "Insufficient token balance in the factory contract");
 
         // Approve the swap router to spend tokens
         approveToken(tokenAddress, address(swapRouter), amountIn);
@@ -230,9 +236,19 @@ contract MyFactory {
             });
 
         amountOut = swapRouter.exactInputSingle{ value: msg.value }(params);
+        
+        uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+        allTokens[index].feeFromSwap = amountIn * 1 / 100;
         emit TokensSwapped(amountOut);
         return amountOut;
     }
+
+    /* function checkFeeFromSwap( uint256 tokenId ) external onlyOwner {
+
+        uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+        allTokens[index].feeFromSwap = amountIn * 1 / 100;
+
+    } */
 
     
     
@@ -272,30 +288,68 @@ contract MyFactory {
         timeStamp: block.timestamp,
         liquidityRemoved: false,
         zerofeedays: 0,
-        isTokenDEAD: false
+        isTokenDEAD: false,
+        feeFromSwap: 0
     }));
 
     // Save the index of the new token details in the mapping
     tokenIndex[tokenId] = allTokens.length - 1;
 
-    emit LiquidityAdded(tokenId , _token0, _token1, _token0Amount, _token1Amount);
+    emit LiquidityAdded(tokenId);
     return tokenId;
     }
 
 
 function updateNoFeeDays(uint256 tokenId) external onlyOwner { 
 
+    uint256 removeNow = 0;
 
     uint256 index = tokenIndex[tokenId]; // Get the index from mapping
     allTokens[index].zerofeedays++;
+    
 
-    if (allTokens[index].zerofeedays >= 3){
+    if( allTokens[index].liquidityRemoved == false && allTokens[index].zerofeedays >= 3){
+
+        allTokens[index].isTokenDEAD = true;
+
+        removeNow = 1;
+
+    }
+
+    if ( allTokens[index].liquidityRemoved == true && allTokens[index].zerofeedays >= 2 ){
 
         allTokens[index].isTokenDEAD = true;
 
     }
 
-    emit ZeroFeesDays(allTokens[index].zerofeedays, allTokens[index].isTokenDEAD );
+    //emit ZeroFeesDays(allTokens[index].zerofeedays, allTokens[index].isTokenDEAD );
+    emit RemoveTime(removeNow);
+    
+}
+
+function updateNoFeeDays2(uint256 tokenId) external onlyOwner { 
+
+    uint256 remove = 0;
+
+    uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+    allTokens[index].zerofeedays++;
+    
+
+    if( allTokens[index].liquidityRemoved == false && allTokens[index].zerofeedays >= 3){
+
+        allTokens[index].isTokenDEAD = true;
+
+        remove = 1;
+        emit RemoveTime(remove);
+
+    }
+
+    if ( allTokens[index].liquidityRemoved == true && allTokens[index].zerofeedays >= 2 ){
+
+        allTokens[index].isTokenDEAD = true;
+        emit RemoveTime(remove);
+
+    }
     
 }
 
@@ -366,7 +420,7 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
     address token0,
     address token1,
     uint24 fee,
-     int24 tickLower,
+    int24 tickLower,
     int24 tickUpper,
     uint128 liquidity,
     uint256 feeGrowthInside0LastX128,
@@ -395,7 +449,6 @@ function collectFees(uint256 tokenId) external onlyOwner {
     }
 
 
-
 //new changes regarding unstaking queue
 
  uint256 public pendingFunds; 
@@ -418,8 +471,8 @@ function notifyFundsNeeded(uint256 amount) external {
 
     // if unstaking queue is too long, only pay the first in the line
 
-
-    function tryToSendFunds() public {
+// CHANGE TO INTERNAL WHEN COMING FROM REMOVEL
+    function tryToSendFunds() public  {
         uint256 availableWETH = IERC20(weth).balanceOf(address(this));
         if (availableWETH >= pendingFunds && pendingFunds > 0) {
             IERC20(weth).transfer(stakingAddress, pendingFunds);
@@ -446,13 +499,15 @@ function notifyFundsNeeded(uint256 amount) external {
         receive() external payable {
            }
 
-
+ 
 }
 
 
 interface ISimpleStaking {
     function notifyFundsReceived(uint256 amount) external;
 }
+
+
 
 interface ISwapRouter {
     struct ExactInputSingleParams {
@@ -472,7 +527,13 @@ interface ISwapRouter {
 }
 
 
-
-
-
- 
+/* interface IWETH {
+    function deposit() external payable;
+    function deposit(uint256 amount) external payable;
+    function withdraw(uint256 amount) external;
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transfer(address to, uint256 value) external returns (bool);
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
+    function balanceOf(address owner) external view returns (uint256);
+    function allowance(address owner, address spender) external view returns (uint256);
+} */

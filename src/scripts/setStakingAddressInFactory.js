@@ -3,10 +3,10 @@ const { ethers } = require("hardhat");
 
 async function main() {
   // The address of your deployed factory contract
-  const factoryContractAddress = "0xb852A73BD5aD3c131F520430902512fb935Db187"; // Sepolia factory
+  const factoryContractAddress = "0x1a9EF94197D2b0a39D922dbEe0b87F8c973b85dd"; // Sepolia factory
 
   // The address of your deployed SimpleStaking contract
-  const stakingContractAddress = "0xFE19688801b0813b14884bc89541F51A0B3a886D";
+  const stakingContractAddress = "0x35a4a01b81D011b09BC01d996C215188Be1e8491";
 
   // Get signer information from the default account
   const [signer] = await ethers.getSigners();
