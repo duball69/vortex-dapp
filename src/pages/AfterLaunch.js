@@ -21,8 +21,8 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x1a9EF94197D2b0a39D922dbEe0b87F8c973b85dd",
-    lockerAddress: "0x31828AAC589e46549F3980912A6a8001F81a9eD5",
+    factoryAddress: "0xe2049F2dCA5A909b3CbF2581620BBde9f78F115D",
+    lockerAddress: "0x618dc0F2cf41C3feDA52D614D13CEcf5Bcd0C43E",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
     nftAddress: "0x1238536071E1c677A632429e3655c799b22cDA52",
@@ -133,59 +133,6 @@ function AfterLaunch() {
     window.location.href = "/";
   };
 
-  const lockLiquidity = async () => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-
-    const factory = new ethers.Contract(
-      factoryChainAddress,
-      MyFactoryJson.abi,
-      signer
-    );
-    const locker = new ethers.Contract(
-      "0x31828AAC589e46549F3980912A6a8001F81a9eD5",
-      LiquidityLockerJson.abi,
-      signer
-    );
-
-    try {
-      // Assume tokenId and nftAddress are fetched or set elsewhere in your component
-      console.log("Locker Address:", lockerChainAddress);
-      console.log("Chain:", chainId);
-
-      console.log("Approving LiquidityLocker to manage the NFT...");
-      const approveTx = await factory.approveNFT(
-        positionManagerChainAddress,
-        tokenDetails.tokenId, // Assuming the tokenId is stored in state after fetching
-        "0x31828AAC589e46549F3980912A6a8001F81a9eD5"
-      );
-      await approveTx.wait();
-      console.log("Approval successful.");
-
-      // Lock the liquidity
-      console.log("Locking liquidity...");
-      const duration = 3600 * 24 * 7; // Example duration: 1 week in seconds
-      const lockLiquidityTx = await locker.lockLiquidity(
-        positionManagerChainAddress,
-        tokenDetails.tokenId,
-        duration,
-        factoryChainAddress
-      );
-      const receipt = await lockLiquidityTx.wait();
-      console.log("Liquidity locked.");
-
-      // Optionally, handle the liquidity locked event
-      const liquidityLockedEvent = receipt.events.find(
-        (event) => event.event === "LiquidityLocked"
-      );
-      if (liquidityLockedEvent) {
-        console.log("Lock ID:", liquidityLockedEvent.args[0]);
-      }
-    } catch (error) {
-      console.error("Failed to lock liquidity:", error);
-    }
-  };
-
   return (
     <div>
       <Header
@@ -195,22 +142,6 @@ function AfterLaunch() {
       />
       <div className="center-container">
         <div className="factory-container">
-          <h1>Token Management</h1>
-          {isLoaded ? (
-            <div>
-              <button
-                onClick={lockLiquidity}
-                disabled={
-                  isLoading || !isConnected || connectedWallet !== deployer
-                }
-              >
-                Lock Liquidity
-              </button>
-            </div>
-          ) : (
-            <p>Loading token details...</p>
-          )}
-
           <h1>Update your Token Details</h1>
 
           {isLoaded ? (

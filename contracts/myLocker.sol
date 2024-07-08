@@ -8,27 +8,21 @@ import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.s
 
 contract LiquidityLocker is ERC721Holder {
     struct Lock {
-        address tokenAddress;
-        uint256 tokenId;
-        uint256 unlockTime;
-    }
-
-    struct Alltokens {
         uint256 tokenId;
         bool isLocked;
         uint256 lockID;
         uint256 unlockTime;
     }
 
-    Alltokens[] public allTokens;
 
     mapping(uint256 => uint256) private tokenIndex; // Maps tokenId to index in allTokens array
 
     address public owner;
-    mapping(uint256 => Alltokens) public token;
     mapping(uint256 => Lock) public locks;
     uint256 public nextLockId = 0;
     INonfungiblePositionManager public positionManager;
+    address nftAddress;
+    address public factoryAddress;
 
     event LiquidityLocked(uint256 indexed lockId, address indexed tokenAddress, uint256 tokenId, uint256 unlockTime);
     event LiquidityUnlocked(uint256 indexed lockId, address indexed tokenAddress, uint256 tokenId);
@@ -39,12 +33,24 @@ contract LiquidityLocker is ERC721Holder {
         _;
     }
 
+    modifier onlyAuth() {
+        require(msg.sender == owner || msg.sender == factoryAddress, "Caller is not authorized");
+        _;
+    }
+
+    // Set the factory address
+    function setFactoryAddress(address _factoryAddress) external onlyOwner {
+        factoryAddress = _factoryAddress;
+    }
+
     constructor(address _positionManager) {
         owner = msg.sender; // Set the owner to the deployer of the contract
         positionManager = INonfungiblePositionManager(_positionManager);
+        nftAddress = _positionManager;
+        
     }
 
-    // Method to get all token addresses
+    /* // Method to get all token addresses
     function getAllTokens() public view onlyOwner returns (uint256[] memory _tokenId, bool[] memory _isLocked, uint256[] memory _lockID, uint256[] memory _unlockTime) {
     _tokenId = new uint256[](allTokens.length);
     _isLocked = new bool[](allTokens.length);
@@ -59,10 +65,10 @@ contract LiquidityLocker is ERC721Holder {
     }
 
     return (_tokenId, _isLocked, _lockID, _unlockTime);
-}
+} */
 
     // Locks the liquidity NFT
-    function lockLiquidity(address _nftAddress, uint256 _tokenId, uint256 _duration, address factory) external onlyOwner returns (uint256 lockId) {
+    function lockLiquidity(address _nftAddress, uint256 _tokenId, uint256 _duration, address factory) external onlyAuth returns (uint256 lockId) {
         require(_nftAddress != address(0), "Invalid NFT address");
 
         // Transfer the NFT from the sender to this contract
@@ -73,20 +79,16 @@ contract LiquidityLocker is ERC721Holder {
         lockId = nextLockId++;
 
         locks[lockId] = Lock({
-            tokenAddress: _nftAddress,
             tokenId: _tokenId,
+            isLocked: true,
+            lockID: lockId,
             unlockTime: unlockTime
         });
 
-        allTokens.push(Alltokens({
-        tokenId: _tokenId,
-        isLocked: true,
-        lockID: lockId,
-        unlockTime: unlockTime
-    }));
+
         
         // Save the index of the new token details in the mapping
-        tokenIndex[_tokenId] = allTokens.length - 1;
+        //tokenIndex[_tokenId] = allTokens.length - 1;
 
         emit LiquidityLocked(lockId, _nftAddress, _tokenId, unlockTime);
 
@@ -100,23 +102,22 @@ contract LiquidityLocker is ERC721Holder {
         Lock storage lock = locks[_lockId];
         require(block.timestamp >= lock.unlockTime, "Liquidity is still locked");
 
-        address nftAddress = lock.tokenAddress;
-        uint256 tokenId = lock.tokenId;
+        uint256 token_Id = lock.tokenId;
 
         // Transfer the NFT back to the owner
-        IERC721(nftAddress).transferFrom(address(this), factory, tokenId);
+        IERC721(nftAddress).transferFrom(address(this), factory, token_Id);
 
         delete locks[_lockId]; // Clean up the storage
 
-        emit LiquidityUnlocked(_lockId, nftAddress, tokenId);
+        emit LiquidityUnlocked(_lockId, nftAddress, token_Id);
 
-        uint256 index = tokenIndex[tokenId]; // Get the index from mapping
-        allTokens[index].isLocked = false;
+        //uint256 index = tokenIndex[token_Id]; // Get the index from mapping
+        // allTokens[index].isLocked = false;
     }
 
     // Function to approve the factory contract to manage the locked NFT
-    function approveFactory(address factoryAddress, address nftAddress, uint256 tokenId) external {
-        IERC721(nftAddress).approve(factoryAddress, tokenId);
+    function approveFactory(address factory, uint256 tokenId) external {
+        IERC721(nftAddress).approve(factory, tokenId);
     }
 
 // Function to collect fees from the locked NFT

@@ -36,7 +36,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x1a9EF94197D2b0a39D922dbEe0b87F8c973b85dd",
+    factoryAddress: "0x2ad8373573F21C8Ed40a1F470a8CeAcf75B58D08",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -59,9 +59,6 @@ function DashboardPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [tokenAmountToBuy, setTokenAmountToBuy] = useState("");
-  const [isCreatingPair, setIsCreatingPair] = useState(false);
-  const [isPoolInitializing, setIsPoolInitializing] = useState(false);
-  const [isAddingLiquidity, setIsAddingLiquidity] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const factoryChainAddress =
@@ -101,6 +98,7 @@ function DashboardPage() {
 
     // Fetch token information from the blockchain
     const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
     const tokenContract = new ethers.Contract(
       contractAddress,
       MyTokenJson.abi,
@@ -129,144 +127,90 @@ function DashboardPage() {
     });
   }
 
-  function calculateSqrtPriceX96(token1Amount, token0Amount) {
-    console.log("Token0amount:", token0Amount);
-    console.log("Token1amount:", token1Amount);
-
-    // Calculate the price ratio as token1 / token0, scaled up by 10^18 to maintain precision
-    const priceRatio =
-      (BigInt(token1Amount) * BigInt(10 ** 18)) / BigInt(token0Amount);
-
-    console.log("Price ratio:", priceRatio);
-
-    // Calculate the square root of the price ratio, convert it to a number to handle floating-point operations
-    const sqrtPriceRatio = Math.sqrt(Number(priceRatio));
-    console.log(sqrtPriceRatio);
-    console.log("sqrtpricerati:", sqrtPriceRatio);
-    // Adjust the floating point result before converting it back to BigInt
-    const adjustedSqrtPriceRatio = Math.floor(sqrtPriceRatio * 10 ** 9); // Adjust by scaling up to preserve precision
-
-    // Convert the adjusted result to BigInt and then scale it to sqrtPriceX96 format
-    const sqrtPriceX96 =
-      (BigInt(adjustedSqrtPriceRatio) * BigInt(2 ** 96)) / BigInt(10 ** 18);
-    console.log("sqrtpriceratio96:", sqrtPriceX96);
-    return sqrtPriceX96.toString(); // Return as string to avoid further BigInt conversion issues in ethers.js
-  }
-
   async function handleMulticall() {
     setIsLoading(true);
     setSuccessMessage("");
-    let token0, token1, token0amount, token1amount;
-
-    const tokenAmount = ethers.parseUnits(String(tokenDetails.supply), 18); // Total supply for your token
-    const wethAmount = ethers.parseUnits("0.01", 18); // 0.01 WETH
-
-    if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
-      token0 = contractAddress;
-      token1 = WETH_ChainAddress;
-      token0amount = tokenAmount;
-      token1amount = wethAmount;
-    } else {
-      token0 = WETH_ChainAddress;
-      token1 = contractAddress;
-      token0amount = wethAmount;
-      token1amount = tokenAmount;
-    }
-
-    // Calculate sqrtPriceX96
-    const priceRatio =
-      (BigInt(token1amount) * BigInt(10 ** 18)) / BigInt(token0amount);
-    const sqrtPriceRatio = sqrt(priceRatio);
-    const sqrtPriceX96 = (sqrtPriceRatio * BigInt(2 ** 96)) / BigInt(10 ** 9);
-
-    const iface = new ethers.Interface([
-      "function createAndInitializePoolIfNecessary(address,address,uint160) external returns (address pool)",
-      "function addInitialLiquidity(address,address,address,uint256,uint256) external",
-      "function swapETHforTokens(uint256,address) payable returns (bool)",
-    ]);
-
-    const createPoolData = iface.encodeFunctionData(
-      "createAndInitializePoolIfNecessary",
-      [token0, token1, sqrtPriceX96]
-    );
-    const addLiquidityData = iface.encodeFunctionData("addInitialLiquidity", [
-      token0,
-      token1,
-      contractAddress,
-      token0amount,
-      token1amount,
-    ]);
+    setErrorMessage("");
 
     try {
+      const swapAmount = ethers.parseUnits(tokenAmountToBuy, 18);
+
+      // Setup for adding liquidity
+      const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
+      const wethAmount = ethers.parseUnits("0.0001", 18); // Example amount of WETH
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
+
       const factoryContract = new ethers.Contract(
         factoryChainAddress,
         MyFactoryJson.abi,
         signer
       );
 
-      const tx = await factoryContract.multicall(
-        [createPoolData, addLiquidityData],
-        { gasLimit: 9000000 }
-      );
-      const txReceipt = await tx.wait();
-      console.log("Transaction Receipt:", txReceipt);
-
-      // Assuming the LiquidityAdded event returns tokenId
-
-      // Make sure there are enough logs
-      if (txReceipt.logs && txReceipt.logs.length > 10) {
-        const tokenIdLog = txReceipt.logs[10].data; // accessing the 10th log
-
-        const tokenIdDec = parseInt(tokenIdLog, 16); //save token Id as decimal
-
-        console.log("Liquidity Token ID:", tokenIdDec);
-
-        const tokenDocRef = doc(firestore, "tokens", contractAddress);
-        await updateDoc(tokenDocRef, {
-          tokenId: tokenIdDec,
-        });
+      let token0, token1, token0amount, token1amount;
+      if (contractAddress.toLowerCase() < WETH_ChainAddress.toLowerCase()) {
+        token0 = contractAddress;
+        token1 = WETH_ChainAddress;
+        token0amount = tokenAmount;
+        token1amount = wethAmount;
+      } else {
+        token0 = WETH_ChainAddress;
+        token1 = contractAddress;
+        token0amount = wethAmount;
+        token1amount = tokenAmount;
       }
+
+      // Calculate sqrtPriceX96
+      const priceRatio =
+        (BigInt(token1amount) * BigInt(10 ** 18)) / BigInt(token0amount);
+      const sqrtPriceRatio = sqrt(priceRatio);
+      const sqrtPriceX96 = (sqrtPriceRatio * BigInt(2 ** 96)) / BigInt(10 ** 9);
+
+      // Call the addLiquidityLockSwap function
+      const txAddLiquidity = await factoryContract.addLiquidityLockSwap(
+        token0,
+        token1,
+        contractAddress,
+        token0amount,
+        token1amount,
+        sqrtPriceX96,
+        swapAmount, // Adjust amount of ETH swapped accordingly
+        { value: swapAmount, gasLimit: 9000000 }
+      );
+      await txAddLiquidity.wait();
+      console.log("Liquidity added and locked!");
+
+      // Optionally handle swap and any other interactions here
+      const tokensSwappedEvent = await getLatestEvent(
+        factoryContract,
+        "TokensSwapped"
+      );
+      const tokensReceived = ethers.formatUnits(tokensSwappedEvent.args[0], 18);
+      console.log("Tokens received: ", tokensReceived);
 
       setSuccessMessage(
-        "Your token is now launched on Uniswap with liquidity added!"
+        "Token deployed, liquidity added, and initial swap done!"
       );
-
-      if (parseFloat(tokenAmountToBuy) > 0) {
-        // Perform the token purchase after liquidity is added
-        console.log("Buying tokens for the team...");
-        const amountIn = ethers.parseUnits(tokenAmountToBuy, 18); // Define the ETH amount to use in token purchase
-
-        const tx1 = await factoryContract.swapETHforTokens(
-          amountIn,
-          contractAddress,
-          {
-            value: amountIn,
-            gasLimit: 9000000,
-          }
-        );
-        const receipt = await tx1.wait();
-        console.log("Swap performed successfully!");
-        setSuccessMessage(
-          "Your token is now launched on Uniswap with liquidity added, and tokens purchased!"
-        );
-      } else {
-        console.log("No tokens purchased as the input amount was zero.");
-      }
-
-      setErrorMessage("");
     } catch (error) {
-      console.error("Transaction failed:", error);
-      setErrorMessage("Transaction failed: " + error.message);
-      setSuccessMessage(""); // Clear any previous success messages
+      console.error(error);
+      setErrorMessage(`Operation failed: ${error.message}`);
     } finally {
-      setIsLoading(false); // Reset loading state after operation is complete
+      setIsLoading(false);
     }
   }
 
-  // Helper function to calculate square root
-  const sqrt = (value) => {
+  // Helper function to get the latest event
+  async function getLatestEvent(token, eventName) {
+    const filter = token.filters[eventName]();
+    const events = await token.queryFilter(filter);
+    return events[events.length - 1];
+  }
+
+  // Babylonian method for square root calculation using BigInt
+  function sqrt(value) {
+    if (value < 0n)
+      throw new Error("Square root of negative numbers is not supported");
+    if (value === 0n) return 0n;
     let z = value;
     let x = value / 2n + 1n;
     while (x < z) {
@@ -274,7 +218,7 @@ function DashboardPage() {
       x = (value / x + x) / 2n;
     }
     return z;
-  };
+  }
 
   return (
     <div>
@@ -286,7 +230,8 @@ function DashboardPage() {
 
       <h1 className="titlefactory">Get Initial LP for your token</h1>
       <h3 className="subtitlefactory">
-        Click to launch your token with initial liquidity for free.
+        Click to launch your token with initial liquidity for free. It will be
+        locked.
       </h3>
 
       <div className="center-container">
@@ -333,26 +278,20 @@ function DashboardPage() {
                 step="0.01"
                 value={tokenAmountToBuy}
                 onChange={(e) => {
-                  // Use a regular expression to allow only numerical input with both comma and point as decimal separators
-                  let value = e.target.value;
-                  if (!value) {
-                    setTokenAmountToBuy("0"); // Set to '0' if the input is empty
-                  } else {
-                    // Replace commas with periods to standardize the input as a number
-                    value = value.replace(/,/g, ".");
-                    if (value.match(/^\d*\.?\d*$/)) {
-                      setTokenAmountToBuy(value);
-                    }
+                  let value = e.target.value.replace(/,/g, "."); // Standardize input by replacing commas with periods
+                  if (value === "" || value.match(/^\d*\.?\d*$/)) {
+                    setTokenAmountToBuy(value); // Only set the value if it matches the decimal pattern or is an empty string
                   }
                 }}
                 onBlur={(e) => {
-                  // Ensure that empty fields are set to '0' when the user leaves the input
-                  if (!e.target.value) {
-                    setTokenAmountToBuy("0.00");
-                  }
+                  // Format the input to two decimal places on blur, assume '0.00' if the input is invalid or empty
+                  let value = e.target.value
+                    ? parseFloat(e.target.value).toFixed(2)
+                    : "0.00";
+                  setTokenAmountToBuy(value);
                 }}
                 placeholder="Token amount"
-                min="0.00" // Ensure that only positive numbers can be entered
+                min="0.00" // Set minimum to "0.00" to allow zero as a valid input
               />
             </div>
           </div>

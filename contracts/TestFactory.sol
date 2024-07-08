@@ -26,6 +26,10 @@ contract MyFactory {
     ISwapRouter public swapRouter; 
     address public owner;
     address payable public stakingAddress;
+    address public lockerAddress;
+    ILocker public locker;
+    address nftAddress;
+
     uint256 wethProvided = 0.0001 ether;
     bool removeEarlier;
 
@@ -37,6 +41,9 @@ contract MyFactory {
         uint256 zerofeedays;
         bool isTokenDEAD;
         uint256 feeFromSwap;
+        uint256 lockId;
+        bool isLocked;
+        uint256 unlockTime;
     }
 
     TokenDetails[] public allTokens;
@@ -64,18 +71,21 @@ contract MyFactory {
         _;
     }
 
-    constructor(address _positionManager, address _weth, address _uniswapFactory, address _swapRouter) {
+    constructor(address _positionManager, address _weth, address _uniswapFactory, address _swapRouter, address _lockerAddress) {
         positionManager = INonfungiblePositionManager(_positionManager);
+        nftAddress = _positionManager;
         weth = _weth;
         uniswapFactory = IUniswapV3Factory(_uniswapFactory);
         swapRouter = ISwapRouter(_swapRouter);
         owner = msg.sender;  // Set the deployer as the owner
+        lockerAddress = _lockerAddress;
+        locker = ILocker(_lockerAddress);
     }
     
 
 
     // Method to get all token addresses
-    function getAllTokens() public view onlyOwner returns (address[] memory addresses, uint256[] memory tokenIds, uint256[] memory timestamps, bool[] memory liquidityRemovedStatus, uint256[] memory zerofeesdays, bool[] memory isTokenDead, uint256[] memory feefromswap) {
+    function getAllTokens() public view onlyOwner returns (address[] memory addresses, uint256[] memory tokenIds, uint256[] memory timestamps, bool[] memory liquidityRemovedStatus, uint256[] memory zerofeesdays, bool[] memory isTokenDead, uint256[] memory feefromswap, uint256[] memory lockIds, bool[] memory isTokenLocked, uint256[] memory unlockTimes) {
     addresses = new address[](allTokens.length);
     tokenIds = new uint256[](allTokens.length);
     timestamps = new uint256[](allTokens.length);
@@ -83,7 +93,9 @@ contract MyFactory {
     zerofeesdays = new uint256[](allTokens.length);
     isTokenDead = new bool[](allTokens.length);
     feefromswap = new uint256[](allTokens.length);
-    //userTradeFees = new uint256[](allTokens.length);
+    lockIds = new uint256[](allTokens.length);
+    isTokenLocked = new bool[](allTokens.length);
+    unlockTimes = new uint256[](allTokens.length);
 
     for (uint i = 0; i < allTokens.length; i++) {
         addresses[i] = allTokens[i].tokenAddress;
@@ -93,10 +105,12 @@ contract MyFactory {
         zerofeesdays[i] = allTokens[i].zerofeedays;
         isTokenDead[i] = allTokens[i].isTokenDEAD;
         feefromswap[i] = allTokens[i].feeFromSwap;
-        //userTradeFees[i] = allTokens[i].userTradeFees;
+        lockIds[i] = allTokens[i].lockId;
+        isTokenLocked[i] = allTokens[i].isLocked;
+        unlockTimes[i] = allTokens[i].unlockTime;
     }
 
-    return (addresses, tokenIds, timestamps, liquidityRemovedStatus, zerofeesdays, isTokenDead, feefromswap);
+    return (addresses, tokenIds, timestamps, liquidityRemovedStatus, zerofeesdays, isTokenDead, feefromswap, lockIds, isTokenLocked, unlockTimes);
 }
 
     function deployToken( string calldata _name, string calldata _symbol, uint256 _supply) external returns (address) {
@@ -135,6 +149,7 @@ contract MyFactory {
     ) external returns (address pool) {
         pool = positionManager.createAndInitializePoolIfNecessary(token0, token1, 10000, sqrtPriceX96);
         emit PoolCreated(token0, pool);
+        return pool;
     }
 
 
@@ -149,13 +164,17 @@ contract MyFactory {
         // Handle received Ether if necessary
     }
 
+    // Receive function to handle incoming Ether
+    receive() external payable {
+        // Handle received Ether
+    }
 
     function approveToken(address token, address spender, uint256 amount) internal onlyOwner {
     require(IERC20(token).approve(spender, amount), "Approval failed");
 }
 
     // Function to approve another contract or address to manage a specific NFT
-    function approveNFT(address nftAddress, uint256 tokenId, address spender) external {
+    function approveNFT(uint256 tokenId, address spender) external {
         IERC721(nftAddress).approve(spender, tokenId);
     }
 
@@ -253,11 +272,14 @@ contract MyFactory {
     
     
 
-    function addInitialLiquidity(address _token0, address _token1, address tokenAddress, uint256 _token0Amount, uint256 _token1Amount) external returns (uint256 tokenId) {
+    function addLiquidityLockSwap(address _token0, address _token1, address tokenAddress, uint256 _token0Amount, uint256 _token1Amount, uint160 sqrtPriceX96, uint256 amountToBuy) external payable returns (uint256 tokenId) {
 
      // Check if the factory contract has enough WETH
     uint256 wethBalance = IERC20(weth).balanceOf(address(this));
     require(wethBalance >= wethProvided, "Not enough WETH in the factory contract");
+
+    address pool = positionManager.createAndInitializePoolIfNecessary(_token0, _token1, 10000, sqrtPriceX96);
+    emit PoolCreated(_token0, pool);
 
 
     // Approve the position manager to spend tokens
@@ -281,7 +303,36 @@ contract MyFactory {
 
         (tokenId,,,) = positionManager.mint(params);
 
-        // Store the token details in the array
+
+    emit LiquidityAdded(tokenId);
+
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    // Approve the locker contract to manage the liquidity NFT
+        IERC721(address(positionManager)).approve(lockerAddress, tokenId);
+        uint256 duration = 6;
+
+        // Lock the liquidity NFT
+        ILocker(lockerAddress).lockLiquidity(address(positionManager), tokenId, duration, address(this));
+
+    //////////////////////////////////////////////////////////////////////////////////
+    if(amountToBuy > 0){
+        approveToken(weth, address(swapRouter), amountToBuy);
+        ISwapRouter.ExactInputSingleParams memory swapParams =
+                    ISwapRouter.ExactInputSingleParams({
+                tokenIn: weth,
+                tokenOut: tokenAddress,
+                fee: 10000,
+                recipient: msg.sender,
+                amountIn: amountToBuy,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+        uint256 amountOut = swapRouter.exactInputSingle{ value: msg.value }(swapParams);
+        emit TokensSwapped(amountOut);
+    }
+/////////////////////////////////////////////////////////////////////////////////////////
+    // Store the token details in the array
     allTokens.push(TokenDetails({
         tokenAddress: tokenAddress,  // Storing _token0 as an example, store _token1 similarly if needed
         tokenId: tokenId,
@@ -289,69 +340,33 @@ contract MyFactory {
         liquidityRemoved: false,
         zerofeedays: 0,
         isTokenDEAD: false,
-        feeFromSwap: 0
+        feeFromSwap: 0,
+        lockId: 0,
+        isLocked: true,
+        unlockTime: block.timestamp + 6 seconds 
     }));
 
     // Save the index of the new token details in the mapping
     tokenIndex[tokenId] = allTokens.length - 1;
 
-    emit LiquidityAdded(tokenId);
     return tokenId;
     }
 
 
 function updateNoFeeDays(uint256 tokenId) external onlyOwner { 
 
-    uint256 removeNow = 0;
-
     uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+
+    if( allTokens[index].zerofeedays >= 2){
+
+        allTokens[index].isTokenDEAD = true;
+
+    }
+
     allTokens[index].zerofeedays++;
-    
-
-    if( allTokens[index].liquidityRemoved == false && allTokens[index].zerofeedays >= 3){
-
-        allTokens[index].isTokenDEAD = true;
-
-        removeNow = 1;
-
-    }
-
-    if ( allTokens[index].liquidityRemoved == true && allTokens[index].zerofeedays >= 2 ){
-
-        allTokens[index].isTokenDEAD = true;
-
-    }
-
-    //emit ZeroFeesDays(allTokens[index].zerofeedays, allTokens[index].isTokenDEAD );
-    emit RemoveTime(removeNow);
     
 }
 
-function updateNoFeeDays2(uint256 tokenId) external onlyOwner { 
-
-    uint256 remove = 0;
-
-    uint256 index = tokenIndex[tokenId]; // Get the index from mapping
-    allTokens[index].zerofeedays++;
-    
-
-    if( allTokens[index].liquidityRemoved == false && allTokens[index].zerofeedays >= 3){
-
-        allTokens[index].isTokenDEAD = true;
-
-        remove = 1;
-        emit RemoveTime(remove);
-
-    }
-
-    if ( allTokens[index].liquidityRemoved == true && allTokens[index].zerofeedays >= 2 ){
-
-        allTokens[index].isTokenDEAD = true;
-        emit RemoveTime(remove);
-
-    }
-    
-}
 
 
 function resetNoFeeDays(uint256 tokenId) external onlyOwner { 
@@ -362,6 +377,15 @@ function resetNoFeeDays(uint256 tokenId) external onlyOwner {
 
     emit ResetFeesDays(allTokens[index].zerofeedays, allTokens[index].isTokenDEAD );
     
+}
+
+function storeLockID(uint256 tokenId, uint256 _lockId, bool locked, uint256 unlockDate) external {
+
+    uint256 index = tokenIndex[tokenId]; // Get the index from mapping
+    allTokens[index].lockId = _lockId;
+    allTokens[index].isLocked = locked;
+    allTokens[index].unlockTime = unlockDate;
+
 }
 
 
@@ -383,7 +407,7 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
     function removeLiquidity(uint256 tokenId, uint128 liquidityToRemove) external onlyOwner {
 
         uint256 index = tokenIndex[tokenId]; // Get the index from mapping
-        require(!allTokens[index].liquidityRemoved, "Liquidity already removed");
+        //require(!allTokens[index].liquidityRemoved, "Liquidity already removed");
 
         // Decrease liquidity
         positionManager.decreaseLiquidity(
@@ -410,6 +434,7 @@ function sqrt(uint256 y) internal pure returns (uint256 z) {
 
         allTokens[index].liquidityRemoved = true; // Update the liquidity removed status
         emit LiquidityRemoved(msg.sender, tokenId, collectedAmount0, collectedAmount1);
+        tryToSendFunds();
          
     }
 
@@ -449,7 +474,7 @@ function collectFees(uint256 tokenId) external onlyOwner {
     }
 
 
-//new changes regarding unstaking queue
+    //new changes regarding unstaking queue
 
  uint256 public pendingFunds; 
 
@@ -463,16 +488,14 @@ function notifyFundsNeeded(uint256 amount) external {
         emit FundsRequested(amount);
         tryToSendFunds();
     }
-
-
-    // Attempt to send funds to the staking contract
+ // Attempt to send funds to the staking contract
 
   
 
     // if unstaking queue is too long, only pay the first in the line
 
-// CHANGE TO INTERNAL WHEN COMING FROM REMOVEL
-    function tryToSendFunds() public  {
+
+    function tryToSendFunds() public {
         uint256 availableWETH = IERC20(weth).balanceOf(address(this));
         if (availableWETH >= pendingFunds && pendingFunds > 0) {
             IERC20(weth).transfer(stakingAddress, pendingFunds);
@@ -493,20 +516,7 @@ function notifyFundsNeeded(uint256 amount) external {
 }
 
 
-
-
-        // Fallback function to handle incoming Ether
-        receive() external payable {
-           }
-
- 
 }
-
-
-interface ISimpleStaking {
-    function notifyFundsReceived(uint256 amount) external;
-}
-
 
 
 interface ISwapRouter {
@@ -527,13 +537,10 @@ interface ISwapRouter {
 }
 
 
-/* interface IWETH {
-    function deposit() external payable;
-    function deposit(uint256 amount) external payable;
-    function withdraw(uint256 amount) external;
-    function approve(address spender, uint256 amount) external returns (bool);
-    function transfer(address to, uint256 value) external returns (bool);
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
-    function balanceOf(address owner) external view returns (uint256);
-    function allowance(address owner, address spender) external view returns (uint256);
-} */
+interface ISimpleStaking {
+    function notifyFundsReceived(uint256 amount) external;
+}
+
+interface ILocker {
+    function lockLiquidity(address _nftAddress, uint256 _tokenId, uint256 _duration, address factory) external returns (uint256 lockId);
+}

@@ -12,21 +12,16 @@ async function main() {
   const MyLocker = await ethers.getContractFactory("LiquidityLocker");
   const MyLockerDeployment = await MyLocker.deploy(positionManager_address);
 
-  if (MyLockerDeployment) {
-    // If successful, print contract address
-    console.log("MyLocker address:", MyLockerDeployment.target);
-  } else {
-    // If unsuccessful, log an error
-    console.error("MyLocker deployment failed");
-    return;
-  }
+  console.log("MyLocker address:", MyLockerDeployment.target);
+  const lockerAddress = MyLockerDeployment.target;
 
   const MyFactory = await ethers.getContractFactory("MyFactory");
   const myFactory = await MyFactory.deploy(
     positionManager_address,
     WETH_address,
     uniswapV3Factory_address,
-    swap_router
+    swap_router,
+    lockerAddress
   );
   const factoryAddress = myFactory.target;
   console.log("MyFactory address:", myFactory.target);
@@ -43,19 +38,23 @@ async function main() {
   const treasury = await Treasury.deploy(factoryAddress);
 
   const treasuryAddress = treasury.target;
-  console.log("MyTreasury address:", treasury.target);
+  console.log("MyTreasury address:", treasuryAddress);
 
   const factory = await MyFactory.attach(factoryAddress);
-
-  const treasure = await Treasury.attach(treasuryAddress);
+  const locker = await MyLocker.attach(lockerAddress);
 
   console.log("Setting staking address in the factory contract...");
-  tx2 = await factory.setStakingAddress(stakingAddress);
+  tx3 = await factory.setStakingAddress(stakingAddress);
+  await tx3.wait();
+  console.log("Done!");
+
+  console.log("Setting staking address in the factory contract...");
+  tx2 = await locker.setFactoryAddress(factoryAddress);
   await tx2.wait();
   console.log("Done!");
 
   // Amount of WETH to send (in Wei)
-  const amountInWei = ethers.parseUnits("0.0003", 18); // Replace "0.1" with the desired amount of WETH
+  const amountInWei = ethers.parseUnits("0.0003", 18);
 
   // WETH ABI
   const WETHAbi = require("../contracts/WETHabi.json");

@@ -5,8 +5,6 @@ async function getLatestEvent(token, eventName) {
   // Query the filter for events emitted by the token contract
   const events = await token.queryFilter(filter);
 
-  //console.log("Events = ", events);
-
   // Find the TokenDeployed event emitted by the token contract
   const latestEvent = events[events.length - 1]; // Get the latest event
 
@@ -42,9 +40,9 @@ async function main() {
   const tokenSupply = "100";
 
   // Replace this with the address of the deployed factory contract
-  const factoryAddress = "0xBD89A44A2DEC9A1B4AaeEb1b64bE4eF0adafAB8c";
+  const factoryAddress = "0xC1e8b127C08aDA6B5c7FfCB237870c304BCd5508";
 
-  const lockerAddress = "0x31828AAC589e46549F3980912A6a8001F81a9eD5";
+  const lockerAddress = "0x4ee875d1cd3DC0151332d54c13055A7f69c350Fd";
 
   const WETH_address = process.env.SEPOLIA_WETH;
 
@@ -64,17 +62,11 @@ async function main() {
   const amountIn = ethers.parseUnits("0.0001", 18); // 0.01 ETH
 
   // Call the deployToken function of the factory contract
-  const tx = await factory.deployToken(tokenName, tokenSymbol, tokenSupply); //DEPLOY
-
-  // Wait for the transaction to be mined
+  const tx = await factory.deployToken(tokenName, tokenSymbol, tokenSupply);
   await tx.wait();
   console.log("Token deployed successfully!");
 
-  // Get the TokenDeployed event emitted by the token contract
-  //const tokenDeployedEvent = await getTokenDeployedEvent(factory);
-
-  const eventName = "TokenDeployed";
-  const tokenDeployedEvent = await getLatestEvent(factory, eventName);
+  const tokenDeployedEvent = await getLatestEvent(factory, "TokenDeployed");
 
   const tokenAddress = tokenDeployedEvent.args[0];
   console.log("Token Address: ", tokenAddress);
@@ -96,103 +88,35 @@ async function main() {
   const priceRatio =
     (BigInt(token1amount) * BigInt(10 ** 18)) / BigInt(token0amount);
   const sqrtPriceRatio = sqrt(priceRatio);
-  const sqrtPriceX96 = (sqrtPriceRatio * 2n ** 96n) / 10n ** 9n; // Scale to 2^96
-  //console.log(`Calculated sqrtPriceX96: ${sqrtPriceX96.toString()}`);
+  const sqrtPriceX96 = (sqrtPriceRatio * 2n ** 96n) / 10n ** 9n;
 
-  // Encode the calls
-  const iface = new ethers.Interface([
-    "function createAndInitializePoolIfNecessary(address,address,uint160) external returns (address pool)",
-    "function addInitialLiquidity(address,address,address,uint256,uint256) external",
-    "function swapETHforTokens(uint256, address) external payable returns (uint256 )",
-  ]);
-
-  const createPoolData = iface.encodeFunctionData(
-    "createAndInitializePoolIfNecessary",
-    [token0, token1, sqrtPriceX96]
-  );
-  const addLiquidityData = iface.encodeFunctionData("addInitialLiquidity", [
+  console.log("Adding initial liquidity, swapping and locking");
+  const txtest = await factory.addLiquidityLockSwap(
     token0,
     token1,
     tokenAddress,
     token0amount,
     token1amount,
-  ]);
-  //const swapData = iface.encodeFunctionData("swapETHforTokens", [amountIn, tokenAddress]);
+    sqrtPriceX96,
+    amountIn,
+    {
+      value: amountIn,
+      gasLimit: 9000000,
+    }
+  );
+  await txtest.wait();
+  console.log("Success!");
 
-  // Multicall
-  const tx2 = await factory.multicall([createPoolData, addLiquidityData], {
-    //value: amountIn,
-    gasLimit: 9000000,
-  });
-
-  await tx2.wait();
-  console.log("Multi-call successful!");
-
-  //const tokenIdEvent = await getLiquidityAddedEvent(factory);
-
-  const eventName2 = "LiquidityAdded";
-  const tokenIdEvent = await getLatestEvent(factory, eventName2);
-
-  const tokenId = tokenIdEvent.args[0];
-
-  console.log("tokenId: ", tokenId);
-
-  console.log("Buying tokens for the team...");
-  tx1 = await factory.swapETHforTokens(amountIn, tokenAddress, {
-    value: amountIn,
-  });
-  receipt = await tx1.wait();
-  console.log("Swap performed successfully!");
-
-  //const tokensSwappedEvent = await getTokensSwappedEvent(factory);
-
-  const eventName3 = "TokensSwapped";
-  const tokensSwappedEvent = await getLatestEvent(factory, eventName3);
+  const tokensSwappedEvent = await getLatestEvent(factory, "TokensSwapped");
 
   const tokensReceived = tokensSwappedEvent.args[0];
   const formattedTokens = ethers.formatUnits(tokensReceived, 18);
   console.log("Tokens received: ", formattedTokens);
-
-  // Approve the locker to manage the NFT
-  console.log("Approving LiquidityLocker to manage the factory NFT...");
-  const approveTx = await factory.approveNFT(
-    nftAddress,
-    tokenId,
-    lockerAddress
-  );
-  await approveTx.wait();
-  console.log("Approval successful.");
-
-  // Lock the liquidity
-  console.log("Locking liquidity...");
-  //const duration = 3600 * 24 * 7; // 1 week in seconds
-  const duration = 120;
-
-  const lockLiquidityTx = await locker.lockLiquidity(
-    nftAddress,
-    tokenId,
-    duration,
-    factoryAddress
-  );
-  receipt = await lockLiquidityTx.wait();
-
-  console.log("Liquidity locked.");
-
-  // Get the TokenDeployed event emitted by the token contract
-  //const liquidityLockedEvent = await getLiquidityLockedEvent(locker);
-
-  const eventName4 = "LiquidityLocked";
-
-  const liquidityLockedEvent = await getLatestEvent(locker, eventName4);
-
-  const lockId = liquidityLockedEvent.args[0];
-  console.log("lockId: ", lockId);
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);
-    console.log("Not enough weth on the factory contract");
     process.exit(1);
   });
