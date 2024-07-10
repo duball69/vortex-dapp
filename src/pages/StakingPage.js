@@ -17,13 +17,29 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x38ae57aeE9F05b19FE993A07effc8431473C854A";
+const STAKING_POOL_ADDRESS = "0xb8730B8f311FE8488336dc73047cFDA776803D4B";
 
 const CHAIN_NAMES = {
   56: "BSC",
   42161: "Arbitrum",
   8453: "Base",
   11155111: "Sepolia",
+};
+
+const networkConfig = {
+  // Example Chain IDs for Base and Sepolia
+  8453: {
+    // Mainnet (as an example; replace with the correct ID for "base")
+    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
+    WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://basescan.org",
+  },
+  11155111: {
+    // Sepolia Testnet Chain ID
+    stakingAddress: "0x38ae57aeE9F05b19FE993A07effc8431473C854A",
+    WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+    explorerUrl: "https://sepolia.etherscan.io",
+  },
 };
 
 const StakingPage = () => {
@@ -36,16 +52,28 @@ const StakingPage = () => {
   const [stakedAmount, setStakedAmount] = useState(0n); // Use BigInt for staked amount
   const [pendingUnstake, setPendingUnstake] = useState(0n);
   const [canUnstake, setCanUnstake] = useState(true);
-  const [pendingRewards, setPendingRewards] = useState("0.0000"); // State for pending rewards
-  const [loadingClaim, setLoadingClaim] = useState(false);
-  const [apy, setApy] = useState("Calculating...");
-
   const {
     address: connectedWallet,
     chainId,
     isConnected,
   } = useWeb3ModalAccount();
   const { open } = useWeb3Modal();
+  const [pendingRewards, setPendingRewards] = useState("0.0000"); // State for pending rewards
+  const [loadingClaim, setLoadingClaim] = useState(false);
+  const [apy, setApy] = useState("Calculating...");
+  const explorerUrl =
+    networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
+  const StakingChainAddress =
+    networkConfig[chainId]?.StakingChainAddress || "DefaultFactoryAddress";
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (!isInitialized && chainId && networkConfig[chainId]) {
+      console.log("Initialization with chainId:", chainId);
+      setIsInitialized(true);
+      // Additional initialization logic here
+    }
+  }, [chainId]);
 
   useEffect(() => {
     const calculateAPY = async () => {

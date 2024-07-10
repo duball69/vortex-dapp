@@ -4,6 +4,7 @@ async function main() {
   const positionManager_address = process.env.SEPOLIA_POSITION_MANAGER;
   const swap_router = process.env.SEPOLIA_SWAP_ROUTER;
   const WETH_address = process.env.SEPOLIA_WETH;
+  const teamWallet = "0xdc28630221B2d58B8E249Df6d96c928f57bed952";
 
   const [deployer] = await ethers.getSigners();
 
@@ -21,7 +22,8 @@ async function main() {
     WETH_address,
     uniswapV3Factory_address,
     swap_router,
-    lockerAddress
+    lockerAddress,
+    teamWallet
   );
   const factoryAddress = myFactory.target;
   console.log("MyFactory address:", myFactory.target);
@@ -43,18 +45,27 @@ async function main() {
   const factory = await MyFactory.attach(factoryAddress);
   const locker = await MyLocker.attach(lockerAddress);
 
-  console.log("Setting staking address in the factory contract...");
-  tx3 = await factory.setStakingAddress(stakingAddress);
+  console.log(
+    "Setting staking and treasury address in the factory contract..."
+  );
+  tx3 = await factory.setStakingAndTreasuryAddress(
+    stakingAddress,
+    treasuryAddress
+  );
   await tx3.wait();
   console.log("Done!");
 
-  console.log("Setting staking address in the factory contract...");
+  console.log("Setting factory address in the locker contract...");
   tx2 = await locker.setFactoryAddress(factoryAddress);
   await tx2.wait();
   console.log("Done!");
 
   // Amount of WETH to send (in Wei)
   const amountInWei = ethers.parseUnits("0.0003", 18);
+
+  /* const txx = await factory.transferWETHToFactory(amountInWei);
+  await txx.wait();
+  console.log("WETH sent to the factory."); */
 
   // WETH ABI
   const WETHAbi = require("../contracts/WETHabi.json");

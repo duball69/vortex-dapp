@@ -40,9 +40,9 @@ async function main() {
   const tokenSupply = "100";
 
   // Replace this with the address of the deployed factory contract
-  const factoryAddress = "0xC1e8b127C08aDA6B5c7FfCB237870c304BCd5508";
+  const factoryAddress = "0x5892F7EF2Cb0017C75a51D6bbB91f5C1615CbB29";
 
-  const lockerAddress = "0x4ee875d1cd3DC0151332d54c13055A7f69c350Fd";
+  const lockerAddress = "0x2eb803Ca9DA5730B66365545D93e59c2aFB28D4C";
 
   const WETH_address = process.env.SEPOLIA_WETH;
 
@@ -71,7 +71,7 @@ async function main() {
   const tokenAddress = tokenDeployedEvent.args[0];
   console.log("Token Address: ", tokenAddress);
 
-  let token0, token1, token0amount, token1amount;
+  /* let token0, token1, token0amount, token1amount;
   if (tokenAddress.toLowerCase() < WETH_address.toLowerCase()) {
     token0 = tokenAddress;
     token1 = WETH_address;
@@ -88,22 +88,13 @@ async function main() {
   const priceRatio =
     (BigInt(token1amount) * BigInt(10 ** 18)) / BigInt(token0amount);
   const sqrtPriceRatio = sqrt(priceRatio);
-  const sqrtPriceX96 = (sqrtPriceRatio * 2n ** 96n) / 10n ** 9n;
+  const sqrtPriceX96 = (sqrtPriceRatio * 2n ** 96n) / 10n ** 9n; */
 
   console.log("Adding initial liquidity, swapping and locking");
-  const txtest = await factory.addLiquidityLockSwap(
-    token0,
-    token1,
-    tokenAddress,
-    token0amount,
-    token1amount,
-    sqrtPriceX96,
-    amountIn,
-    {
-      value: amountIn,
-      gasLimit: 9000000,
-    }
-  );
+  const txtest = await factory.addLiquidityLockSwap(tokenAddress, amountIn, {
+    value: amountIn,
+    gasLimit: 9000000,
+  });
   await txtest.wait();
   console.log("Success!");
 

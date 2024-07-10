@@ -33,7 +33,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x00125DcE4b8d399e74fE20A9c962D1bCBC369382",
+    factoryAddress: "0xcda23d39464b4c687c9A44cEbebB40660efa8ACd",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -326,7 +326,7 @@ function FactoryPage() {
 
             {!deployedContractAddress && (
               <button type="submit" className="deploy-button">
-                {isLoading ? "Loading..." : "Deploy Token"}
+                {isLoading ? "Loading..." : "Create Token"}
               </button>
             )}
           </form>
@@ -345,7 +345,7 @@ function FactoryPage() {
               </p>
 
               <Link to={`/dashboard/${deployedContractAddress}`}>
-                <button className="deploy-button">Get LP</button>
+                <button className="deploy-button">Next</button>
               </Link>
             </>
           )}

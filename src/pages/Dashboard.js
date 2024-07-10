@@ -36,7 +36,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x00125DcE4b8d399e74fE20A9c962D1bCBC369382",
+    factoryAddress: "0xcda23d39464b4c687c9A44cEbebB40660efa8ACd",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -168,12 +168,7 @@ function DashboardPage() {
 
       // Call the addLiquidityLockSwap function
       const txAddLiquidity = await factoryContract.addLiquidityLockSwap(
-        token0,
-        token1,
         contractAddress,
-        token0amount,
-        token1amount,
-        sqrtPriceX96,
         swapAmount, // Adjust amount of ETH swapped accordingly
         { value: swapAmount, gasLimit: 9000000 }
       );
