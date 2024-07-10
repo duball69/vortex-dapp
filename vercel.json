@@ -6,7 +6,7 @@
         "has": [
           {
             "type": "host",
-            "value": "stake.domain.com"
+            "value": "stake.vortexdapp.com"
           }
         ]
       },
@@ -16,7 +16,7 @@
         "has": [
           {
             "type": "host",
-            "value": "launch.domain.com"
+            "value": "launch.vortexdapp.com"
           }
         ]
       }
