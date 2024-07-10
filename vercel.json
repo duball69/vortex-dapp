@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/",
-        "destination": "/stake",
+        "destination": "/staking",
         "has": [
           {
             "type": "host",
