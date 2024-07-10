@@ -1,0 +1,25 @@
+{
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/stake",
+        "has": [
+          {
+            "type": "host",
+            "value": "stake.domain.com"
+          }
+        ]
+      },
+      {
+        "source": "/",
+        "destination": "/factory",
+        "has": [
+          {
+            "type": "host",
+            "value": "launch.domain.com"
+          }
+        ]
+      }
+    ]
+  }
+  

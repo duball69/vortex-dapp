@@ -144,8 +144,6 @@ function AfterLaunch() {
         <div className="factory-container">
           <h4>Your token is now live. Add your socials below:</h4>
 
-          <h1>Update your Token Details</h1>
-
           {isLoaded ? (
             <form onSubmit={handleUpdate} className="token-form">
               <input
