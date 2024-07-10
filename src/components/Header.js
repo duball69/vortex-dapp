@@ -37,9 +37,13 @@ function Header({ connectWallet, isConnected, chainId }) {
 
           {/* Navigation Menu */}
           <nav className={`menu ${isOpen ? "open" : ""}`}>
-            <Link to="/" onClick={() => setIsOpen(false)}>
+            <a
+              href="https://vortexdapp.com"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+            >
               Home
-            </Link>
+            </a>
             <Link to="/factory" onClick={() => setIsOpen(false)}>
               Launch
             </Link>
