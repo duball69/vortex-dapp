@@ -15,7 +15,7 @@ import {
 import TokensList from "../components/TokenList.js";
 import Footer from "../components/Footer.js";
 
-function HomePage() {
+function RecentlyLaunched() {
   const {
     address: connectedWallet,
     chainId,
@@ -41,37 +41,16 @@ function HomePage() {
         chainId={chainId}
       />
 
-      <div className="centered-content">
-        <img src="logo512.png" alt="Logo" className="logo2" />
-
-        <h1 className="titlehome">
-          Launch ERC20 tokens for free <br />
-        </h1>
-        <h4 className="subtitlehome">Currently only on Sepolia Testnet</h4>
-
-        <div>
-          <Link to="/factory">
-            <button className="home-button">Launch</button>
-          </Link>
-
-          <Link to="/staking">
-            <button className="home-button">Stake</button>
-          </Link>
-        </div>
-      </div>
-
-      <TokensList limit={6} />
+      <TokensList limit={9} />
       <div className="container">
         <Link to="/tokens">
           <button>View All </button>
         </Link>
       </div>
 
-      <HowItWorks />
-
       <Footer />
     </div>
   );
 }
 
-export default HomePage;
+export default RecentlyLaunched;

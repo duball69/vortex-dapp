@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import StakingPage from "./pages/StakingPage";
 import DashboardPage from "./pages/Dashboard";
+import RecentlyLaunched from "./pages/RecentlyLaunched";
 import FactoryPage from "./pages/FactoryPage";
 import AfterLaunch from "./pages/AfterLaunch";
 import Trade from "./pages/Trade";
@@ -23,6 +24,7 @@ function App() {
             element={<DashboardPage />}
           />
           <Route path="/trade" element={<Trade />} />
+          <Route path="/recently" element={<RecentlyLaunched />} />
           <Route path="/tokens" element={<TokensPage />} />
           <Route path="/tracker" element={<TokenBuyTrackerPage />} />
 
