@@ -126,7 +126,7 @@ const TokenBuyTrackerPage = () => {
         );
 
         const validTransactions = transactionsWithLogs.filter(
-          (tx) => tx.firstLog && parseFloat(tx.firstLog.data) > 0.0001
+          (tx) => tx.firstLog && parseFloat(tx.firstLog.data) > 0.000091
         );
 
         setTransactions((prevTransactions) => {
@@ -164,9 +164,7 @@ const TokenBuyTrackerPage = () => {
           transaction.set(txDocRef, {
             hash: tx.hash,
             to: tx.to.toUpperCase(),
-            amount: tx.firstLog
-              ? [{ address: tx.firstLog.address, data: tx.firstLog.data }]
-              : [],
+            amount: tx.firstLog ? [{ data: tx.firstLog.data }] : [],
             timestamp: tx.timestamp,
           });
           console.log("Transaction saved:", tx.hash);
@@ -191,7 +189,14 @@ const TokenBuyTrackerPage = () => {
 
     try {
       console.log("Incrementing points for wallet:", to);
-      await updateDoc(userPointsDoc, { points: increment(pointsToAdd) });
+      await runTransaction(firestore, async (transaction) => {
+        const userPointsSnapshot = await transaction.get(userPointsDoc);
+        if (userPointsSnapshot.exists()) {
+          transaction.update(userPointsDoc, { points: increment(pointsToAdd) });
+        } else {
+          transaction.set(userPointsDoc, { points: pointsToAdd });
+        }
+      });
       console.log("Points successfully incremented for wallet:", to);
     } catch (error) {
       console.error("Failed to increment points for wallet:", to, error);

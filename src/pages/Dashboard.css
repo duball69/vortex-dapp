@@ -84,6 +84,9 @@ padding:10px;}
   .create-pair-button button:hover {
     background-color: #0056b3;
   }
+
+  .swap-container {margin-top:30px;
+  }
   
   .navigation-links {
     margin-top: 20px;

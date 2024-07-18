@@ -23,7 +23,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
-import { typeImplementation } from "@testing-library/user-event/dist/type/typeImplementation.js";
 /* global BigInt */
 
 const networkConfig = {
@@ -133,7 +132,10 @@ function DashboardPage() {
     setErrorMessage("");
 
     try {
-      const swapAmount = ethers.parseUnits(tokenAmountToBuy, 18);
+      const swapAmountValue = tokenAmountToBuy
+        ? parseFloat(tokenAmountToBuy)
+        : 0;
+      const swapAmount = ethers.parseUnits(swapAmountValue.toString(), 18);
 
       // Setup for adding liquidity
       const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
@@ -187,8 +189,12 @@ function DashboardPage() {
         "Token deployed, liquidity added, and initial swap done!"
       );
     } catch (error) {
-      console.error(error);
-      setErrorMessage(`Operation failed: ${error.message}`);
+      if (error.code === "ACTION_REJECTED") {
+        setErrorMessage("Transaction failed: User rejected the transaction.");
+      } else {
+        console.error(error);
+        setErrorMessage(`Transaction failed, please try again.`);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -250,7 +256,6 @@ function DashboardPage() {
               />
             )}
             <h5 className="your-token">Your token:</h5>
-            <p>Token Name: {tokenDetails.name}</p>
             <p>Token Symbol: {tokenDetails.symbol}</p>
             <p>Total Supply: {tokenDetails.supply}</p>
             <p>
@@ -265,7 +270,7 @@ function DashboardPage() {
               </a>
             </p>
 
-            <div>
+            <div className="swap-container">
               <label htmlFor="tokenAmount">Enter amount in ETH to buy:</label>
               <input
                 id="tokenAmount"
@@ -279,7 +284,7 @@ function DashboardPage() {
                   }
                 }}
                 onBlur={(e) => {
-                  // Format the input to two decimal places on blur, assume '0.00' if the input is invalid or empty
+                  // Format the input to four decimal places on blur, assume '0.0000' if the input is invalid or empty
                   let value = e.target.value
                     ? parseFloat(e.target.value).toFixed(4)
                     : "0.0000";

@@ -32,10 +32,12 @@ export const Web3ModalProvider = ({ children }) => {
       explorerUrl: "https://sepolia.etherscan.io/",
     };
 
+    const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
+
     const initWeb3Modal = createWeb3Modal({
       config,
       chains: [sepoliaMainnet],
-      projectId: "9513bcef54af049b9471faff11d5a16a",
+      projectId,
       enableAnalytics: true,
     });
 

@@ -114,6 +114,7 @@ input[type="number"]:focus {
 button.deploy-button {
     padding: 7px 20px;
     margin-top:20px;
+    margin-bottom:20px;
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
