@@ -21,7 +21,6 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-const projectId = "9513bcef54af049b9471faff11d5a16a";
 
 const networkConfig = {
   // Example Chain IDs for Base and Sepolia
@@ -94,6 +93,8 @@ const ethersConfig = defaultConfig({
   defaultChainId: 1,
 });
 
+const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
+
 const web3Modal = createWeb3Modal({
   ethersConfig,
   chains: [sepoliaMainnet, arbitrumMainnet, baseMainnet, bscMainnet],
@@ -102,7 +103,7 @@ const web3Modal = createWeb3Modal({
 });
 
 const IMGUR_API_URL = "https://api.imgur.com/3/image";
-const CLIENT_ID = "7bd162baabe49a2"; // Your Imgur Client ID
+const CLIENT_ID = process.env.REACT_APP_IMGUR_ID;
 
 const uploadImageToImgur = async (file) => {
   const formData = new FormData();

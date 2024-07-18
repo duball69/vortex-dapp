@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { ethers } from "ethers";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
 import "./TokenBuyTrackerPage.css";
 import { firestore } from "../components/firebaseConfig.js";
 import { useWeb3ModalAccount, useWeb3Modal } from "@web3modal/ethers/react";
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  increment,
-  runTransaction,
-  exists,
-  gt,
-} from "firebase/firestore";
+import { doc, updateDoc, increment, runTransaction } from "firebase/firestore";
+/* global BigInt */
 
 const TOKEN_ADDRESS = "0x02A54dD4ED8A088935486f435B1b686172e1AbA7"; // Replace with your token address
 const ALCHEMY_API_KEY = "szbuLvp-G7QOedbNPfL89Fn78DgCJqGh"; // Replace with your Alchemy API key
@@ -33,10 +25,17 @@ const TokenBuyTrackerPage = () => {
 
   const DECIMALS = 18;
 
+  const provider = new ethers.BrowserProvider(window.ethereum);
+
   function formatTokenValue(rawValue) {
-    const factor = Math.pow(1, DECIMALS);
+    const factor = Math.pow(10, DECIMALS);
     const value = rawValue / factor; // Adjust raw value by the token's decimals
     return Number(value.toFixed(3)); // Convert to number again to remove any trailing zeros
+  }
+
+  function hexToEther(hex) {
+    const bigIntValue = BigInt(hex);
+    return ethers.formatUnits(bigIntValue, 18); // Convert Wei to Ether
   }
 
   const connectWallet = async () => {
@@ -48,6 +47,11 @@ const TokenBuyTrackerPage = () => {
   };
 
   useEffect(() => {
+    const fetchBlockTimestamp = async (blockNumber) => {
+      const block = await provider.getBlock(blockNumber);
+      return block.timestamp;
+    };
+
     const fetchTokenTransfers = async () => {
       setLoading(true);
       setError(null);
@@ -98,9 +102,27 @@ const TokenBuyTrackerPage = () => {
               to: tx.to.toUpperCase(),
             }));
 
-          setTransactions(filteredTransfers);
+          const transactionsWithLogs = await Promise.all(
+            filteredTransfers.map(async (tx) => {
+              const receipt = await provider.getTransactionReceipt(tx.hash);
+              const firstLog = receipt.logs[0]
+                ? {
+                    address: receipt.logs[0].address,
+                    data: hexToEther(receipt.logs[0].data),
+                  }
+                : null;
 
-          for (const tx of filteredTransfers) {
+              const timestamp = await fetchBlockTimestamp(
+                parseInt(tx.blockNum, 16)
+              ); // Ensure blockNum is in correct format
+
+              return { ...tx, firstLog, timestamp };
+            })
+          );
+
+          setTransactions(transactionsWithLogs);
+
+          for (const tx of transactionsWithLogs) {
             saveTransaction(tx);
           }
         } else {
@@ -123,9 +145,17 @@ const TokenBuyTrackerPage = () => {
       await runTransaction(firestore, async (transaction) => {
         const txDoc = await transaction.get(txDocRef);
         if (!txDoc.exists()) {
+          console.log("Saving transaction:", {
+            hash: tx.hash,
+            to: tx.to.toUpperCase(),
+            amount: tx.firstLog ? [{ data: tx.firstLog.data }] : [],
+            timestamp: tx.timestamp,
+          });
           transaction.set(txDocRef, {
             hash: tx.hash,
             to: tx.to.toUpperCase(),
+            amount: tx.firstLog ? [{ amount: tx.firstLog.data }] : [],
+            timestamp: tx.timestamp,
           });
           console.log("Transaction saved:", tx.hash);
           // Update points
@@ -172,7 +202,8 @@ const TokenBuyTrackerPage = () => {
               <tr>
                 <th>From</th>
                 <th>To</th>
-                <th>Amount</th>
+                <th>Amount (ETH)</th>
+                <th>Timestamp</th>
               </tr>
             </thead>
             <tbody>
@@ -180,7 +211,10 @@ const TokenBuyTrackerPage = () => {
                 <tr key={tx.hash}>
                   <td>{tx.from}</td>
                   <td>{tx.to}</td>
-                  <td>{formatTokenValue(tx.value)}</td>
+                  <td>
+                    {tx.firstLog ? <div>{tx.firstLog.data}</div> : "No logs"}
+                  </td>
+                  <td>{new Date(tx.timestamp * 1000).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

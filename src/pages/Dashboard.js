@@ -137,7 +137,7 @@ function DashboardPage() {
 
       // Setup for adding liquidity
       const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
-      const wethAmount = ethers.parseUnits("0.0001", 18); // Example amount of WETH
+      const wethAmount = ethers.parseUnits("0.00001", 18); // Example amount of WETH
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
@@ -281,8 +281,8 @@ function DashboardPage() {
                 onBlur={(e) => {
                   // Format the input to two decimal places on blur, assume '0.00' if the input is invalid or empty
                   let value = e.target.value
-                    ? parseFloat(e.target.value).toFixed(2)
-                    : "0.00";
+                    ? parseFloat(e.target.value).toFixed(4)
+                    : "0.0000";
                   setTokenAmountToBuy(value);
                 }}
                 placeholder="Token amount"
