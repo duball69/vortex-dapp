@@ -1,3 +1,5 @@
+const { ethers } = require("hardhat");
+
 async function main() {
   //Setting contract addresses
   const uniswapV3Factory_address = process.env.SEPOLIA_UNISWAP_FACTORY;
@@ -27,6 +29,22 @@ async function main() {
   );
   const factoryAddress = myFactory.target;
   console.log("MyFactory address:", myFactory.target);
+
+  /* // Wait a few seconds for the contract to be propagated
+  await new Promise((r) => setTimeout(r, 60000));
+
+  // Verify the contract
+  await hre.run("verify:verify", {
+    address: factoryAddress,
+    constructorArguments: [
+      positionManager_address,
+      WETH_address,
+      uniswapV3Factory_address,
+      swap_router,
+      lockerAddress,
+      teamWallet,
+    ], // Add constructor arguments if any
+  }); */
 
   // Deploy the SimpleStaking contract
   const SimpleStaking = await ethers.getContractFactory("SimpleStaking");
@@ -61,7 +79,7 @@ async function main() {
   console.log("Done!");
 
   // Amount of WETH to send (in Wei)
-  const amountInWei = ethers.parseUnits("0.0003", 18);
+  const amountInWei = ethers.parseUnits("0.0004", 18);
 
   /* const txx = await factory.transferWETHToFactory(amountInWei);
   await txx.wait();

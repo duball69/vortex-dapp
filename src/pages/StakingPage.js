@@ -17,7 +17,7 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0xb8730B8f311FE8488336dc73047cFDA776803D4B";
+const STAKING_POOL_ADDRESS = "0xAF7be3c33b75d7d6e104098781D782f854d3c764";
 
 const CHAIN_NAMES = {
   56: "BSC",
