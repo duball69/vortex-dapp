@@ -27,15 +27,12 @@ const CHAIN_NAMES = {
 };
 
 const networkConfig = {
-  // Example Chain IDs for Base and Sepolia
   8453: {
-    // Mainnet (as an example; replace with the correct ID for "base")
-    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
+    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://basescan.org",
   },
   11155111: {
-    // Sepolia Testnet Chain ID
     stakingAddress: "0x38ae57aeE9F05b19FE993A07effc8431473C854A",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
@@ -43,13 +40,13 @@ const networkConfig = {
 };
 
 const StakingPage = () => {
-  const [amount, setAmount] = useState(""); // Use a single state for the input amount
+  const [amount, setAmount] = useState("");
   const [stakedMessage, setStakedMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isStaked, setIsStaked] = useState(false);
   const [loadingStake, setLoadingStake] = useState(false);
   const [loadingUnstake, setLoadingUnstake] = useState(false);
-  const [stakedAmount, setStakedAmount] = useState(0n); // Use BigInt for staked amount
+  const [stakedAmount, setStakedAmount] = useState(0n);
   const [pendingUnstake, setPendingUnstake] = useState(0n);
   const [canUnstake, setCanUnstake] = useState(true);
   const {
@@ -58,7 +55,7 @@ const StakingPage = () => {
     isConnected,
   } = useWeb3ModalAccount();
   const { open } = useWeb3Modal();
-  const [pendingRewards, setPendingRewards] = useState("0.0000"); // State for pending rewards
+  const [pendingRewards, setPendingRewards] = useState("0.0000");
   const [loadingClaim, setLoadingClaim] = useState(false);
   const [apy, setApy] = useState("Calculating...");
   const explorerUrl =
@@ -71,7 +68,6 @@ const StakingPage = () => {
     if (!isInitialized && chainId && networkConfig[chainId]) {
       console.log("Initialization with chainId:", chainId);
       setIsInitialized(true);
-      // Additional initialization logic here
     }
   }, [chainId]);
 
@@ -86,7 +82,6 @@ const StakingPage = () => {
           signer
         );
 
-        // Fetch staking details necessary for APY calculation
         const totalStaked = await stakingPoolContract.totalStaked();
         const totalRewards = await stakingPoolContract.totalRewards();
         const rewardIntervalSeconds =
@@ -100,12 +95,11 @@ const StakingPage = () => {
           rewardPerInterval / Number(ethers.formatEther(totalStaked));
         const apy = (1 + ratePerInterval) ** intervalsPerYear - 1;
 
-        // Set the APY state to display in the component
-        setApy(`${(apy * 100).toFixed(2)}%`); // Update APY display
+        setApy(`${(apy * 100).toFixed(2)}%`);
         console.log("APY:", (apy * 100).toFixed(2) + "%");
       } catch (error) {
         console.error("Error calculating APY:", error);
-        setApy("Error calculating APY"); // Set APY state to an error message or similar
+        setApy("Error calculating APY");
       }
     };
 
@@ -123,17 +117,14 @@ const StakingPage = () => {
 
         showPendingRewards(connectedWallet);
 
-        // Fetch the staked amount
         const stakedAmount = await stakingPoolContract.getStake(
           connectedWallet
         );
-        const stakedAmountBN = BigInt(stakedAmount.toString()); // Convert to BigInt
+        const stakedAmountBN = BigInt(stakedAmount.toString());
 
-        // Fetch pending unstakes
         const pendingUnstakes = await fetchPendingUnstakes(connectedWallet);
-        const pendingUnstakesBN = BigInt(pendingUnstakes.toString()); // Convert to BigInt
+        const pendingUnstakesBN = BigInt(pendingUnstakes.toString());
 
-        // Set the pending unstakes state
         setPendingUnstake(pendingUnstakesBN);
 
         console.log(
@@ -144,7 +135,7 @@ const StakingPage = () => {
           `Converted staked amount: ${stakedAmountBN}, Converted pending unstakes: ${pendingUnstakesBN}`
         );
 
-        const availableForUnstake = stakedAmountBN - pendingUnstakesBN; // Calculate the available amount
+        const availableForUnstake = stakedAmountBN - pendingUnstakesBN;
 
         if (availableForUnstake > 0n) {
           setIsStaked(true);
@@ -156,7 +147,7 @@ const StakingPage = () => {
             )} ETH available for unstaking in the Vortex Pool.`
           );
         } else {
-          setIsStaked(stakedAmountBN > 0n); // Only set to false if no ETH is staked at all
+          setIsStaked(stakedAmountBN > 0n);
           setCanUnstake(false);
           setStakedMessage(
             availableForUnstake < 0n
@@ -172,9 +163,11 @@ const StakingPage = () => {
       }
     };
 
-    checkStakingStatus();
-    calculateAPY();
-  }, [connectedWallet]); // Removed `amount` from dependencies if it's not needed
+    if (isConnected) {
+      checkStakingStatus();
+      calculateAPY();
+    }
+  }, [connectedWallet, isConnected]);
 
   const connectWallet = async () => {
     try {
@@ -225,9 +218,7 @@ const StakingPage = () => {
       const tx = await stakingPoolContract.stake({
         value: ethers.parseUnits(amount, 18),
       });
-      await tx.wait(); // Ensure you wait for the transaction to be mined
-
-      // Check if the amount staked is greater than 0.01 ETH before updating points
+      await tx.wait();
 
       const uppercaseWallet = connectedWallet.toUpperCase();
 
@@ -236,7 +227,6 @@ const StakingPage = () => {
         await updateDoc(userPointsDoc, { points: increment(1) });
       }
 
-      // After successful staking, refetch the relevant data
       const newStakedAmount = await stakingPoolContract.getStake(
         connectedWallet
       );
@@ -255,7 +245,7 @@ const StakingPage = () => {
       setCanUnstake(availableForUnstake > 0n);
 
       setStakedMessage(`You staked ${amount} ETH in the Vortex Pool.`);
-      setErrorMessage(""); // Clear any error messages
+      setErrorMessage("");
 
       setLoadingStake(false);
     } catch (error) {
@@ -281,11 +271,9 @@ const StakingPage = () => {
 
     if (unstakeAmount > availableForUnstake) {
       setErrorMessage(
-        setErrorMessage(
-          `You can only unstake up to ${ethers.formatEther(
-            availableForUnstake
-          )} ETH.`
-        )
+        `You can only unstake up to ${ethers.formatEther(
+          availableForUnstake
+        )} ETH.`
       );
       return;
     }
@@ -308,9 +296,8 @@ const StakingPage = () => {
       const txResponse = await stakingPoolContract.requestUnstake(
         unstakeAmount
       );
-      await txResponse.wait(); // Wait for transaction to be mined
+      await txResponse.wait();
 
-      // Fetch the updated staked amount and pending unstakes immediately after the transaction
       const updatedStakedAmount = await stakingPoolContract.getStake(
         connectedWallet
       );
@@ -333,7 +320,7 @@ const StakingPage = () => {
       setCanUnstake(availableForUnstake > 0n);
 
       setLoadingUnstake(false);
-      setErrorMessage(""); // Clear any previous error messages
+      setErrorMessage("");
 
       if (txResponse.events?.find((e) => e.event === "UnstakeProcessed")) {
         setStakedMessage(
@@ -351,7 +338,7 @@ const StakingPage = () => {
     } catch (error) {
       console.error("Error unstaking ETH:", error);
       setErrorMessage("An error occurred while unstaking. Please try again.");
-      setLoadingUnstake(false); // Ensure loading is set to false even on error
+      setLoadingUnstake(false);
     }
   };
 
@@ -373,7 +360,6 @@ const StakingPage = () => {
       }
     }
 
-    // Log the total pending unstakes to the console
     console.log(
       `Total pending unstakes for ${userAddress}: ${totalPendingUnstakes.toString()}`
     );
@@ -398,10 +384,10 @@ const StakingPage = () => {
       );
 
       const tx = await stakingPoolContract.claimRewards({ gasLimit: 500000 });
-      await tx.wait(); // Wait for the transaction to be mined
+      await tx.wait();
 
       setLoadingClaim(false);
-      showPendingRewards(connectedWallet); // Refresh the pending rewards display
+      showPendingRewards(connectedWallet);
       setStakedMessage("Your rewards have been claimed!");
       setErrorMessage("");
     } catch (error) {
@@ -427,7 +413,7 @@ const StakingPage = () => {
     try {
       const pendingRewards = await stakingContract.pendingReward(userAddress);
       console.log("Pending Rewards:", ethers.formatEther(pendingRewards));
-      setPendingRewards(ethers.formatEther(pendingRewards)); // Update state with fetched pending rewards
+      setPendingRewards(ethers.formatEther(pendingRewards));
     } catch (error) {
       console.error("Error getting pending rewards:", error);
     }
@@ -458,11 +444,11 @@ const StakingPage = () => {
           {isConnected && (
             <>
               <div>
-                <p> Connected Wallet: {connectedWallet}</p>
+                <p>Connected Wallet: {connectedWallet}</p>
                 <div>
                   <h4>APY: {apy}</h4>
                 </div>
-                {pendingUnstake > 0n && ( // Only display if there are pending unstakes
+                {pendingUnstake > 0n && (
                   <p>
                     Pending amount unstaking:{" "}
                     {ethers.formatEther(pendingUnstake.toString())} ETH
@@ -513,7 +499,7 @@ const StakingPage = () => {
                 )}
 
                 {isConnected && isStaked && (
-                  <p>Pending Rewards: {pendingRewards} ETH</p> // Only display if there is a staked amount
+                  <p>Pending Rewards: {pendingRewards} ETH</p>
                 )}
               </div>
             </>
