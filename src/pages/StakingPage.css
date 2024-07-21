@@ -40,7 +40,7 @@ h5 {
 
 @media only screen and (max-width: 600px) {
   .staking-container {
-      margin: 30px 20px 60px 20px; /* Add margin for mobile devices */
+    margin: 10px 10px 10px 10px; /* Add margin for mobile devices */
       height: 60%;
   }
 
