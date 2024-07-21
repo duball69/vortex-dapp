@@ -275,7 +275,7 @@ function FactoryPage() {
           {/* Display connected wallet address */}
           <form onSubmit={deployToken} className="token-form">
             <div className="custom-file-input">
-              <span>Add your token image here</span>
+              <span>Add your image here</span>
               <input
                 type="file"
                 id="tokenImage"

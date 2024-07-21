@@ -61,13 +61,15 @@ function Header({ connectWallet, isConnected, chainId }) {
           </nav>
         </div>
         <div className="div-button">
-          {" "}
-          {isConnected ? (
-            <button onClick={connectWallet}>Options</button>
+          <button className="Connect" onClick={connectWallet}>
+            {isConnected ? "Options" : "Connect"}
+          </button>
+
+          {!isConnected ? (
+            <p className="connected-chain">Connect Wallet</p>
           ) : (
-            <button onClick={connectWallet}>Connect</button>
+            <p className="connected-chain">Chain: {chainName}</p>
           )}
-          {isConnected && <p className="connected-chain">Chain: {chainName}</p>}
         </div>
       </div>
     </header>

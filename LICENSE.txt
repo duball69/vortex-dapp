@@ -1,0 +1,24 @@
+Vortex Dapp Custom License
+
+Copyright (c) 2024 Vortex Dapp
+
+Authors:
+- David Caldeira (dcaldeirao1)
+- Duarte Baltazar (duball69)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+2. Any use of the Software for monetization purposes must receive prior written
+   permission from the copyright holders. Monetization includes, but is not limited
+   to, selling, licensing, or any form of commercializing the Software or any derivative
+   works based on the Software. Please reach out via Telegram (t.me/duball69) / Twitter (x.com/duball69) / Email (team@vortexdapp.com)
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR

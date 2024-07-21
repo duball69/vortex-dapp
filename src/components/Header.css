@@ -21,6 +21,12 @@
       display: flex;
   }
 
+
+  div-button{ display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; /* Allow the button div to take up available space */}
+    
   .div-logo, .div-burger, .div-button {
     max-width: 33%; /* Each div takes 33% of the width */
 }
