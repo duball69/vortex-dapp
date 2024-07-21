@@ -33,7 +33,7 @@ const networkConfig = {
     explorerUrl: "https://basescan.org",
   },
   11155111: {
-    stakingAddress: "0x38ae57aeE9F05b19FE993A07effc8431473C854A",
+    stakingAddress: "0xAF7be3c33b75d7d6e104098781D782f854d3c764",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -444,7 +444,9 @@ const StakingPage = () => {
           {isConnected && (
             <>
               <div>
-                <p>Connected Wallet: {connectedWallet}</p>
+                <p className="connected-wallet">
+                  Connected Wallet: {connectedWallet}
+                </p>
                 <div>
                   <h4>APY: {apy}</h4>
                 </div>
