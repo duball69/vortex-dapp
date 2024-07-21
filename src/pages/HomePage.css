@@ -111,6 +111,6 @@ button.home-button:hover{
   /* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
   @media only screen and (max-width: 600px) {
     .logo2 {
-      width: 70px; /* Adjust the width for smaller screens */
+      width: 100px; /* Adjust the width for smaller screens */
     }
   }
