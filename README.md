@@ -1,42 +1,25 @@
-# Vortex DApp
+# Vortex Dapp
 
-![Vortex Logo](https://i.imgur.com/XDHnW0R.png)
-
-Vortex is a decentralized application (DApp) that aims to provide a seamless and rewarding experience for staking, token creation, and trading on multiple blockchain networks. Our platform aligns incentives among participants, including stakers, token creators, traders, and the protocol itself, utilizing revenue to maximize benefits for all users.
-
-## Table of Contents
-
-- [Features](#features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-  - [Connecting Your Wallet](#connecting-your-wallet)
-  - [Staking](#staking)
-  - [Unstaking](#unstaking)
-  - [Claiming Rewards](#claiming-rewards)
-- [Leaderboard and Points](#leaderboard-and-points)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+Vortex is a rev-sharing token launcher platform designed to simplify the launch of ERC20 tokens by providing first-block initial liquidity lending on EVM-compatible blockchains. With Vortex, users can create a token and have it instantly live and tradable on Uniswap with initial liquidity provided by stakers, with 2 clicks.
 
 ## Features
 
-- **Multi-Chain Support**: Operate on BSC, Arbitrum, Base, Sepolia, and more.
-- **Staking**: Stake your ETH and earn rewards.
-- **Token Creation**: Deploy new tokens effortlessly.
+- **Multi-Chain Support**: Operate on BSC, Arbitrum, Base, Sepolia, and more. (Currently only live on Sepolia)
+- **Staking**: Stake your ETH to contribute to the Vortex LP Lending Pool and earn 40% of the trading fees of tokens created through Vortex.
+- **Token Creation**: Launch new tokens with initial liquidity without costs and without coding.
 - **Trading**: Trade tokens created on the Vortex platform.
-- **Leaderboard**: Earn points for various activities and climb the leaderboard for rewards.
 
-## Getting Started
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
+If you want to fork our dapp to test it out, ensure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (v14 or later)
 - [npm](https://www.npmjs.com/)
 - [Metamask](https://metamask.io/) (or another Ethereum wallet)
+- Ethers V6
+- A valid Alchemy API Key
+- WalletConnect API Key
 
 ### Installation
 
@@ -48,6 +31,7 @@ Before you begin, ensure you have the following installed:
 
 ## Features
 
-For more info, reach out to the team:
+For more info, feel free to reach out to the team:
 - [Dcaldeirao1](https://x.com/dcaldeirao1)
+- [Duball69](https://x.com/duball69)
 - [Duball69](https://t.me/duball69)
