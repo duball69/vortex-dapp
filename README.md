@@ -33,5 +33,4 @@ If you want to fork our dapp to test it out, ensure you have the following insta
 
 For more info, feel free to reach out to the team:
 - [Dcaldeirao1](https://x.com/dcaldeirao1)
-- [Duball69](https://x.com/duball69)
 - [Duball69](https://t.me/duball69)
