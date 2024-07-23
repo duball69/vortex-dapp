@@ -29,7 +29,7 @@ If you want to fork our dapp to test it out, ensure you have the following insta
    cd vortex-dapp
 
 
-## Features
+## Authors
 
 For more info, feel free to reach out to the team:
 - [Dcaldeirao1](https://x.com/dcaldeirao1)
