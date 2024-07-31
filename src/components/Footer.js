@@ -28,7 +28,7 @@ function Footer() {
         <a
           href="mailto:team@vortexdapp.com"
           className="icon-link"
-          aria-label="Mail"
+          aria-label="Email"
         >
           <FaEnvelope className="icon mail" />
         </a>
