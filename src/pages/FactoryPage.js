@@ -103,7 +103,7 @@ const web3Modal = createWeb3Modal({
 });
 
 const IMGUR_API_URL = "https://api.imgur.com/3/image";
-const CLIENT_ID = process.env.REACT_APP_IMGUR_ID;
+const CLIENT_ID = "7bd162baabe49a2";
 
 const uploadImageToImgur = async (file) => {
   const formData = new FormData();
