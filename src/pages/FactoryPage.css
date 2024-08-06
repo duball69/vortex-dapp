@@ -12,7 +12,7 @@ html, body {
     color: white;
     padding-right:250px;    
     padding-left:250px;
-    margin-top: 20px; /* Add some top margin to the title */
+   /* Add some top margin to the title */
     }
 
 .subtitlefactory {font-size:18px;
@@ -28,46 +28,41 @@ html, body {
 }
 .token_address_message a{color:white;}
 .factory-container {
-    max-width: 600px;
-    padding: 100px 70px 150px 70px; /* Increased top and bottom padding */
+
     border: 1px solid #cccccc81;
     border-radius: 30px;
-    margin-top:100px;
     background-color: #0000006c;
     color:white;
     display: flex;
     flex-direction: column;
     justify-content: center; /* Vertically center */
     align-items: center; /* Horizontally center */
-    height: 20%; /* Changed from 50% to auto */
     text-align: center;
-    min-height: 50vh; /* Added minimum height */
+ margin-top:-150px;
 }
 
 .center-container{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 
 }
 
 @media only screen and (max-width: 700px) {
     .center-container {
         align-items: flex-start;
-        padding-top: 30px;
+        padding-top: 0px;
         min-height: 100vh;
         box-sizing: border-box;
     }
 
     .factory-container {
         padding: 0px 30px;
-        margin: 10px 0px 0px 10px;
+        margin: -40px 0px 0px 10px;
         width: 100%;
         max-height: 100vh;
         border: 0px solid #ffffff00;
         border-radius: 30px;
-        margin-top:100px;
         background-color: #00000000;
       
     }
@@ -97,7 +92,7 @@ html, body {
     }
 
     .deploy-button {
-        margin-top: 15px;
+      
         margin-bottom: 15px;
     }
 }
@@ -132,7 +127,7 @@ input[type="number"]:focus {
 
 button.deploy-button {
     padding: 7px 20px;
-    margin-top:20px;
+    
     margin-bottom:20px;
     font-size: 16px;
     border-radius: 30px;
@@ -163,14 +158,6 @@ button.deploy-button:hover {
     font-style: italic;
 }
 
-.center2-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-
-
-}
 
 
   

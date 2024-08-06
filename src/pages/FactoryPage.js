@@ -264,7 +264,7 @@ function FactoryPage() {
           Uniswap.
         </h3>
       </div>
-      <div className="center2-container">
+      <div className="center-container">
         <div className="factory-container">
           <h2 className="createerc">Create Your ERC20 Token</h2>
           {isConnected} {/* Display connected wallet address */}
