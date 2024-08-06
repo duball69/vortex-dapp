@@ -41,7 +41,11 @@ h5 {
 @media only screen and (max-width: 600px) {
   .staking-container {
     margin: 10px 10px 10px 10px; /* Add margin for mobile devices */
-      height: 60%;
+   
+      border: 0px solid #ffffff00;
+      border-radius: 30px;
+     
+      background-color: #00000000;
   }
 
   .connected-wallet{font-size: 10px;}
@@ -63,7 +67,7 @@ h5 {
       text-align: center;
       color: white;
       font-size: 14px;
-      margin-bottom: 50px;
+      margin-bottom: 10px;
   }
 
   center2-container {

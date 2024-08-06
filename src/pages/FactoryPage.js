@@ -258,7 +258,7 @@ function FactoryPage() {
         chainId={chainId}
       />
       <div>
-        <h1 className="titlefactory">Launch your new token without costs.</h1>
+        <h1 className="titlefactory">Launch your new ERC20 token</h1>
         <h3 className="subtitlefactory">
           Vortex provides liquidity lending to launch tokens, directly on
           Uniswap.
@@ -267,21 +267,17 @@ function FactoryPage() {
       <div className="center2-container">
         <div className="factory-container">
           <h2 className="createerc">Create Your ERC20 Token</h2>
-          {isConnected && (
-            <p className="connected-wallet">
-              Connected Wallet: {connectedWallet}
-            </p>
-          )}{" "}
-          {/* Display connected wallet address */}
+          {isConnected} {/* Display connected wallet address */}
           <form onSubmit={deployToken} className="token-form">
             <div className="custom-file-input">
-              <span>Add your image here</span>
+              <span>Add image here</span>
               <input
                 type="file"
                 id="tokenImage"
                 accept="image/*"
                 onChange={(e) => setTokenImage(e.target.files[0])}
                 className="input"
+                placeholder="token image"
               />
               {tokenImage && (
                 <div>
@@ -341,12 +337,12 @@ function FactoryPage() {
                   target="_blank"
                   className="a"
                 >
-                  {deployedContractAddress}
+                  <span>Check CA</span>
                 </a>
               </p>
 
               <Link to={`/dashboard/${deployedContractAddress}`}>
-                <button className="deploy-button">Next</button>
+                <button className="deploy-button">Next Step</button>
               </Link>
             </>
           )}

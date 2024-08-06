@@ -1,3 +1,70 @@
+/* TokenList.css */
+.tokens-container {
+    padding: 20px;
+}
+
+.deployedtokenstitle {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: white; /* Set title text to white */
+}
+
+.subtitletokens {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: white; /* Set subtitle text to white */
+}
+
+.tokens-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tokens-table th, .tokens-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: white; /* Set table text to white */
+}
+
+.tokens-table th {
+    background-color: #000000;
+    font-weight: bold;
+    color: white; /* Set table header text to white */
+}
+
+.tokens-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.tokens-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.tokens-table tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.tokens-table tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+.tokens-table th, .tokens-table td {
+    border: 1px solid rgba(221, 221, 221, 0.159); /* More transparent and thinner border */
+    padding: 8px;
+    text-align: left;
+    color: white;
+}
+
+.icon2 {
+    font-size: 18px;
+    margin-right: 5px;
+    color: white; /* Set icon text to white */
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -7,104 +74,89 @@ html, body {
     background-attachment: fixed;
 }
 
-.titlefactory {font-size:30px;
+.titlefactory {
+    font-size: 30px;
     text-align: center;
     color: white;
-    padding-right:250px;    
-    padding-left:250px;
-    margin-top: 20px; /* Add some top margin to the title */
-    }
+    padding-right: 250px;
+    padding-left: 250px;
+}
 
-.subtitlefactory {font-size:18px;
-    margin-top:5px;
+.subtitlefactory {
+    font-size: 18px;
+    margin-top: 5px;
     font-weight: 300;
-    margin-bottom: 20px;
+    color: white; /* Set subtitle factory text to white */
 }
 
-.token_address_message{   color: white;
-    margin-top: 30px; /* Increased top margin */
-    margin-bottom: 30px; /* Added bottom margin */
-    font-size: 0.9rem;
+.token_address_message {
+    color: white;
 }
-.token_address_message a{color:white;}
+
+.token_address_message a {
+    color: white;
+}
+
 .factory-container {
     max-width: 600px;
-    padding: 100px 70px 150px 70px; /* Increased top and bottom padding */
+    padding: 70px 70px 100px 70px;
     border: 1px solid #cccccc81;
     border-radius: 30px;
-    margin-top:100px;
+    margin-top: 100px;
     background-color: #0000006c;
-    color:white;
+    color: white;
     display: flex;
     flex-direction: column;
     justify-content: center; /* Vertically center */
     align-items: center; /* Horizontally center */
-    height: 20%; /* Changed from 50% to auto */
+    height: 50%; /* Ensure the container takes the full height of the viewport */
     text-align: center;
-    min-height: 50vh; /* Added minimum height */
 }
 
-.center-container{
+.center-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-
 }
 
-@media only screen and (max-width: 700px) {
-    .center-container {
-        align-items: flex-start;
-        padding-top: 30px;
-        min-height: 100vh;
-        box-sizing: border-box;
-    }
-
+@media only screen and (max-width: 600px) {
     .factory-container {
-        padding: 0px 30px;
-        margin: 10px 0px 0px 10px;
-        width: 100%;
-        max-height: 100vh;
-        border: 0px solid #ffffff00;
-        border-radius: 30px;
-        margin-top:100px;
-        background-color: #00000000;
-      
+        margin: 10px 10px 10px 10px; /* Add margin for mobile devices */
+        height: 60%;
+        padding: 30px;
     }
 
-    .createerc {padding-top:10px;}
+    .center2-container {
+        margin: 0px;
+    }
+
     .titlefactory {
-        font-size: 20px;
-        padding-right: 10px;
-        padding-left: 10px;
-        margin-top: 10px;
+        font-size: 23px;
+        text-align: center;
+        color: white;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+    .createerc {
+        font-size: 18px;
     }
 
     .subtitlefactory {
-        font-size: 14px;
+        font-size: 15px;
         margin-top: 10px;
-        margin-right: 10px;
+        margin-right: 20px;
         margin-left: 10px;
-    }
-
-    .token_address_message {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .custom-file-input {
-        margin-top: 10px;
-    }
-
-    .deploy-button {
-        margin-top: 15px;
-        margin-bottom: 15px;
+        font-weight: 300;
+        color: white; /* Set mobile subtitle factory text to white */
     }
 }
 
 .token-form label {
     display: block;
     margin-bottom: 10px;
+    color: white; /* Set label text to white */
 }
 
 input[type="text"],
@@ -116,7 +168,6 @@ input[type="number"] {
     border-radius: 30px;
     box-sizing: border-box;
     font-family: "Space Grotesk", sans-serif;
-
 }
 
 input[type="text"]:focus,
@@ -126,14 +177,13 @@ input[type="number"]:focus {
 }
 
 .input {
-
     margin-bottom: 13px;
 }
 
 button.deploy-button {
     padding: 7px 20px;
-    margin-top:20px;
-    margin-bottom:20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
@@ -147,7 +197,6 @@ button.deploy-button {
     font-weight: 600;
 }
 
-
 button.deploy-button:hover {
     background-color: #ffffff;
     font-style: normal;
@@ -156,11 +205,11 @@ button.deploy-button:hover {
     font-weight: 600;
 }
 
-
 .contract-address {
     margin-top: 20px;
     font-size: 16px;
     font-style: italic;
+    color: white; /* Set contract address text to white */
 }
 
 .center2-container {
@@ -168,25 +217,18 @@ button.deploy-button:hover {
     justify-content: center;
     align-items: center;
     height: 100vh;
-
-
 }
 
-
-  
-  h3 {
+h3 {
     text-align: center;
     color: white;
-    margin-bottom:-60px;
-    
+    margin-bottom: -60px;
     font-size: 16px;
-    
-  }
+}
 
-  
 .start-button {
     padding: 7px 20px;
-    margin-top:10px;
+    margin-top: 10px;
     font-size: 16px;
     border-radius: 30px;
     /* Gradient background */
@@ -199,15 +241,14 @@ button.deploy-button:hover {
     font-weight: 400;
     text-decoration: none;
     font-family: 'Comfortaa', sans-serif; /* Updated font-family */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
-
 
 .start-button:hover {
     background-color: #0056b3;
 }
-  
+
 .custom-file-input {
     position: relative;
     overflow: hidden;
@@ -218,7 +259,8 @@ button.deploy-button:hover {
     border: 1px solid #ccc;
     border-radius: 30px;
     font-size: 16px;
-    margin-bottom:20px;
+    margin-bottom: 20px;
+    color: white; /* Set custom file input text to white */
 }
 
 .custom-file-input input[type="file"] {
@@ -240,7 +282,8 @@ button.deploy-button:hover {
     font-size: 14px;
     text-align: center;
     margin-top: -10px;
-    margin-bottom:20px;
+    margin-bottom: 20px;
+    color: white; /* Set connected wallet text to white */
 }
 
 .error-message {
@@ -248,9 +291,8 @@ button.deploy-button:hover {
     color: #ffffff; /* Typical error message color */
 }
 
-/* Styling the paragraph */
 .token_address_message {
-    margin-top:20px;
+    margin-top: 20px;
     font-size: 0.9rem; /* Adjust the size as needed */
     color: #ffffff; /* Example color */
 }

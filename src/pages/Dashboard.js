@@ -58,6 +58,7 @@ function DashboardPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [tokenAmountToBuy, setTokenAmountToBuy] = useState("");
+  const [maxBuyAmount, setMaxBuyAmount] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const factoryChainAddress =
@@ -66,6 +67,9 @@ function DashboardPage() {
     networkConfig[chainId]?.WETH_address || "DefaultWETHAddress";
   const explorerUrl =
     networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
+
+  // Add new state for liquidity amount
+  const [liquidityAmount, setLiquidityAmount] = useState("");
 
   // Effect to log and set factory address only when chainId changes
   useEffect(() => {
@@ -139,7 +143,9 @@ function DashboardPage() {
 
       // Setup for adding liquidity
       const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
-      const wethAmount = ethers.parseUnits("0.00001", 18); // Example amount of WETH
+      const wethAmount = ethers.parseUnits("0.05", 18); // Example amount of WETH
+      const maxBuyWei = (wethAmount * BigInt(5)) / BigInt(100);
+      setMaxBuyAmount(ethers.formatEther(maxBuyWei));
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
@@ -200,6 +206,46 @@ function DashboardPage() {
     }
   }
 
+  async function handleAddLiquidity() {
+    setIsLoading(true);
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    try {
+      const liquidityAmountValue = liquidityAmount
+        ? parseFloat(liquidityAmount)
+        : 0;
+      const liquidityAmountWei = ethers.parseUnits(
+        liquidityAmountValue.toString(),
+        18
+      );
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const factoryContract = new ethers.Contract(
+        factoryChainAddress,
+        MyFactoryJson.abi,
+        signer
+      );
+
+      // Call the addLiquidity function (assuming it exists in your factory contract)
+      const txAddLiquidity = await factoryContract.addLiquidity(
+        contractAddress,
+        liquidityAmountWei,
+        { value: liquidityAmountWei, gasLimit: 500000 }
+      );
+      await txAddLiquidity.wait();
+
+      setSuccessMessage("Liquidity added successfully!");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Failed to add liquidity. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   // Helper function to get the latest event
   async function getLatestEvent(token, eventName) {
     const filter = token.filters[eventName]();
@@ -231,8 +277,7 @@ function DashboardPage() {
 
       <h1 className="titlefactory">Get Initial LP for your token</h1>
       <h3 className="subtitlefactory">
-        Click to launch your token with initial liquidity for free. It will be
-        locked.
+        Click to launch your token with initial liquidity
       </h3>
 
       <div className="center-container">
@@ -292,6 +337,7 @@ function DashboardPage() {
                 }}
                 placeholder="Token amount"
                 min="0.00" // Set minimum to "0.00" to allow zero as a valid input
+                max="0.01"
               />
             </div>
           </div>
@@ -316,6 +362,20 @@ function DashboardPage() {
           )}
         </div>
       </div>
+
+      <div className="liquidity-container">
+        <h2>Add Liquidity</h2>
+        <input
+          type="number"
+          value={liquidityAmount}
+          onChange={(e) => setLiquidityAmount(e.target.value)}
+          placeholder="Enter ETH amount for liquidity"
+        />
+        <button onClick={handleAddLiquidity} disabled={isLoading}>
+          {isLoading ? "Adding Liquidity..." : "Add Liquidity"}
+        </button>
+      </div>
+
       <Footer />
     </div>
   );
