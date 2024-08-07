@@ -32,6 +32,7 @@ html, body {
     border: 1px solid #cccccc81;
     border-radius: 30px;
     background-color: #0000006c;
+    padding:30px;
     color:white;
     display: flex;
     flex-direction: column;
