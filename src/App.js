@@ -10,6 +10,7 @@ import AfterLaunch from "./pages/AfterLaunch";
 import Trade from "./pages/Trade";
 import TokensPage from "./pages/TokenListPage";
 import TokenBuyTrackerPage from "./pages/TokenBuyTrackerPage";
+import Trading from "./pages/Trading";
 import { Web3ModalProvider } from "./Web3ModalContext";
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
             path="/dashboard/:contractAddress"
             element={<DashboardPage />}
           />
-          <Route path="/trade" element={<Trade />} />
+          <Route path="/trading" element={<Trading />} />
           <Route path="/recently" element={<RecentlyLaunched />} />
           <Route path="/tokens" element={<TokensPage />} />
           <Route path="/tracker" element={<TokenBuyTrackerPage />} />

@@ -25,16 +25,16 @@ import {
 const networkConfig = {
   // Example Chain IDs for Base and Sepolia
   8453: {
-    // Mainnet (as an example; replace with the correct ID for "base")
+    // BASE (as an example; replace with the correct ID for "base")
     factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
-    explorerUrl: "https://basescan.org",
+    explorerUrl: "https://base.blockscout.com/",
   },
   11155111: {
     // Sepolia Testnet Chain ID
     factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-    explorerUrl: "https://sepolia.etherscan.io",
+    explorerUrl: "https://eth-sepolia.blockscout.com/",
   },
 };
 
@@ -49,7 +49,7 @@ const sepoliaMainnet = {
   chainId: 11155111,
   name: "Sepolia",
   currency: "ETH",
-  explorerUrl: "https://sepolia.etherscan.io/",
+  explorerUrl: "https://eth-sepolia.blockscout.com",
   rpcUrl: process.env.SEPOLIA_RPC_URL,
 };
 
@@ -57,7 +57,7 @@ const baseMainnet = {
   chainId: 8453,
   name: "Base",
   currency: "ETH",
-  explorerUrl: "https://basescan.org/",
+  explorerUrl: "https://base.blockscout.com/",
   rpcUrl: process.env.BASE_RPC_URL,
 };
 
@@ -72,7 +72,7 @@ const arbitrumMainnet = {
   chainId: 42161,
   name: "Arbitrum",
   currency: "ETH",
-  explorerUrl: "https://arbiscan.io",
+  explorerUrl: "https://arbitrum.blockscout.com/",
   rpcUrl: process.env.ARBITRUM_RPC_URL,
 };
 
@@ -150,7 +150,7 @@ function FactoryPage() {
   const [error, setError] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
   const explorerUrl =
-    networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
+    networkConfig[chainId]?.explorerUrl || "https://eth.blockscout.com/";
   const factoryChainAddress =
     networkConfig[chainId]?.factoryAddress || "DefaultFactoryAddress";
 

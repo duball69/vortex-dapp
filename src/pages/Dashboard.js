@@ -31,13 +31,13 @@ const networkConfig = {
     // Mainnet (as an example; replace with the correct ID for "base")
     factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
-    explorerUrl: "https://basescan.org",
+    explorerUrl: "https://base.blockscout.com/",
   },
   11155111: {
     // Sepolia Testnet Chain ID
     factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-    explorerUrl: "https://eth-sepolia.blockscout.com",
+    explorerUrl: "https://eth-sepolia.blockscout.com/",
   },
 };
 
@@ -195,11 +195,13 @@ function DashboardPage() {
       const txLink = `https://eth-sepolia.blockscout.com/tx/${txHash}`;
 
       setSuccessMessage(
-        `Token deployed, liquidity added, and initial swap done! 
-        <a href="${txLink}" target="_blank" rel="noopener noreferrer" className="a">
-          <span>${txHash}</span>
-        </a> 
-        (Hash: ${txHash})`
+        `<p>
+          Token deployed, liquidity added, and initial swap done! 
+          <a href="${txLink}" target="_blank" rel="noopener noreferrer" className="a">
+            <span>${txHash}</span>
+          </a> 
+          (Hash: ${txHash})
+        </p>`
       );
     } catch (error) {
       if (error.code === "ACTION_REJECTED") {
