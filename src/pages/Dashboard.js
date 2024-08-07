@@ -56,6 +56,7 @@ function DashboardPage() {
   const { open, close } = useWeb3Modal();
   const [deployedPoolAddress, setDeployedPoolAddress] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [txHash, setTxHash] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [tokenAmountToBuy, setTokenAmountToBuy] = useState("");
   const [maxBuyAmount, setMaxBuyAmount] = useState("");
@@ -192,16 +193,14 @@ function DashboardPage() {
       console.log("Tokens received: ", tokensReceived);
 
       const txHash = txAddLiquidity.hash;
-      const txLink = `https://eth-sepolia.blockscout.com/tx/${txHash}`;
+      setTxHash(txHash);
+      const txLink = `${explorerUrl}/tx/${txHash}`;
 
       setSuccessMessage(
-        `<p>
+        `
           Token deployed, liquidity added, and initial swap done! 
-          <a href="${txLink}" target="_blank" rel="noopener noreferrer" className="a">
-            <span>${txHash}</span>
-          </a> 
-          (Hash: ${txHash})
-        </p>`
+        
+          `
       );
     } catch (error) {
       if (error.code === "ACTION_REJECTED") {
@@ -210,46 +209,6 @@ function DashboardPage() {
         console.error(error);
         setErrorMessage(`Transaction failed, please try again.`);
       }
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleAddLiquidity() {
-    setIsLoading(true);
-    setSuccessMessage("");
-    setErrorMessage("");
-
-    try {
-      const liquidityAmountValue = liquidityAmount
-        ? parseFloat(liquidityAmount)
-        : 0;
-      const liquidityAmountWei = ethers.parseUnits(
-        liquidityAmountValue.toString(),
-        18
-      );
-
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      const factoryContract = new ethers.Contract(
-        factoryChainAddress,
-        MyFactoryJson.abi,
-        signer
-      );
-
-      // Call the addLiquidity function (assuming it exists in your factory contract)
-      const txAddLiquidity = await factoryContract.addLiquidity(
-        contractAddress,
-        liquidityAmountWei,
-        { value: liquidityAmountWei, gasLimit: 500000 }
-      );
-      await txAddLiquidity.wait();
-
-      setSuccessMessage("Liquidity added successfully!");
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Failed to add liquidity. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -353,7 +312,6 @@ function DashboardPage() {
               />
             </div>
           </div>
-
           {!successMessage && (
             <button
               onClick={handleMulticall}
@@ -364,7 +322,17 @@ function DashboardPage() {
             </button>
           )}
           {successMessage && (
-            <div className="success-message2">{successMessage}</div>
+            <div>
+              <div className="success-message2">{successMessage}</div>
+              <a
+                href={`${explorerUrl}/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="a"
+              >
+                <span>Check transaction</span>
+              </a>
+            </div>
           )}
           {errorMessage && <div className="error-message">{errorMessage}</div>}
           {successMessage && (
@@ -373,19 +341,6 @@ function DashboardPage() {
             </Link>
           )}
         </div>
-      </div>
-
-      <div className="liquidity-container">
-        <h2>Add Liquidity</h2>
-        <input
-          type="number"
-          value={liquidityAmount}
-          onChange={(e) => setLiquidityAmount(e.target.value)}
-          placeholder="Enter ETH amount for liquidity"
-        />
-        <button onClick={handleAddLiquidity} disabled={isLoading}>
-          {isLoading ? "Adding Liquidity..." : "Add Liquidity"}
-        </button>
       </div>
 
       <Footer />

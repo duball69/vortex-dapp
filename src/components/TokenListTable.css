@@ -17,10 +17,7 @@
 
 .tokens-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 10px;
-    overflow: hidden;
+    border-collapse: collapse;
 }
 
 .tokens-table th, .tokens-table td {
@@ -34,29 +31,6 @@
     background-color: #000000;
     font-weight: bold;
     color: white; /* Set table header text to white */
-}
-
-.tokens-table th:first-child {
-    border-top-left-radius: 10px;
-}
-
-.tokens-table th:last-child {
-    border-top-right-radius: 10px;
-}
-
-.tokens-table tr:last-child td:first-child {
-    border-bottom-left-radius: 10px;
-}
-
-.tokens-table tr:last-child td:last-child {
-    border-bottom-right-radius: 10px;
-}
-
-.tokens-table th, .tokens-table td {
-    border: 1px solid rgba(221, 221, 221, 0.159); /* More transparent and thinner border */
-    padding: 8px;
-    text-align: left;
-    color: white;
 }
 
 .icon2 {

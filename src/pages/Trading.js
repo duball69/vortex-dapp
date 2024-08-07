@@ -18,7 +18,7 @@ function Trading() {
         title="DEXTools Trading Chart"
         width="500"
         height="400"
-        src="https://www.dextools.io/widget-chart/en/ether/pe-light/0x7e1d7905bd724c03aae9707bf6a71e7a7bb930c5?theme=light&chartType=2&chartResolution=30&drawingToolbars=false"
+        src="https://www.dextools.io/widget-chart/en/ether/pe-dark/0x7e1d7905bd724c03aae9707bf6a71e7a7bb930c5?theme=light&chartType=2&chartResolution=30&drawingToolbars=false"
       ></iframe>
     </div>
   );
