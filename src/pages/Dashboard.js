@@ -37,7 +37,7 @@ const networkConfig = {
     // Sepolia Testnet Chain ID
     factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
-    explorerUrl: "https://sepolia.etherscan.io",
+    explorerUrl: "https://eth-sepolia.blockscout.com",
   },
 };
 
@@ -191,8 +191,15 @@ function DashboardPage() {
       const tokensReceived = ethers.formatUnits(tokensSwappedEvent.args[0], 18);
       console.log("Tokens received: ", tokensReceived);
 
+      const txHash = txAddLiquidity.hash;
+      const txLink = `https://eth-sepolia.blockscout.com/tx/${txHash}`;
+
       setSuccessMessage(
-        "Token deployed, liquidity added, and initial swap done!"
+        `Token deployed, liquidity added, and initial swap done! 
+        <a href="${txLink}" target="_blank" rel="noopener noreferrer" className="a">
+          <span>${txHash}</span>
+        </a> 
+        (Hash: ${txHash})`
       );
     } catch (error) {
       if (error.code === "ACTION_REJECTED") {
@@ -333,6 +340,9 @@ function DashboardPage() {
                   let value = e.target.value
                     ? parseFloat(e.target.value).toFixed(4)
                     : "0.0000";
+                  if (parseFloat(value) > 0.01) {
+                    value = "0.0100"; // Set to max value if it exceeds the limit
+                  }
                   setTokenAmountToBuy(value);
                 }}
                 placeholder="Token amount"

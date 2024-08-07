@@ -435,7 +435,7 @@ const StakingPage = () => {
         </h5>
         <h6 className="texthome2">Currently only on Sepolia Testnet</h6>
       </div>
-      <div className="center2-container">
+      <div className="center-container">
         <div className="staking-container">
           <h2>Vortex ETH Pool</h2>
           {!isConnected && (
@@ -444,9 +444,6 @@ const StakingPage = () => {
           {isConnected && (
             <>
               <div>
-                <p className="connected-wallet">
-                  Connected Wallet: {connectedWallet}
-                </p>
                 <div>
                   <h4>APY: {apy}</h4>
                 </div>
@@ -463,28 +460,31 @@ const StakingPage = () => {
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount (ETH)"
                 />
-                <button
-                  className="stake-button"
-                  onClick={handleStake}
-                  disabled={loadingStake || loadingUnstake}
-                >
-                  {loadingStake ? "Staking..." : "Stake"}
-                </button>
-
-                {isStaked && canUnstake && (
+                <div>
+                  {" "}
                   <button
-                    className="unstake-button"
-                    onClick={handleUnstake}
-                    disabled={
-                      loadingStake ||
-                      loadingUnstake ||
-                      !canUnstake ||
-                      calculateMaxUnstakable(stakedAmount, pendingUnstake) <= 0n
-                    }
+                    className="stake-button"
+                    onClick={handleStake}
+                    disabled={loadingStake || loadingUnstake}
                   >
-                    {loadingUnstake ? "Unstaking..." : "Unstake"}
+                    {loadingStake ? "Staking..." : "Stake"}
                   </button>
-                )}
+                  {isStaked && canUnstake && (
+                    <button
+                      className="unstake-button"
+                      onClick={handleUnstake}
+                      disabled={
+                        loadingStake ||
+                        loadingUnstake ||
+                        !canUnstake ||
+                        calculateMaxUnstakable(stakedAmount, pendingUnstake) <=
+                          0n
+                      }
+                    >
+                      {loadingUnstake ? "Unstaking..." : "Unstake"}
+                    </button>
+                  )}
+                </div>
 
                 {isConnected && isStaked && (
                   <button
@@ -498,10 +498,6 @@ const StakingPage = () => {
 
                 {errorMessage && (
                   <p className="error-message">{errorMessage}</p>
-                )}
-
-                {isConnected && isStaked && (
-                  <p>Pending Rewards: {pendingRewards} ETH</p>
                 )}
               </div>
             </>
