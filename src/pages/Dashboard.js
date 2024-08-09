@@ -29,7 +29,7 @@ const networkConfig = {
   // Example Chain IDs for Base and Sepolia
   8453: {
     // Mainnet (as an example; replace with the correct ID for "base")
-    factoryAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0", //deprecated - deploy new one one base
+    factoryAddress: "0xe77045eEc064fE5E9B4a1E30A85282ADc9284957", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://base.blockscout.com/",
   },
@@ -144,7 +144,7 @@ function DashboardPage() {
 
       // Setup for adding liquidity
       const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
-      const wethAmount = ethers.parseUnits("0.000009", 18); // Example amount of WETH
+      const wethAmount = ethers.parseUnits("0.000005", 18); // Example amount of WETH
       const maxBuyWei = (wethAmount * BigInt(5)) / BigInt(100);
       setMaxBuyAmount(ethers.formatEther(maxBuyWei));
       const provider = new ethers.BrowserProvider(window.ethereum);
