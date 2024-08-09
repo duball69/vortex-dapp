@@ -12,9 +12,8 @@ module.exports = {
         enabled: true,
         runs: 1000,
       },
-      viaIR: true
-    }
-
+      viaIR: true,
+    },
   },
 
   etherscan: {
@@ -28,7 +27,7 @@ module.exports = {
     },
     base: {
       url: process.env.BASE_RPC_URL,
-      accounts: [process.env.SEPOLIA_PRIVATE_KEY],
+      accounts: [process.env.BASE_PRIVATE_KEY],
     },
     localhost: {
       url: "http://127.0.0.1:8545", // This is the default URL for the Hardhat node

@@ -144,7 +144,7 @@ function DashboardPage() {
 
       // Setup for adding liquidity
       const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
-      const wethAmount = ethers.parseUnits("0.00015", 18); // Example amount of WETH
+      const wethAmount = ethers.parseUnits("0.000009", 18); // Example amount of WETH
       const maxBuyWei = (wethAmount * BigInt(5)) / BigInt(100);
       setMaxBuyAmount(ethers.formatEther(maxBuyWei));
       const provider = new ethers.BrowserProvider(window.ethereum);

@@ -17,7 +17,8 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0xAF7be3c33b75d7d6e104098781D782f854d3c764";
+const STAKING_POOL_ADDRESS = "0x265C0d2EFF35A6A8DfEBFa8Db9Ff1B0E69Cd364b";
+//sepolia 0xAF7be3c33b75d7d6e104098781D782f854d3c764
 
 const CHAIN_NAMES = {
   56: "BSC",
