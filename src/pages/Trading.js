@@ -83,7 +83,7 @@ function Trading() {
           }}
         >
           <iframe
-            src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&theme=dark`}
+            src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&trades=1&info=0&theme=dark`}
             style={{
               position: "absolute",
               width: "100%",
@@ -108,7 +108,7 @@ function Trading() {
           }}
         >
           <iframe
-            src={`https://app.uniswap.org/swap?theme=dark&outputCurrency=${contractAddress}&amp;chain=${chain}`}
+            src={`https://app.uniswap.org/swap?theme=dark&outputCurrency=${contractAddress}&amp;chain=base`}
             height="660px"
             width="100%"
             style={{
@@ -116,7 +116,6 @@ function Trading() {
               display: "block",
               borderRadius: "10px",
             }}
-            allowFullScreen
           />
         </div>
       </div>
