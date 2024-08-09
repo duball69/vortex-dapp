@@ -126,9 +126,7 @@ function TokensListTable({ limit }) {
             <th>Contract Address</th>
             <th>Chain</th>
             <th>Created</th>
-            <th>Website</th>
-            <th>Twitter</th>
-            <th>Telegram</th>
+            <th>Socials</th>
             <th>Trade</th>
           </tr>
         </thead>
@@ -152,17 +150,7 @@ function TokensListTable({ limit }) {
               <td>
                 {token.timestamp ? token.timestamp.toLocaleDateString() : "N/A"}
               </td>
-              <td>
-                {token.website && (
-                  <a
-                    href={`https://${token.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaGlobe className="icon2" />
-                  </a>
-                )}
-              </td>
+
               <td>
                 {token.twitter && (
                   <a
@@ -174,17 +162,7 @@ function TokensListTable({ limit }) {
                   </a>
                 )}
               </td>
-              <td>
-                {token.telegram && (
-                  <a
-                    href={`https://${token.telegram}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaTelegram className="icon2" />
-                  </a>
-                )}
-              </td>
+
               <td className="trade-button-cell">
                 <button
                   className="trade-button"
