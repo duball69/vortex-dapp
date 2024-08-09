@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./HomePage.css"; // Import the CSS file for styling
 import Header from "../components/Header.js";
 import HowItWorks from "../components/HowItWorks";
+import TokenListTable from "../components/TokenListTable.js";
 import Features from "../components/Features";
 import FAQ from "../components/Faqs.js";
 import Contact from "../components/Contacts";
@@ -61,6 +62,7 @@ function HomePage() {
       </div>
 
       <TokensList limit={6} />
+      <TokenListTable />
       <div className="container">
         <Link to="/tokens">
           <button>View All </button>

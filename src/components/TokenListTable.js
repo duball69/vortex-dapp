@@ -9,6 +9,8 @@ function TokensListTable({ limit }) {
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState("newest");
   const [sortBy, setSortBy] = useState("date");
+  const [selectedChain, setSelectedChain] = useState("all");
+  const [showFilterOptions, setShowFilterOptions] = useState(false);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -44,10 +46,6 @@ function TokensListTable({ limit }) {
           return order === "newest"
             ? b.timestamp - a.timestamp
             : a.timestamp - b.timestamp;
-        case "chain":
-          return order === "asc"
-            ? a.chain.localeCompare(b.chain)
-            : b.chain.localeCompare(a.chain);
         case "website":
           return order === "asc"
             ? (a.website ? 1 : 0) - (b.website ? 1 : 0)
@@ -65,15 +63,27 @@ function TokensListTable({ limit }) {
     setSortOrder(order);
   };
 
+  const filterByChain = (chain) => {
+    setSelectedChain(chain);
+    setShowFilterOptions(false); // Hide filter options after selecting a chain
+  };
+
   if (loading) return <p>Loading tokens...</p>;
   if (!tokens.length) return <p>No tokens found.</p>;
 
-  const displayedTokens = limit ? tokens.slice(0, limit) : tokens;
+  const filteredTokens =
+    selectedChain === "all"
+      ? tokens
+      : tokens.filter((token) => token.chain === selectedChain);
+
+  const displayedTokens = limit
+    ? filteredTokens.slice(0, limit)
+    : filteredTokens;
 
   return (
     <div className="tokens-container">
       <h3 className="deployedtokenstitle">Deployed Tokens</h3>
-      <h5 className="subtitletokens">Trade them directly on Uniswap</h5>
+      <h5 className="subtitletokens">Choose a token and start trading</h5>
       <div className="sort-container">
         <button
           onClick={() =>
@@ -82,13 +92,24 @@ function TokensListTable({ limit }) {
         >
           Sort by {sortOrder === "newest" ? "Oldest" : "Newest" ? "↓" : "↑"}
         </button>
-        <button
-          onClick={() =>
-            sortTokens("chain", sortOrder === "asc" ? "desc" : "asc")
-          }
-        >
-          Sort by Chain {sortOrder === "asc" ? "↓" : "↑"}
-        </button>
+        <div className="filter-container">
+          <button onClick={() => setShowFilterOptions(!showFilterOptions)}>
+            Filter by Chain
+          </button>
+          {showFilterOptions && (
+            <div className="filter-options">
+              <button onClick={() => filterByChain("all")}>All Chains</button>
+              <button onClick={() => filterByChain("Sepolia")}>Sepolia</button>
+              <button onClick={() => filterByChain("Base")}>Base</button>
+              <button onClick={() => filterByChain("BSC")}>BSC</button>
+              <button onClick={() => filterByChain("Optimism")}>OP</button>
+              <button onClick={() => filterByChain("Arbitrum")}>
+                Arbitrum{" "}
+              </button>
+              <button onClick={() => filterByChain("Blast")}>Blast</button>
+            </div>
+          )}
+        </div>
         <button
           onClick={() =>
             sortTokens("website", sortOrder === "asc" ? "desc" : "asc")
@@ -96,17 +117,11 @@ function TokensListTable({ limit }) {
         >
           Sort by Website {sortOrder === "asc" ? "↓" : "↑"}
         </button>
-        <button
-          onClick={() =>
-            sortTokens("telegram", sortOrder === "asc" ? "desc" : "asc")
-          }
-        >
-          Sort by Telegram {sortOrder === "asc" ? "↓" : "↑"}
-        </button>
       </div>
       <table className="tokens-table">
         <thead>
           <tr>
+            <th>Image</th>
             <th>Name</th>
             <th>Contract Address</th>
             <th>Chain</th>
@@ -114,11 +129,21 @@ function TokensListTable({ limit }) {
             <th>Website</th>
             <th>Twitter</th>
             <th>Telegram</th>
+            <th>Trade</th>
           </tr>
         </thead>
         <tbody>
           {displayedTokens.map((token) => (
             <tr key={token.id}>
+              <td>
+                {token.imageUrl && (
+                  <img
+                    src={token.imageUrl}
+                    alt={token.name}
+                    className="token-image"
+                  />
+                )}
+              </td>
               <td>
                 {token.name} ({token.symbol})
               </td>
@@ -159,6 +184,16 @@ function TokensListTable({ limit }) {
                     <FaTelegram className="icon2" />
                   </a>
                 )}
+              </td>
+              <td className="trade-button-cell">
+                <button
+                  className="trade-button"
+                  onClick={() =>
+                    (window.location.href = `/trading/${token.chain}/${token.address}`)
+                  }
+                >
+                  Trade
+                </button>
               </td>
             </tr>
           ))}

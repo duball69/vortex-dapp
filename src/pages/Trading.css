@@ -1,0 +1,22 @@
+@media (max-width: 768px) {
+    /* Stack the iframes vertically on small screens */
+    .Trading div {
+      flex-direction: column;
+    }
+  
+    .Trading div > div {
+      flex: 0 0 100%; /* Make each iframe container take up full width */
+      margin-right: 0; /* Remove right margin */
+      margin-left: 0; /* Remove left margin */
+      margin-bottom: 20px; /* Add space between the iframes */
+    }
+  
+    .Trading div > div:last-child {
+      margin-bottom: 0; /* Remove margin from the last iframe */
+    }
+  
+    .Trading iframe {
+      height: 400px; /* Reduce iframe height for mobile */
+    }
+  }
+  

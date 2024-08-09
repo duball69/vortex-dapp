@@ -49,6 +49,7 @@ padding:10px;}
     height: auto; /* Maintain the aspect ratio */
     display: block; /* Make the image a block-level element */
     margin: 0 auto; /* Center the image horizontally */
+    margin-bottom:20px;
     padding: 10px 0; /* Optional: adds some space above and below the image */
 }
   

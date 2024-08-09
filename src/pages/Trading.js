@@ -1,25 +1,127 @@
-import React from "react";
-import TokenList from "../components/TokenList.js";
-import Header from "../components/Header.js";
-import Footer from "../components/Footer.js";
+import React, { useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import "./Trading.css"; // Import the CSS file
 
 function Trading() {
+  const { chain: initialChain, contractAddress: initialContractAddress } =
+    useParams();
+  const chain = initialChain.toLowerCase(); // Convert chain to lowercase
+  const [contractAddress, setContractAddress] = useState(
+    initialContractAddress
+  );
+  const [searchValue, setSearchValue] = useState(initialContractAddress);
+  const navigate = useNavigate();
+
+  const handleSearchChange = (e) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setContractAddress(searchValue);
+    navigate(`/trading/${chain}/${searchValue}`);
+  };
+
   return (
     <div>
-      <iframe
-        id="dextswap-aggregator-widget"
-        title="DEXTswap Aggregator"
-        width="400"
-        height="420"
-        src="https://www.dextools.io/widget-aggregator/en/swap/eth/0x46a33b1f48027aaae3c70a5a870b5d5cda52482b"
-      ></iframe>
-      <iframe
-        id="dextools-widget"
-        title="DEXTools Trading Chart"
-        width="500"
-        height="400"
-        src="https://www.dextools.io/widget-chart/en/ether/pe-dark/0x7e1d7905bd724c03aae9707bf6a71e7a7bb930c5?theme=light&chartType=2&chartResolution=30&drawingToolbars=false"
-      ></iframe>
+      <Header />
+
+      {/* Search Bar */}
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        <form onSubmit={handleSearchSubmit}>
+          <input
+            type="text"
+            value={searchValue}
+            onChange={handleSearchChange}
+            placeholder="Enter token contract address"
+            style={{
+              width: "80%",
+              padding: "10px",
+              borderRadius: "10px",
+              border: "1px solid #ccc",
+              marginRight: "10px",
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              padding: "10px 20px",
+              borderRadius: "10px",
+              backgroundColor: "#333",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      {/* New Section with Flexbox Layout */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          margin: "0 auto",
+          maxWidth: "1200px", // Adjust this value as needed
+          padding: "20px",
+        }}
+      >
+        {/* DexScreener Embed (Left, 70% width) */}
+        <div
+          style={{
+            flex: "0 0 70%",
+            marginRight: "10px",
+            position: "relative",
+            height: "660px",
+            minWidth: "300px",
+          }}
+        >
+          <iframe
+            src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&theme=dark`}
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              top: 0,
+              left: 0,
+              border: "0",
+              borderRadius: "20px",
+              overflow: "hidden",
+            }}
+            allowFullScreen
+          />
+        </div>
+
+        {/* Uniswap Embed (Right, 30% width) */}
+        <div
+          style={{
+            flex: "0 0 30%",
+            marginLeft: "10px",
+            minWidth: "300px",
+            height: "660px",
+          }}
+        >
+          <iframe
+            src={`https://app.uniswap.org/swap?theme=dark&outputCurrency=${contractAddress}&amp;chain=${chain}`}
+            height="660px"
+            width="100%"
+            style={{
+              border: "0",
+              display: "block",
+              borderRadius: "10px",
+            }}
+            allowFullScreen
+          />
+        </div>
+      </div>
+
+      <Footer />
     </div>
   );
 }

@@ -50,6 +50,9 @@ function Header({ connectWallet, isConnected, chainId }) {
             <Link to="/staking" onClick={() => setIsOpen(false)}>
               Stake
             </Link>
+            <Link to="/tokens" onClick={() => setIsOpen(false)}>
+              Tokens
+            </Link>
             <a
               href="https://docs.vortexdapp.com"
               target="_blank"
