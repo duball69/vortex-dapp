@@ -181,6 +181,20 @@ function DashboardPage() {
         swapAmount, // Adjust amount of ETH swapped accordingly
         { value: swapAmount, gasLimit: 9000000 }
       );
+
+      // Log the transaction hash
+      console.log("Transaction Hash:", txAddLiquidity.hash);
+
+      // Set success message with transaction link immediately
+      const txHash = txAddLiquidity.hash;
+      setTxHash(txHash);
+
+      const txLink = `${explorerUrl}/tx/${txHash}`;
+      setSuccessMessage(
+        `Your token is now live on the blockchain. Trade it anywhere.`
+      );
+
+      // Wait for the transaction to be confirmed (optional)
       await txAddLiquidity.wait();
       console.log("Liquidity added and locked!");
 
@@ -191,23 +205,12 @@ function DashboardPage() {
       );
       const tokensReceived = ethers.formatUnits(tokensSwappedEvent.args[0], 18);
       console.log("Tokens received: ", tokensReceived);
-
-      const txHash = txAddLiquidity.hash;
-      setTxHash(txHash);
-      const txLink = `${explorerUrl}/tx/${txHash}`;
-
-      setSuccessMessage(
-        `
-          Token deployed, liquidity added, and initial swap done! 
-        
-          `
-      );
     } catch (error) {
       if (error.code === "ACTION_REJECTED") {
         setErrorMessage("Transaction failed: User rejected the transaction.");
       } else {
         console.error(error);
-        setErrorMessage(`Transaction failed, please try again.`);
+        setErrorMessage("Transaction failed, please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -334,7 +337,7 @@ function DashboardPage() {
               </a>
             </div>
           )}
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
+
           {successMessage && (
             <Link to={`/token/${contractAddress}`}>
               <button className="deploy-button">Next</button>
