@@ -18,6 +18,7 @@ const networkConfig = {
     explorerUrl: "https://basescan.org",
     nftAddress: "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
     lockerAddress: "0x31828AAC589e46549F3980912A6a8001F81a9eD5",
+    chainName: "base",
   },
   11155111: {
     // Sepolia Testnet Chain ID
@@ -26,6 +27,7 @@ const networkConfig = {
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
     nftAddress: "0x1238536071E1c677A632429e3655c799b22cDA52",
+    chainName: "sepolia",
   },
 };
 
@@ -45,6 +47,7 @@ function AfterLaunch() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [deployer, setDeployer] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [isLoaded, setIsLoaded] = useState(false);
   const factoryChainAddress =
@@ -53,6 +56,7 @@ function AfterLaunch() {
     networkConfig[chainId]?.lockerAddress || "DefaultLockerAddress";
   const positionManagerChainAddress =
     networkConfig[chainId]?.nftAddress || "DefaultNFTAddress";
+  const chain = networkConfig[chainId]?.chainName || "unknown";
 
   useEffect(() => {
     const fetchTokenDetails = async () => {
@@ -126,11 +130,15 @@ function AfterLaunch() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    if (connectedWallet !== deployer) {
+      setErrorMessage("Only the deployer can update the token details.");
+      return;
+    }
     setIsLoading(true);
     const tokenDoc = doc(firestore, "tokens", contractAddress);
     await updateDoc(tokenDoc, tokenDetails);
     setIsLoading(false);
-    window.location.href = "/";
+    window.location.href = `/trading/${chain}/${contractAddress}`;
   };
 
   return (
@@ -182,6 +190,7 @@ function AfterLaunch() {
           ) : (
             <p>Loading token details...</p>
           )}
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         </div>
       </div>
       <Footer />

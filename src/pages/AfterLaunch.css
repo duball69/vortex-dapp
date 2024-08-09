@@ -1,0 +1,24 @@
+.factory3-container {
+
+    border: 0px solid #cccccc00;
+    border-radius: 30px;
+    background-color: #00000000;
+    
+    padding-left: 50px;
+    padding-right: 50px;
+    color:white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center */
+    align-items: center; /* Horizontally center */
+    text-align: center;
+ margin-top:-150px;
+}
+
+.center-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
