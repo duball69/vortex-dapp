@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig";
-import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./Trading.css"; // Import the CSS file
-
+import Header2 from "../components/Header2.js";
 import { FaTelegramPlane, FaTwitter, FaGlobe } from "react-icons/fa"; // Import social icons
 
 function Trading() {
@@ -67,7 +66,7 @@ function Trading() {
 
   return (
     <div>
-      <Header />
+      <Header2 />
 
       {/* Token Name and Image */}
       <div style={{ textAlign: "center", marginTop: "20px", color: "#ffffff" }}>
@@ -84,6 +83,46 @@ function Trading() {
           />
         )}
         <h1>{tokenName ? `${tokenName}` : "Loading..."}</h1>
+        {contractAddress && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#aaaaaa",
+                marginRight: "10px",
+                marginTop: "-10px",
+              }}
+            >
+              Contract Address: {contractAddress.slice(0, 6)}...
+              {contractAddress.slice(-4)}
+            </p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(contractAddress);
+                // Optionally, you can add some visual feedback here
+              }}
+              style={{
+                background: "none",
+                border: "1px solid #aaaaaa",
+                borderRadius: "4px",
+                marginTop: "-10px",
+                color: "#aaaaaa",
+                cursor: "pointer",
+                padding: "2px 6px",
+                fontSize: "12px",
+              }}
+            >
+              Copy
+            </button>
+          </div>
+        )}
 
         {/* Social Media Icons */}
         <div
@@ -220,7 +259,7 @@ function Trading() {
         {/* Right Section (Uniswap) */}
         <div style={{ flex: "0 0 30%", marginLeft: "10px" }}>
           <iframe
-            src={`https://app.uniswap.org/swap?chain=${chain}&theme=dark&inputCurrency=eth&outputCurrency=${contractAddress}&forceNetwork=${initialChain}`}
+            src={`https://app.uniswap.org/swap?chain=${chain}&theme=dark&inputCurrency=eth&outputCurrency=${contractAddress}&forceNetwork=${chain}`}
             height="660px"
             width="100%"
             style={{

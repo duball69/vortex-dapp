@@ -12,19 +12,19 @@ You can also try it on Base and Optimism, although current initial liquidity poo
 ## Features
 
 - **Multi-Chain Support**: Vortex Dapp is optimized to work on Base, OP, Arbitrum, BSC, Sepolia, and others. (Currently only live on Sepolia)
-- **Token Creation**: [Launch](launch.vortexdapp.com/factory) new tokens with initial liquidity without costs and without coding.
-- **Staking**: [Stake](launch.vortexdapp.com/stake) your ETH to contribute to the Vortex LP Lending Pool and earn 30% of the trading fees of tokens created through Vortex.
-- **Trading**: [Trade](launch.vortexdapp.com/trade) tokens created on the Vortex platform.
+- **Token Creation**: [Launch](https://launch.vortexdapp.com/factory) new tokens with initial liquidity without costs and without coding.
+- **Staking**: [Stake](https://launch.vortexdapp.com/stake) your ETH to contribute to the Vortex LP Lending Pool and earn 30% of the trading fees of tokens created through Vortex.
+- **Trading**: [Trade](https://launch.vortexdapp.com/trade) tokens created on the Vortex platform.
 
 
 ### Invest
 
-If you are interested in seeing Vortex Dapp coming to life and invest on us, feel free to DM one of our cofounders [dcaldeirao1](t.me/dcaldeirao1) or [duball69](duball69).
+If you are interested in seeing Vortex Dapp coming to life and invest on us, feel free to DM one of our cofounders [dcaldeirao1](https://t.me/dcaldeirao1) or [duball69](https://x.com/duball69).
 
 
 ### Documentation
 
-Find more information about Vortex Dapp at our [official docs](docs.vortexdapp.com).
+Find more information about Vortex Dapp at our [official docs](https://docs.vortexdapp.com).
 
 
 ### Prerequisites
@@ -44,7 +44,7 @@ If you want to fork our dapp to test it out, ensure you have the following insta
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/duball69/vortex-dapp.git
+   git clone https://github.com/vortexdapp/vortex-dapp.git
 2.  ```sh
     cd vortex-dapp
 3.  ```sh

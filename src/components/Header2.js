@@ -14,6 +14,8 @@ function Header2({ connectWallet, isConnected, chainId }) {
     8453: "Base",
     11155111: "Sepolia",
     81457: "Blast",
+    10: "Optimism",
+    42220: "Celo",
   };
 
   const chainName = CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`;

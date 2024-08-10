@@ -28,16 +28,30 @@ import { firestore } from "../components/firebaseConfig.js";
 const networkConfig = {
   // Example Chain IDs for Base and Sepolia
   8453: {
-    // Mainnet (as an example; replace with the correct ID for "base")
+    // BASE (as an example; replace with the correct ID for "base")
     factoryAddress: "0xe77045eEc064fE5E9B4a1E30A85282ADc9284957", //deprecated - deploy new one one base
     WETH_address: "0x4200000000000000000000000000000000000006",
-    explorerUrl: "https://basescan.org/",
+    explorerUrl: "https://base.blockscout.com/",
   },
   11155111: {
     // Sepolia Testnet Chain ID
     factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://eth-sepolia.blockscout.com/",
+  },
+
+  10: {
+    // OP Chain ID
+    factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8", //change
+    WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://optimism.blockscout.com/",
+  },
+
+  4710: {
+    // CELO Chain ID
+    factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8", //change
+    WETH_address: "0x471EcE3750Da237f93B8E339c536989b8978a438",
+    explorerUrl: "https://explorer.celo.org/mainnet/",
   },
 };
 

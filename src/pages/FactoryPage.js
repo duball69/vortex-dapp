@@ -36,6 +36,20 @@ const networkConfig = {
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://eth-sepolia.blockscout.com/",
   },
+
+  10: {
+    // OP Chain ID
+    factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8", //change
+    WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://optimism.blockscout.com/",
+  },
+
+  4710: {
+    // CELO Chain ID
+    factoryAddress: "0xD086861306DA949be5073c2fe20b195fc768AAC8", //change
+    WETH_address: "0x471EcE3750Da237f93B8E339c536989b8978a438",
+    explorerUrl: "https://explorer.celo.org/mainnet/",
+  },
 };
 
 const CHAIN_NAMES = {
@@ -43,6 +57,8 @@ const CHAIN_NAMES = {
   42161: "Arbitrum",
   8453: "Base",
   11155111: "Sepolia",
+  10: "Optimism",
+  42220: "Celo",
 };
 
 const sepoliaMainnet = {
@@ -76,6 +92,22 @@ const arbitrumMainnet = {
   rpcUrl: process.env.ARBITRUM_RPC_URL,
 };
 
+const optimismMainnet = {
+  chainId: 10,
+  name: "Optimism",
+  currency: "ETH",
+  explorerUrl: "https://optimism.blockscout.com/",
+  rpcUrl: process.env.OPTIMISM_RPC_URL,
+};
+
+const celoMainnet = {
+  chainId: 42220,
+  name: "Celo",
+  currency: "CELO",
+  explorerUrl: "https://explorer.celo.org/mainnet/",
+  rpcUrl: process.env.CELO_RPC_URL,
+};
+
 const metadata = {
   name: "Vortex Dapp",
   description:
@@ -97,7 +129,14 @@ const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
 
 const web3Modal = createWeb3Modal({
   ethersConfig,
-  chains: [sepoliaMainnet, arbitrumMainnet, baseMainnet, bscMainnet],
+  chains: [
+    sepoliaMainnet,
+    arbitrumMainnet,
+    baseMainnet,
+    bscMainnet,
+    optimismMainnet,
+    celoMainnet,
+  ],
   projectId,
   enableAnalytics: true,
 });
