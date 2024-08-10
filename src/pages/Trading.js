@@ -83,7 +83,7 @@ function Trading() {
           }}
         >
           <iframe
-            src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&info=1&trades=1&&theme=dark`}
+            src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&info=0&trades=1&&theme=dark`}
             style={{
               position: "absolute",
               width: "100%",
