@@ -1,5 +1,14 @@
-import React, { useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { firestore } from "../components/firebaseConfig";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./Trading.css"; // Import the CSS file
@@ -12,7 +21,56 @@ function Trading() {
     initialContractAddress
   );
   const [searchValue, setSearchValue] = useState(initialContractAddress);
+  const [tokenName, setTokenName] = useState(""); // State for token name
+  const [imageUrl, setImageUrl] = useState(""); // State for token image
+  const [price, setPrice] = useState(null); // State for token price
+  const [marketCap, setMarketCap] = useState(null); // State for market cap
+  const [volume, setVolume] = useState(null); // State for volume
+  const [supply, setSupply] = useState(null); // State for token supply
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch token data (assuming token data is in Firebase)
+    const fetchTokenData = async () => {
+      try {
+        // Fetch token info from Firebase
+        const q = query(
+          collection(firestore, "tokens"),
+          where("address", "==", contractAddress)
+        );
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          setTokenName(data.name); // Assuming token data has a name field
+          setImageUrl(data.imageUrl); // Set the token image URL
+          setSupply(data.supply); // Set the token supply (ensure this field exists in your data)
+        });
+
+        // Fetch price and volume from DexScreener API
+        const response = await fetch(
+          `https://api.dexscreener.com/latest/dex/tokens/${contractAddress}`
+        );
+        const data = await response.json();
+        const pairData = data.pairs && data.pairs[0];
+
+        if (pairData) {
+          setPrice(pairData.priceUsd); // Set the token price (USD)
+          setVolume(pairData.volume.h24); // Set the volume (24h)
+        }
+      } catch (error) {
+        console.error("Error fetching token data:", error);
+      }
+    };
+
+    fetchTokenData();
+  }, [contractAddress]);
+
+  useEffect(() => {
+    if (price && supply) {
+      setMarketCap(price * supply); // Calculate market cap
+    }
+  }, [price, supply]);
 
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
@@ -27,6 +85,47 @@ function Trading() {
   return (
     <div>
       <Header />
+
+      {/* Token Name and Image */}
+      <div style={{ textAlign: "center", marginTop: "20px", color: "#ffffff" }}>
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt={tokenName}
+            style={{
+              width: "100px",
+              height: "100px",
+              borderRadius: "50%",
+              marginBottom: "10px",
+            }}
+          />
+        )}
+        <h1>{tokenName ? `${tokenName}` : "Loading..."}</h1>
+
+        {/* Market Cap and Volume Box */}
+        {marketCap !== null && volume !== null && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "20px",
+              padding: "10px",
+
+              color: "#ffffff",
+              gap: "20px",
+            }}
+          >
+            <div>
+              <h3 style={{ margin: "0" }}>Market Cap:</h3>
+              <p style={{ margin: "0" }}>${marketCap.toFixed(2)}</p>
+            </div>
+            <div>
+              <h3 style={{ margin: "0" }}>Volume (24h):</h3>
+              <p style={{ margin: "0" }}>${volume.toFixed(2)}</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Search Bar */}
       <div style={{ padding: "20px", textAlign: "center" }}>
