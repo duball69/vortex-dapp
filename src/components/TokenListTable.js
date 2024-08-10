@@ -12,8 +12,6 @@ function TokensListTable({ limit }) {
   const [sortBy, setSortBy] = useState("date");
   const [selectedChain, setSelectedChain] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const tokensPerPage = 20; // Number of tokens to display per page
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -28,22 +26,55 @@ function TokensListTable({ limit }) {
           };
         });
 
-        // Fetch market cap and volume data from CoinMarketCap API
+        // Fetch market cap, volume, and price data from Bitquery API
         const updatedTokensArray = await Promise.all(
           tokensArray.map(async (token) => {
-            const url = `https://pro-api.coinmarketcap.com/v4/dex/pairs/quotes/latest?contract_address=${token.address}&network_slug=${token.chain}`;
-            const response = await axios.get(url, {
-              headers: {
-                "X-CMC_PRO_API_KEY": "167adebf-5e11-48b9-8358-10c2aa61ee01",
-              },
-            });
+            const query = `
+              query {
+                ethereum(network: ${token.chain.toLowerCase()}) {
+                  dexTrades(
+                    options: {limit: 1, desc: ["block.timestamp.time"]}
+                    baseCurrency: {is: "${token.address}"}
+                    quoteCurrency: {is: "0x0000000000000000000000000000000000000000"}
+                  ) {
+                    baseCurrency {
+                      symbol
+                    }
+                    quoteCurrency {
+                      symbol
+                    }
+                    tradeAmount(in: USD)
+                    tradeAmount
+                    price(in: USD)
+                    block {
+                      timestamp {
+                        time
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            const response = await axios.post(
+              "https://graphql.bitquery.io",
+              { query },
+              {
+                headers: {
+                  "X-API-KEY": "BITQUERY_KEY_1",
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
-            const marketData = response.data.data[token.address];
+            const marketData = response.data.data.ethereum.dexTrades[0];
 
             return {
               ...token,
-              marketCap: marketData.quote.USD.fully_diluted_value,
-              volume24h: marketData.quote.USD.volume_24h,
+              marketCap: marketData.price
+                ? marketData.price * marketData.tradeAmount
+                : null,
+              volume24h: marketData.tradeAmount,
+              price: marketData.price,
             };
           })
         );
@@ -91,10 +122,6 @@ function TokensListTable({ limit }) {
     setShowFilterOptions(false);
   };
 
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   if (loading) return <p>Loading tokens...</p>;
   if (!tokens.length) return <p>No tokens found.</p>;
 
@@ -103,14 +130,9 @@ function TokensListTable({ limit }) {
       ? tokens
       : tokens.filter((token) => token.chain === selectedChain);
 
-  // Pagination logic
-  const indexOfLastToken = currentPage * tokensPerPage;
-  const indexOfFirstToken = indexOfLastToken - tokensPerPage;
-  const currentTokens = filteredTokens.slice(
-    indexOfFirstToken,
-    indexOfLastToken
-  );
-  const totalPages = Math.ceil(filteredTokens.length / tokensPerPage);
+  const displayedTokens = limit
+    ? filteredTokens.slice(0, limit)
+    : filteredTokens;
 
   return (
     <div className="tokens-container">
@@ -167,12 +189,13 @@ function TokensListTable({ limit }) {
             <th>Created</th>
             <th>Market Cap</th>
             <th>24h Volume</th>
+            <th>Price</th>
             <th>Socials</th>
             <th>Trade</th>
           </tr>
         </thead>
         <tbody>
-          {currentTokens.map((token) => (
+          {displayedTokens.map((token) => (
             <tr key={token.id}>
               <td>
                 {token.imageUrl && (
@@ -202,6 +225,9 @@ function TokensListTable({ limit }) {
                   : "N/A"}
               </td>
               <td>
+                {token.price ? `$${token.price.toLocaleString()}` : "N/A"}
+              </td>
+              <td>
                 {token.twitter && (
                   <a
                     href={`https://${token.twitter}`}
@@ -226,17 +252,6 @@ function TokensListTable({ limit }) {
           ))}
         </tbody>
       </table>
-      <div className="pagination">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index + 1}
-            onClick={() => paginate(index + 1)}
-            className={currentPage === index + 1 ? "active" : ""}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
