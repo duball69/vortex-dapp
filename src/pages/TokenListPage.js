@@ -1,12 +1,12 @@
 import React from "react";
 import TokenListTable from "../components/TokenListTable.js";
-import Header from "../components/Header.js";
+import Header2 from "../components/Header2.js";
 import Footer from "../components/Footer.js";
 
 function TokensPage() {
   return (
     <div>
-      <Header />
+      <Header2 />
       <TokenListTable />
       <Footer />
     </div>

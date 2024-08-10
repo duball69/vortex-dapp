@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
-import { FaTwitter, FaXTwitter, FaTelegram, FaGlobe } from "react-icons/fa6";
+import { FaTwitter, FaXTwitter } from "react-icons/fa6";
 import axios from "axios";
 import "./TokenListTable.css";
 
@@ -12,6 +12,9 @@ function TokensListTable({ limit }) {
   const [sortBy, setSortBy] = useState("date");
   const [selectedChain, setSelectedChain] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const tokensPerPage = 10;
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -26,66 +29,53 @@ function TokensListTable({ limit }) {
           };
         });
 
-        // Fetch market cap, volume, and price data from Bitquery API
+        // Fetch price, market cap, and volume data from DEX Screener API
         const updatedTokensArray = await Promise.all(
           tokensArray.map(async (token) => {
-            const query = `
-              query {
-                ethereum(network: ${token.chain.toLowerCase()}) {
-                  dexTrades(
-                    options: {limit: 1, desc: ["block.timestamp.time"]}
-                    baseCurrency: {is: "${token.address}"}
-                    quoteCurrency: {is: "0x0000000000000000000000000000000000000000"}
-                  ) {
-                    baseCurrency {
-                      symbol
-                    }
-                    quoteCurrency {
-                      symbol
-                    }
-                    tradeAmount(in: USD)
-                    tradeAmount
-                    price(in: USD)
-                    block {
-                      timestamp {
-                        time
-                      }
-                    }
-                  }
-                }
-              }
-            `;
-            const response = await axios.post(
-              "https://graphql.bitquery.io",
-              { query },
-              {
-                headers: {
-                  "X-API-KEY": "BITQUERY_KEY_1",
-                  "Content-Type": "application/json",
-                },
-              }
-            );
+            try {
+              const response = await axios.get(
+                `https://api.dexscreener.com/latest/dex/tokens/${token.address}`
+              );
 
-            const marketData = response.data.data.ethereum.dexTrades[0];
+              const pairData = response.data.pairs
+                ? response.data.pairs[0]
+                : null;
+              const price = pairData?.priceUsd || "N/A";
+              const marketCap =
+                price !== "N/A" && token.supply
+                  ? (price * token.supply).toFixed(2)
+                  : "N/A";
 
-            return {
-              ...token,
-              marketCap: marketData.price
-                ? marketData.price * marketData.tradeAmount
-                : null,
-              volume24h: marketData.tradeAmount,
-              price: marketData.price,
-            };
+              return {
+                ...token,
+                price,
+                volume24h: pairData?.volume.h24 || "N/A",
+                marketCap,
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching data for token ${token.address}:`,
+                error
+              );
+              return {
+                ...token,
+                price: "N/A",
+                volume24h: "N/A",
+                marketCap: "N/A",
+              };
+            }
           })
         );
 
+        // Sorting tokens by date (newest to oldest) by default
         const sortedTokens = updatedTokensArray.sort(
           (a, b) => b.timestamp - a.timestamp
         );
+
         setTokens(sortedTokens);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching tokens or market data:", error);
+        console.error("Error fetching tokens:", error);
         setLoading(false);
       }
     };
@@ -115,11 +105,21 @@ function TokensListTable({ limit }) {
     setTokens(sorted);
     setSortBy(by);
     setSortOrder(order);
+    setCurrentPage(1); // Reset to the first page when sorting
   };
 
   const filterByChain = (chain) => {
     setSelectedChain(chain);
     setShowFilterOptions(false);
+    setCurrentPage(1); // Reset to the first page when filtering
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
   if (loading) return <p>Loading tokens...</p>;
@@ -130,9 +130,12 @@ function TokensListTable({ limit }) {
       ? tokens
       : tokens.filter((token) => token.chain === selectedChain);
 
-  const displayedTokens = limit
-    ? filteredTokens.slice(0, limit)
-    : filteredTokens;
+  const displayedTokens = filteredTokens.slice(
+    (currentPage - 1) * tokensPerPage,
+    currentPage * tokensPerPage
+  );
+
+  const totalPages = Math.ceil(filteredTokens.length / tokensPerPage);
 
   return (
     <div className="tokens-container">
@@ -145,20 +148,6 @@ function TokensListTable({ limit }) {
           }
         >
           Sort by {sortOrder === "newest" ? "Oldest" : "Newest"} ↓
-        </button>
-        <button
-          onClick={() =>
-            sortTokens("marketCap", sortOrder === "desc" ? "asc" : "desc")
-          }
-        >
-          Sort by Market Cap {sortOrder === "desc" ? "↓" : "↑"}
-        </button>
-        <button
-          onClick={() =>
-            sortTokens("volume", sortOrder === "desc" ? "asc" : "desc")
-          }
-        >
-          Sort by Volume {sortOrder === "desc" ? "↓" : "↑"}
         </button>
         <div className="filter-container">
           <button onClick={() => setShowFilterOptions(!showFilterOptions)}>
@@ -215,17 +204,19 @@ function TokensListTable({ limit }) {
                 {token.timestamp ? token.timestamp.toLocaleDateString() : "N/A"}
               </td>
               <td>
-                {token.marketCap
+                {token.marketCap !== "N/A"
                   ? `$${token.marketCap.toLocaleString()}`
                   : "N/A"}
               </td>
               <td>
-                {token.volume24h
+                {token.volume24h !== "N/A"
                   ? `$${token.volume24h.toLocaleString()}`
                   : "N/A"}
               </td>
               <td>
-                {token.price ? `$${token.price.toLocaleString()}` : "N/A"}
+                {token.price !== "N/A"
+                  ? `$${token.price.toLocaleString()}`
+                  : "N/A"}
               </td>
               <td>
                 {token.twitter && (
@@ -252,6 +243,25 @@ function TokensListTable({ limit }) {
           ))}
         </tbody>
       </table>
+      <div className="pagination">
+        <button
+          className="page-button"
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+        >
+          ← Previous
+        </button>
+        <span className="page-info">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="page-button"
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+        >
+          Next →
+        </button>
+      </div>
     </div>
   );
 }

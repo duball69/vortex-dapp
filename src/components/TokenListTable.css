@@ -333,3 +333,32 @@ h3 {
   height: 15px;
  
 }
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  
+  .page-button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 10px;
+  }
+  
+ 
+  .page-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .page-info {
+    font-size: 16px;
+  }
+  
