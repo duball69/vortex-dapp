@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "./Trading.css"; // Import the CSS file
+
+import { FaTelegramPlane, FaTwitter, FaGlobe } from "react-icons/fa"; // Import social icons
 
 function Trading() {
   const { chain: initialChain, contractAddress: initialContractAddress } =
@@ -23,10 +18,10 @@ function Trading() {
   const [searchValue, setSearchValue] = useState(initialContractAddress);
   const [tokenName, setTokenName] = useState(""); // State for token name
   const [imageUrl, setImageUrl] = useState(""); // State for token image
-  const [price, setPrice] = useState(null); // State for token price
-  const [marketCap, setMarketCap] = useState(null); // State for market cap
-  const [volume, setVolume] = useState(null); // State for volume
-  const [supply, setSupply] = useState(null); // State for token supply
+  const [website, setWebsite] = useState(""); // State for website link
+  const [telegram, setTelegram] = useState(""); // State for telegram link
+  const [twitter, setTwitter] = useState(""); // State for X link
+  const [showInfo, setShowInfo] = useState(false); // State to toggle between chart and info
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,20 +39,10 @@ function Trading() {
           const data = doc.data();
           setTokenName(data.name); // Assuming token data has a name field
           setImageUrl(data.imageUrl); // Set the token image URL
-          setSupply(data.supply); // Set the token supply (ensure this field exists in your data)
+          setWebsite(data.website); // Set the website link
+          setTelegram(data.telegram); // Set the Telegram link
+          setTwitter(data.twitter); // Set the X (Twitter) link
         });
-
-        // Fetch price and volume from DexScreener API
-        const response = await fetch(
-          `https://api.dexscreener.com/latest/dex/tokens/${contractAddress}`
-        );
-        const data = await response.json();
-        const pairData = data.pairs && data.pairs[0];
-
-        if (pairData) {
-          setPrice(pairData.priceUsd); // Set the token price (USD)
-          setVolume(pairData.volume.h24); // Set the volume (24h)
-        }
       } catch (error) {
         console.error("Error fetching token data:", error);
       }
@@ -65,12 +50,6 @@ function Trading() {
 
     fetchTokenData();
   }, [contractAddress]);
-
-  useEffect(() => {
-    if (price && supply) {
-      setMarketCap(price * supply); // Calculate market cap
-    }
-  }, [price, supply]);
 
   const handleSearchChange = (e) => {
     setSearchValue(e.target.value);
@@ -80,6 +59,10 @@ function Trading() {
     e.preventDefault();
     setContractAddress(searchValue);
     navigate(`/trading/${chain}/${searchValue}`);
+  };
+
+  const toggleInfo = () => {
+    setShowInfo(!showInfo);
   };
 
   return (
@@ -102,29 +85,46 @@ function Trading() {
         )}
         <h1>{tokenName ? `${tokenName}` : "Loading..."}</h1>
 
-        {/* Market Cap and Volume Box */}
-        {marketCap !== null && volume !== null && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "20px",
-              padding: "10px",
-
-              color: "#ffffff",
-              gap: "20px",
-            }}
-          >
-            <div>
-              <h3 style={{ margin: "0" }}>Market Cap:</h3>
-              <p style={{ margin: "0" }}>${marketCap.toFixed(2)}</p>
-            </div>
-            <div>
-              <h3 style={{ margin: "0" }}>Volume (24h):</h3>
-              <p style={{ margin: "0" }}>${volume.toFixed(2)}</p>
-            </div>
-          </div>
-        )}
+        {/* Social Media Icons */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
+            gap: "20px",
+            color: "#ffffff",
+          }}
+        >
+          {website && (
+            <a
+              href={website.startsWith("http") ? website : `http://${website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaGlobe size={20} color="#ffffff" />
+            </a>
+          )}
+          {telegram && (
+            <a
+              href={
+                telegram.startsWith("http") ? telegram : `https://${telegram}`
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaTelegramPlane size={20} color="#ffffff" />
+            </a>
+          )}
+          {twitter && (
+            <a
+              href={twitter.startsWith("http") ? twitter : `https://${twitter}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaTwitter size={20} color="#ffffff" />
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -171,43 +171,56 @@ function Trading() {
           padding: "20px",
         }}
       >
-        {/* DexScreener Embed (Left, 70% width) */}
-        <div
-          style={{
-            flex: "0 0 70%",
-            marginRight: "10px",
-            position: "relative",
-            height: "660px",
-            minWidth: "300px",
-          }}
-        >
-          <iframe
-            src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&info=0&trades=1&&theme=dark`}
+        {/* Left Section (DexScreener) */}
+        <div style={{ flex: "0 0 70%", marginRight: "10px" }}>
+          {/* Toggle Button (Left-aligned above the iframe) */}
+
+          {/* DexScreener Embed */}
+          <div
             style={{
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-              top: 0,
-              left: 0,
-              border: "0",
-              borderRadius: "20px",
-              overflow: "hidden",
+              position: "relative",
+              height: "660px",
+              minWidth: "300px",
             }}
-            allowFullScreen
-          />
+          >
+            <iframe
+              src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&info=${
+                showInfo ? 1 : 0
+              }&trades=1&theme=dark`}
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                top: 0,
+                left: 0,
+                border: "0",
+                borderRadius: "20px",
+                overflow: "hidden",
+              }}
+              allowFullScreen
+            />
+          </div>
+          <div style={{ textAlign: "left", marginBottom: "10px" }}>
+            <button
+              onClick={toggleInfo}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#333",
+                color: "#fff",
+                borderRadius: "10px",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              {showInfo ? "Show Chart" : "Show Info"}
+            </button>
+          </div>
         </div>
 
-        {/* Uniswap Embed (Right, 30% width) */}
-        <div
-          style={{
-            flex: "0 0 30%",
-            marginLeft: "10px",
-            minWidth: "300px",
-            height: "660px",
-          }}
-        >
+        {/* Right Section (Uniswap) */}
+        <div style={{ flex: "0 0 30%", marginLeft: "10px" }}>
           <iframe
-            src={`https://app.uniswap.org/swap?chain=${chain}&theme=dark&outputCurrency=${contractAddress}&forceNetwork=${initialChain}`}
+            src={`https://app.uniswap.org/swap?chain=${chain}&theme=dark&inputCurrency=eth&outputCurrency=${contractAddress}&forceNetwork=${initialChain}`}
             height="660px"
             width="100%"
             style={{
