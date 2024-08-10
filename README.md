@@ -2,6 +2,11 @@
 
 Vortex is a rev-sharing token launcher platform designed to simplify the launch of ERC20 tokens by providing first-block initial liquidity lending on EVM-compatible blockchains. With Vortex, users can create a token and have it instantly live and tradable on Uniswap with initial liquidity provided by stakers, with 2 clicks.
 
+## Test Vortex
+
+Vortex Dapp is currently live on Sepolia Testnet. You can try it here: [vortexdapp.com](https://vortexdapp.com)
+
+
 ## Features
 
 - **Multi-Chain Support**: Operate on BSC, Arbitrum, Base, Sepolia, and more. (Currently only live on Sepolia)
