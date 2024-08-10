@@ -178,7 +178,6 @@ function TokensListTable({ limit }) {
             <th>Created</th>
             <th>Market Cap</th>
             <th>24h Volume</th>
-            <th>Price</th>
             <th>Socials</th>
             <th>Trade</th>
           </tr>
@@ -211,11 +210,6 @@ function TokensListTable({ limit }) {
               <td>
                 {token.volume24h !== "N/A"
                   ? `$${token.volume24h.toLocaleString()}`
-                  : "N/A"}
-              </td>
-              <td>
-                {token.price !== "N/A"
-                  ? `$${token.price.toLocaleString()}`
                   : "N/A"}
               </td>
               <td>
