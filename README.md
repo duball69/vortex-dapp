@@ -6,13 +6,25 @@ Vortex is a rev-sharing token launcher platform designed to simplify the launch 
 
 Vortex Dapp is currently live on Sepolia Testnet. You can try it here: [vortexdapp.com](https://vortexdapp.com)
 
+You can also try it on Base and Optimism, although current lending is 0.2$ per token created, until our fundaraise. You can also add funds to the pool, by staking ETH on your preferred chain.
+
 
 ## Features
 
-- **Multi-Chain Support**: Operate on BSC, Arbitrum, Base, Sepolia, and more. (Currently only live on Sepolia)
-- **Staking**: Stake your ETH to contribute to the Vortex LP Lending Pool and earn 40% of the trading fees of tokens created through Vortex.
-- **Token Creation**: Launch new tokens with initial liquidity without costs and without coding.
-- **Trading**: Trade tokens created on the Vortex platform.
+- **Multi-Chain Support**: Vortex Dapp is optimized to work on Base, OP, Arbitrum, BSC, Sepolia, and others. (Currently only live on Sepolia)
+- **Token Creation**: [Launch](launch.vortexdapp.com/factory) new tokens with initial liquidity without costs and without coding.
+- **Staking**: [Stake](launch.vortexdapp.com/stake) your ETH to contribute to the Vortex LP Lending Pool and earn 30% of the trading fees of tokens created through Vortex.
+- **Trading**: [Trade](launch.vortexdapp.com/trade) tokens created on the Vortex platform.
+
+
+### Invest
+
+If you are interested in seeing Vortex Dapp coming to life and invest on us, feel free to DM one of our cofounders [dcaldeirao1](t.me/dcaldeirao1) or [duball69](duball69).
+
+
+### Documentation
+
+Find more information about Vortex Dapp at our [official docs](docs.vortexdapp.com).
 
 
 ### Prerequisites
@@ -25,13 +37,21 @@ If you want to fork our dapp to test it out, ensure you have the following insta
 - Ethers V6
 - A valid Alchemy API Key
 - WalletConnect API Key
+- Imgur API Key
+
 
 ### Installation
 
 1. Clone the repository:
    ```sh
    git clone https://github.com/duball69/vortex-dapp.git
-   cd vortex-dapp
+2.  ```sh
+    cd vortex-dapp
+3.  ```sh
+    npm install
+4. add APIs on an .env file
+5.  ```sh
+    npm start
 
 
 ## Authors
