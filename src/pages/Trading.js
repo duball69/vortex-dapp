@@ -108,7 +108,7 @@ function Trading() {
           }}
         >
           <iframe
-            src={`https://app.uniswap.org/swap?theme=dark&outputCurrency=${contractAddress}&amp;chain=base`}
+            src={`https://app.uniswap.org/swap?chain=${chain}&theme=dark&outputCurrency=${contractAddress}&forceNetwork=${initialChain}`}
             height="660px"
             width="100%"
             style={{
