@@ -6,7 +6,7 @@ Vortex is a rev-sharing token launcher platform designed to simplify the launch 
 
 Vortex Dapp is currently live on Sepolia Testnet. You can try it here: [vortexdapp.com](https://vortexdapp.com)
 
-You can also try it on Base and Optimism, although current lending is 0.2$ per token created, until our fundaraise. You can also add funds to the pool, by staking ETH on your preferred chain.
+You can also try it on Base and Optimism, although current initial liquidity pool is set with a symbolic amount per token created, until our fundaraise. You can also add funds to the pool, by staking ETH on your preferred chain.
 
 
 ## Features
