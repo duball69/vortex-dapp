@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
 import { FaTwitter, FaXTwitter, FaTelegram, FaGlobe } from "react-icons/fa6";
+import axios from "axios";
 import "./TokenListTable.css";
 
 function TokensListTable({ limit }) {
@@ -11,6 +12,8 @@ function TokensListTable({ limit }) {
   const [sortBy, setSortBy] = useState("date");
   const [selectedChain, setSelectedChain] = useState("all");
   const [showFilterOptions, setShowFilterOptions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const tokensPerPage = 20; // Number of tokens to display per page
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -25,13 +28,33 @@ function TokensListTable({ limit }) {
           };
         });
 
-        const sortedTokens = tokensArray.sort(
+        // Fetch market cap and volume data from CoinMarketCap API
+        const updatedTokensArray = await Promise.all(
+          tokensArray.map(async (token) => {
+            const url = `https://pro-api.coinmarketcap.com/v4/dex/pairs/quotes/latest?contract_address=${token.address}&network_slug=${token.chain}`;
+            const response = await axios.get(url, {
+              headers: {
+                "X-CMC_PRO_API_KEY": "167adebf-5e11-48b9-8358-10c2aa61ee01",
+              },
+            });
+
+            const marketData = response.data.data[token.address];
+
+            return {
+              ...token,
+              marketCap: marketData.quote.USD.fully_diluted_value,
+              volume24h: marketData.quote.USD.volume_24h,
+            };
+          })
+        );
+
+        const sortedTokens = updatedTokensArray.sort(
           (a, b) => b.timestamp - a.timestamp
         );
         setTokens(sortedTokens);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching tokens:", error);
+        console.error("Error fetching tokens or market data:", error);
         setLoading(false);
       }
     };
@@ -46,14 +69,14 @@ function TokensListTable({ limit }) {
           return order === "newest"
             ? b.timestamp - a.timestamp
             : a.timestamp - b.timestamp;
-        case "website":
-          return order === "asc"
-            ? (a.website ? 1 : 0) - (b.website ? 1 : 0)
-            : (b.website ? 1 : 0) - (a.website ? 1 : 0);
-        case "telegram":
-          return order === "asc"
-            ? (a.telegram ? 1 : 0) - (b.telegram ? 1 : 0)
-            : (b.telegram ? 1 : 0) - (a.telegram ? 1 : 0);
+        case "marketCap":
+          return order === "desc"
+            ? b.marketCap - a.marketCap
+            : a.marketCap - b.marketCap;
+        case "volume":
+          return order === "desc"
+            ? b.volume24h - a.volume24h
+            : a.volume24h - b.volume24h;
         default:
           return 0;
       }
@@ -65,7 +88,11 @@ function TokensListTable({ limit }) {
 
   const filterByChain = (chain) => {
     setSelectedChain(chain);
-    setShowFilterOptions(false); // Hide filter options after selecting a chain
+    setShowFilterOptions(false);
+  };
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   if (loading) return <p>Loading tokens...</p>;
@@ -76,9 +103,14 @@ function TokensListTable({ limit }) {
       ? tokens
       : tokens.filter((token) => token.chain === selectedChain);
 
-  const displayedTokens = limit
-    ? filteredTokens.slice(0, limit)
-    : filteredTokens;
+  // Pagination logic
+  const indexOfLastToken = currentPage * tokensPerPage;
+  const indexOfFirstToken = indexOfLastToken - tokensPerPage;
+  const currentTokens = filteredTokens.slice(
+    indexOfFirstToken,
+    indexOfLastToken
+  );
+  const totalPages = Math.ceil(filteredTokens.length / tokensPerPage);
 
   return (
     <div className="tokens-container">
@@ -90,7 +122,21 @@ function TokensListTable({ limit }) {
             sortTokens("date", sortOrder === "newest" ? "oldest" : "newest")
           }
         >
-          Sort by {sortOrder === "newest" ? "Oldest" : "Newest" ? "↓" : "↑"}
+          Sort by {sortOrder === "newest" ? "Oldest" : "Newest"} ↓
+        </button>
+        <button
+          onClick={() =>
+            sortTokens("marketCap", sortOrder === "desc" ? "asc" : "desc")
+          }
+        >
+          Sort by Market Cap {sortOrder === "desc" ? "↓" : "↑"}
+        </button>
+        <button
+          onClick={() =>
+            sortTokens("volume", sortOrder === "desc" ? "asc" : "desc")
+          }
+        >
+          Sort by Volume {sortOrder === "desc" ? "↓" : "↑"}
         </button>
         <div className="filter-container">
           <button onClick={() => setShowFilterOptions(!showFilterOptions)}>
@@ -104,19 +150,12 @@ function TokensListTable({ limit }) {
               <button onClick={() => filterByChain("BSC")}>BSC</button>
               <button onClick={() => filterByChain("Optimism")}>OP</button>
               <button onClick={() => filterByChain("Arbitrum")}>
-                Arbitrum{" "}
+                Arbitrum
               </button>
               <button onClick={() => filterByChain("Blast")}>Blast</button>
             </div>
           )}
         </div>
-        <button
-          onClick={() =>
-            sortTokens("website", sortOrder === "asc" ? "desc" : "asc")
-          }
-        >
-          Sort by Website {sortOrder === "asc" ? "↓" : "↑"}
-        </button>
       </div>
       <table className="tokens-table">
         <thead>
@@ -126,12 +165,14 @@ function TokensListTable({ limit }) {
             <th>Contract Address</th>
             <th>Chain</th>
             <th>Created</th>
+            <th>Market Cap</th>
+            <th>24h Volume</th>
             <th>Socials</th>
             <th>Trade</th>
           </tr>
         </thead>
         <tbody>
-          {displayedTokens.map((token) => (
+          {currentTokens.map((token) => (
             <tr key={token.id}>
               <td>
                 {token.imageUrl && (
@@ -150,7 +191,16 @@ function TokensListTable({ limit }) {
               <td>
                 {token.timestamp ? token.timestamp.toLocaleDateString() : "N/A"}
               </td>
-
+              <td>
+                {token.marketCap
+                  ? `$${token.marketCap.toLocaleString()}`
+                  : "N/A"}
+              </td>
+              <td>
+                {token.volume24h
+                  ? `$${token.volume24h.toLocaleString()}`
+                  : "N/A"}
+              </td>
               <td>
                 {token.twitter && (
                   <a
@@ -162,7 +212,6 @@ function TokensListTable({ limit }) {
                   </a>
                 )}
               </td>
-
               <td className="trade-button-cell">
                 <button
                   className="trade-button"
@@ -177,6 +226,17 @@ function TokensListTable({ limit }) {
           ))}
         </tbody>
       </table>
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => paginate(index + 1)}
+            className={currentPage === index + 1 ? "active" : ""}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
