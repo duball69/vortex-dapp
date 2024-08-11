@@ -17,26 +17,56 @@ import {
   gt,
 } from "firebase/firestore";
 
-const STAKING_POOL_ADDRESS = "0x265C0d2EFF35A6A8DfEBFa8Db9Ff1B0E69Cd364b";
-//sepolia 0xAF7be3c33b75d7d6e104098781D782f854d3c764
-
 const CHAIN_NAMES = {
   56: "BSC",
   42161: "Arbitrum",
   8453: "Base",
   11155111: "Sepolia",
+  10: "Optimism",
+  42220: "Celo",
 };
 
 const networkConfig = {
+  //base
   8453: {
-    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    stakingAddress: "0x265C0d2EFF35A6A8DfEBFa8Db9Ff1B0E69Cd364b",
     WETH_address: "0x4200000000000000000000000000000000000006",
-    explorerUrl: "https://basescan.org",
+    explorerUrl: "https://base.blockscout.com/",
   },
+
+  //bsc
+  56: {
+    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    WETH_address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", //WBNB
+    explorerUrl: "https://bscscan.com/",
+  },
+
+  //sepolia
   11155111: {
     stakingAddress: "0xAF7be3c33b75d7d6e104098781D782f854d3c764",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
+  },
+
+  //arbitrum
+  42161: {
+    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    WETH_address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    explorerUrl: "https://arbitrum.blockscout.com/",
+  },
+
+  //optimism
+  10: {
+    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    WETH_address: "0x4200000000000000000000000000000000000006",
+    explorerUrl: "https://optimism.blockscout.com/",
+  },
+
+  //celo
+  42220: {
+    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    WETH_address: "0x471EcE3750Da237f93B8E339c536989b8978a438", //CELO
+    explorerUrl: "https://explorer.celo.org/mainnet/",
   },
 };
 
@@ -60,9 +90,9 @@ const StakingPage = () => {
   const [loadingClaim, setLoadingClaim] = useState(false);
   const [apy, setApy] = useState("Calculating...");
   const explorerUrl =
-    networkConfig[chainId]?.explorerUrl || "https://etherscan.io";
+    networkConfig[chainId]?.explorerUrl || "https://base.blockscout.com/";
   const StakingChainAddress =
-    networkConfig[chainId]?.StakingChainAddress || "DefaultFactoryAddress";
+    networkConfig[chainId]?.stakingAddress || "DefaultFactoryAddress";
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -78,7 +108,7 @@ const StakingPage = () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const stakingPoolContract = new ethers.Contract(
-          STAKING_POOL_ADDRESS,
+          StakingChainAddress,
           SimpleStakingJson.abi,
           signer
         );
@@ -111,7 +141,7 @@ const StakingPage = () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const stakingPoolContract = new ethers.Contract(
-          STAKING_POOL_ADDRESS,
+          StakingChainAddress,
           SimpleStakingJson.abi,
           signer
         );
@@ -201,7 +231,7 @@ const StakingPage = () => {
       return;
     }
 
-    if (!ethers.isAddress(STAKING_POOL_ADDRESS)) {
+    if (!ethers.isAddress(StakingChainAddress)) {
       setErrorMessage("Invalid staking pool address.");
       return;
     }
@@ -211,7 +241,7 @@ const StakingPage = () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const stakingPoolContract = new ethers.Contract(
-        STAKING_POOL_ADDRESS,
+        StakingChainAddress,
         SimpleStakingJson.abi,
         signer
       );
@@ -279,7 +309,7 @@ const StakingPage = () => {
       return;
     }
 
-    if (!ethers.isAddress(STAKING_POOL_ADDRESS)) {
+    if (!ethers.isAddress(StakingChainAddress)) {
       setErrorMessage("Invalid staking pool address.");
       return;
     }
@@ -289,7 +319,7 @@ const StakingPage = () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const stakingPoolContract = new ethers.Contract(
-        STAKING_POOL_ADDRESS,
+        StakingChainAddress,
         SimpleStakingJson.abi,
         signer
       );
@@ -347,7 +377,7 @@ const StakingPage = () => {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const stakingContract = new ethers.Contract(
-      STAKING_POOL_ADDRESS,
+      StakingChainAddress,
       SimpleStakingJson.abi,
       signer
     );
@@ -379,7 +409,7 @@ const StakingPage = () => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const stakingPoolContract = new ethers.Contract(
-        STAKING_POOL_ADDRESS,
+        StakingChainAddress,
         SimpleStakingJson.abi,
         signer
       );
@@ -406,7 +436,7 @@ const StakingPage = () => {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = provider.getSigner();
     const stakingContract = new ethers.Contract(
-      STAKING_POOL_ADDRESS,
+      StakingChainAddress,
       SimpleStakingJson.abi,
       signer
     );

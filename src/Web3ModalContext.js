@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { ethers } from "ethers";
 import { createWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react";
 
 const Web3ModalContext = createContext();
@@ -10,19 +9,13 @@ export const Web3ModalProvider = ({ children }) => {
     useWeb3ModalAccount(web3Modal);
 
   useEffect(() => {
-    const config = {
-      metadata: {
-        name: "Vortex Dapp",
-        description: "An EVM liquidity lender and token launcher",
-        url: "https://vortexdapp.com",
-        icons: ["https://vortexdapp.com/favicon.ico"],
-      },
-      enableEIP6963: true,
-      enableInjected: true,
-      enableCoinbase: false,
-      rpcUrl:
-        "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Ensure this matches your FactoryPage configuration
-      defaultChainId: 1,
+    // Define network configurations
+    const baseMainnet = {
+      chainId: 8453,
+      name: "Base",
+      currency: "ETH",
+      explorerUrl: "https://base.blockscout.com/",
+      rpcUrl: process.env.BASE_RPC_URL || "https://base.blockscout.com/", // Replace with your actual RPC URL
     };
 
     const sepoliaMainnet = {
@@ -30,18 +23,39 @@ export const Web3ModalProvider = ({ children }) => {
       name: "Sepolia",
       currency: "ETH",
       explorerUrl: "https://sepolia.etherscan.io/",
+      rpcUrl:
+        process.env.SEPOLIA_RPC_URL ||
+        "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0",
     };
 
-    const projectId = process.env.WALLETCONNECT_PROJECT_ID;
+    // Web3Modal configuration
+    const config = {
+      metadata: {
+        name: "Vortex Dapp",
+        description: "An EVM liquidity lender and token launcher",
+        url: "https://vortexdapp.com",
+        icons: ["https://vortexdapp.com/favicon.ico"],
+      },
+      enableEIP6963: true, // Enable MetaMask (EIP6963)
+      enableInjected: true, // Enable injected wallets (MetaMask, etc.)
+      enableCoinbase: true, // Enable Coinbase Wallet
+      defaultChainId: baseMainnet.chainId, // Set Base as the default chain
+    };
 
+    const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
+
+    // Initialize Web3Modal
     const initWeb3Modal = createWeb3Modal({
       config,
-      chains: [sepoliaMainnet],
+      chains: [baseMainnet, sepoliaMainnet], // Include Base as the first chain
       projectId,
       enableAnalytics: true,
     });
 
     setWeb3Modal(initWeb3Modal);
+
+    // Optional: Clear cached provider to avoid automatic reconnection to last used wallet
+    initWeb3Modal.clearCachedProvider();
   }, []);
 
   return (

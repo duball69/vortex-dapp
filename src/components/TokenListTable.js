@@ -122,7 +122,12 @@ function TokensListTable({ limit }) {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
-  if (loading) return <p>Loading tokens...</p>;
+  if (loading)
+    return (
+      <div className="loading-container">
+        <p>Loading tokens...</p>
+      </div>
+    );
   if (!tokens.length) return <p>No tokens found.</p>;
 
   const filteredTokens =
