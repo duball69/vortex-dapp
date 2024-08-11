@@ -5,7 +5,7 @@ const HowItWorks = () => {
   return (
     <div className="center-container">
       <div className="how-it-works">
-        <h2 className="titlefactory">How It Works</h2>
+        <h2 className="titlefactory">How Vortex Works</h2>
         <div className="steps-container">
           <div className="step-box">
             Connect your <br /> wallet.
