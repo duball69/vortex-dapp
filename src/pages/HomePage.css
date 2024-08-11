@@ -94,7 +94,7 @@ button.home-button:hover{
 
   @media (max-width: 768px) {
     .centered-content {
-      padding: 20px; /* Add padding to the container */
+      padding: 21px; /* Add padding to the container */
       text-align: center;
     }
   }

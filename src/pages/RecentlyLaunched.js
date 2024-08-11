@@ -29,7 +29,7 @@ function RecentlyLaunched() {
       open(); // Open the Web3Modal modal
       setError("");
     } catch (error) {
-      console.error("Error connecting wallet:", error);
+      console.error("Error connecting:", error);
     }
   }
 
