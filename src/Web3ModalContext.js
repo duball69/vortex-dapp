@@ -38,7 +38,7 @@ export const Web3ModalProvider = ({ children }) => {
       },
       enableEIP6963: true, // Enable MetaMask (EIP6963)
       enableInjected: true, // Enable injected wallets (MetaMask, etc.)
-      enableCoinbase: true, // Enable Coinbase Wallet
+      enableCoinbase: false, // Enable Coinbase Wallet
       defaultChainId: baseMainnet.chainId, // Set Base as the default chain
     };
 
