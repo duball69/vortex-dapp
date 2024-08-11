@@ -8,6 +8,8 @@ import RecentlyLaunched from "./pages/RecentlyLaunched";
 import FactoryPage from "./pages/FactoryPage";
 import AfterLaunch from "./pages/AfterLaunch";
 import TokensPage from "./pages/TokenListPage";
+import TokenMobPage from "./pages/TokenMobPage";
+
 import TokenBuyTrackerPage from "./pages/TokenBuyTrackerPage";
 import Trading from "./pages/Trading";
 import { Web3ModalProvider } from "./Web3ModalContext";
@@ -25,6 +27,7 @@ function App() {
           />
           <Route path="/recently" element={<RecentlyLaunched />} />
           <Route path="/tokens" element={<TokensPage />} />
+          <Route path="/tokenmob" element={<TokenMobPage />} />
           <Route path="/tracker" element={<TokenBuyTrackerPage />} />
           <Route path="/token/:contractAddress" element={<AfterLaunch />} />
           <Route

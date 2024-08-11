@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import "./Header.css";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import "./Header.css";
 
 function Header({ connectWallet, isConnected, chainId }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -18,6 +19,15 @@ function Header({ connectWallet, isConnected, chainId }) {
   };
 
   const chainName = CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <header>
@@ -52,7 +62,10 @@ function Header({ connectWallet, isConnected, chainId }) {
             <Link to="/staking" onClick={() => setIsOpen(false)}>
               Stake
             </Link>
-            <Link to="/tokens" onClick={() => setIsOpen(false)}>
+            <Link
+              to={isMobile ? "/tokensmob" : "/tokens"}
+              onClick={() => setIsOpen(false)}
+            >
               Trade
             </Link>
             <a

@@ -39,6 +39,9 @@ export const Web3ModalProvider = ({ children }) => {
       chains: [sepoliaMainnet],
       projectId,
       enableAnalytics: true,
+      explorerExcludedWalletIds: [
+        "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa",
+      ],
     });
 
     setWeb3Modal(initWeb3Modal);
