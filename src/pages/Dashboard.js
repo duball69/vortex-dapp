@@ -319,7 +319,7 @@ function DashboardPage() {
                     ? parseFloat(e.target.value).toFixed(4)
                     : "0.0000";
                   if (parseFloat(value) > 0.01) {
-                    value = "0.0100"; // Set to max value if it exceeds the limit
+                    value = "0.000005"; // Set to max value if it exceeds the limit
                   }
                   setTokenAmountToBuy(value);
                 }}
