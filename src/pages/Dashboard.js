@@ -221,7 +221,7 @@ function DashboardPage() {
       console.log("Tokens received: ", tokensReceived);
     } catch (error) {
       if (error.code === "ACTION_REJECTED") {
-        setErrorMessage("Transaction failed: User rejected the transaction.");
+        setErrorMessage("Transaction failed: User rejected transaction.");
       } else {
         console.error(error);
         setErrorMessage("Transaction failed, please try again.");
