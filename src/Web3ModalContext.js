@@ -19,7 +19,7 @@ export const Web3ModalProvider = ({ children }) => {
       },
       enableEIP6963: true, //metamask
       enableInjected: true, //metamask
-      enableCoinbase: false, //coinbase
+      enabl eCoinbase: false, //coinbase
       rpcUrl:
         "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Ensure this matches your FactoryPage configuration
       defaultChainId: 1,
