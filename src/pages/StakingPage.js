@@ -29,7 +29,7 @@ const CHAIN_NAMES = {
 const networkConfig = {
   //base
   8453: {
-    stakingAddress: "0x265C0d2EFF35A6A8DfEBFa8Db9Ff1B0E69Cd364b",
+    stakingAddress: "0xd0C3B626162359E41a8Fe1BB0810d38E00432479",
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://base.blockscout.com/",
   },
@@ -57,14 +57,14 @@ const networkConfig = {
 
   //optimism
   10: {
-    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    stakingAddress: "0x7AB122db3DD3f11bf0558caeFD9Bb2fA7CedEBee",
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://optimism.blockscout.com/",
   },
 
   //celo
   42220: {
-    stakingAddress: "0x4301B64C8b4239EfBEb5818F968d1cccf4a640E0",
+    stakingAddress: "0x7AB122db3DD3f11bf0558caeFD9Bb2fA7CedEBee",
     WETH_address: "0x471EcE3750Da237f93B8E339c536989b8978a438", //CELO
     explorerUrl: "https://explorer.celo.org/mainnet/",
   },

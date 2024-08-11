@@ -16,11 +16,11 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: process.env.ALCHEMY_SEPOLIA_ENDPOINT,
+      url: process.env.SEPOLIA_RPC_URL,
       accounts: [process.env.SEPOLIA_PRIVATE_KEY],
     },
     base: {
-      url: process.env.ALCHEMY_BASE_ENDPOINT,
+      url: process.env.BASE_RPC_URL,
       accounts: [process.env.SEPOLIA_PRIVATE_KEY],
     },
     op: {
