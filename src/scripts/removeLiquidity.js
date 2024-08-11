@@ -6,7 +6,7 @@ async function main() {
   console.log("Removing liquidity with the account:", deployer.address);
 
   const factoryAddress = "0x3168e66eC3fa850C9B24E5e39890Bc29F6159071";
-  const tokenId = 16391; // The token ID of the liquidity position
+  const t okenId = 16391; // The token ID of the liquidity position
 
   const Factory = await hre.ethers.getContractFactory("MyFactory");
   const factory = await Factory.attach(factoryAddress);

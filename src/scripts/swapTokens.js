@@ -3,7 +3,7 @@ async function main() {
 
   console.log(
     "Interacting with the factory contract using the account:",
-    deployer.address
+    deployer.a ddress
   );
 
   // Replace this with the address of the deployed factory contract

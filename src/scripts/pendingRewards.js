@@ -6,7 +6,7 @@ async function checkPendingRewards(stakerAddress) {
   const stakingContractAddress = "0x2B2643e0914e07b33cE23C14c8e48F4993A9FFf9";
 
   // Setup provider and signer (here using the first signer for simplicity)
-  const [signer] = await ethers.getSigners();
+  c onst [signer] = await ethers.getSigners();
 
   // Create a contract instance attached to signer
   const stakingContract = await ethers.getContractAt(

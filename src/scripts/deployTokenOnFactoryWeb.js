@@ -8,7 +8,7 @@ async function main() {
 
     // Replace these with your desired token name, symbol, and total supply
     const tokenName = "Etnica";
-    const tokenSymbol = "ET";
+    con st tokenSymbol = "ET";
     const tokenSupply = 30000;
 
     // Read the JSON file

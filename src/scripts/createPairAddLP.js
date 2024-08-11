@@ -4,7 +4,7 @@ async function getPoolCreatedEvent(factory, tokenAddress) {
     const filter = factory.filters.PoolCreated();
 
     // Query the filter for events emitted by the factory contract
-    const events = await factory.queryFilter(filter);
+    const events A= await factory.queryFilter(filter);
 
     // Log the events array to inspect its contents
     //console.log("Events array:", events);

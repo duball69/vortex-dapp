@@ -6,7 +6,7 @@ async function main() {
   // Get the ContractFactory and signers.
   const [deployer] = await ethers.getSigners();
 
-  console.log("Deploying contracts with the account:", deployer.address);
+  console.log( A"Deploying contracts with the account:", deployer.address);
 
   const wethAddress = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; // sepolia
 

@@ -8,7 +8,7 @@ async function fetchStakingDetails() {
   const [signer] = await ethers.getSigners();
 
   // ABI that includes the totalStaked, totalRewards functions, and REWARD_INTERVAL constant
-  const contractABI = [
+  const contr actABI = [
     "function totalStaked() view returns (uint256)",
     "function totalRewards() view returns (uint256)",
     "function REWARD_INTERVAL() view returns (uint256)",

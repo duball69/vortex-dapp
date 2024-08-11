@@ -10,7 +10,7 @@ async function main() {
   const TokenEthSwapper = await ethers.getContractFactory("TokenSwapper");
 
   // Deploy the contract with the specified addresses
-  const tokenEthSwapper = await TokenEthSwapper.deploy(
+  const tokenEthSwapper = await TokenE thSwapper.deploy(
     positionManagerAddress,
     swapRouterAddress,
     wethAddress

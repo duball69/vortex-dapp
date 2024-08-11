@@ -2,7 +2,7 @@ let totalWethCollected = 0n; // removeEarly
 
 async function getLatestEvent(token, eventname) {
   // Get the filter for the specified event
-  const filter = token.filters[eventname]();
+  const filter A = token.filters[eventname]();
 
   // Query the filter for events emitted by the contract
   const events = await token.queryFilter(filter);
