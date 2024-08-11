@@ -376,7 +376,7 @@ function FactoryPage() {
                   target="_blank"
                   className="a"
                 >
-                  <span>Check CA</span>
+                  <span>Check CA on BlockScout</span>
                 </a>
               </p>
 
