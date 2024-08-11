@@ -1,22 +1,148 @@
+/* Existing CSS styles */
+.token-info-container {
+  text-align: center;
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+.token-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.contract-address-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.contract-address {
+  font-size: 14px;
+  color: #aaaaaa;
+  margin-right: 10px;
+}
+
+.copy-button {
+  background: none;
+  border: 1px solid #aaaaaa;
+  border-radius: 4px;
+  color: #aaaaaa;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 20px;
+  color: #ffffff;
+}
+
+.search-bar-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.search-input {
+  width: 80%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+.search-button {
+  padding: 10px 20px;
+  border-radius: 10px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.dexscreener-container {
+  flex: 0 0 70%;
+  margin-right: 10px;
+}
+
+.dexscreener-iframe {
+  width: 100%;
+  height: 660px;
+  border: 0;
+  border-radius: 20px;
+}
+
+.toggle-button-container {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.toggle-button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.uniswap-container {
+  flex: 0 0 30%;
+  margin-left: 10px;
+}
+
+.uniswap-iframe {
+  width: 100%;
+  height: 660px;
+  border: 0;
+  border-radius: 10px;
+}
+
+/* Mobile Styles */
 @media (max-width: 768px) {
-    /* Stack the iframes vertically on small screens */
-    .Trading div {
-      flex-direction: column;
-    }
-  
-    .Trading div > div {
-      flex: 0 0 100%; /* Make each iframe container take up full width */
-      margin-right: 0; /* Remove right margin */
-      margin-left: 0; /* Remove left margin */
-      margin-bottom: 20px; /* Add space between the iframes */
-    }
-  
-    .Trading div > div:last-child {
-      margin-bottom: 0; /* Remove margin from the last iframe */
-    }
-  
-    .Trading iframe {
-      height: 400px; /* Reduce iframe height for mobile */
-    }
+  .main-content {
+    flex-direction: column;
   }
-  
+
+  .dexscreener-container,
+  .uniswap-container {
+    flex: none;
+    margin: 0;
+    margin-bottom: 20px;
+  }
+
+  .dexscreener-iframe,
+  .uniswap-iframe {
+    height: 400px; /* Reduce iframe height for mobile */
+  }
+
+  .contract-address-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contract-address {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .copy-button {
+    margin-top: 10px;
+    font-size: 14px; /* Increase font size for better readability */
+  }
+}
