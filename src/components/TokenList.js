@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
 import { FaTwitter, FaXTwitter, FaTelegram, FaGlobe } from "react-icons/fa6";
+import axios from "axios";
 import "./TokenList.css";
 
 function TokensList({ limit }) {
@@ -17,20 +18,50 @@ function TokensList({ limit }) {
           return {
             id: doc.id,
             ...data,
-            timestamp: data.timestamp ? data.timestamp.toDate() : null, // Convert Firestore Timestamp to JavaScript Date
+            timestamp: data.timestamp ? data.timestamp.toDate() : null,
           };
         });
 
-        // Log tokens before sorting
-        console.log("Tokens before sorting:", tokensArray);
+        const updatedTokensArray = await Promise.all(
+          tokensArray.map(async (token) => {
+            try {
+              const response = await axios.get(
+                `https://api.dexscreener.com/latest/dex/tokens/${token.address}`
+              );
 
-        // Sort tokens by timestamp in descending order (most recent first)
-        const sortedTokens = tokensArray.sort(
-          (a, b) => b.timestamp - a.timestamp
+              const pairData = response.data.pairs
+                ? response.data.pairs[0]
+                : null;
+              const price = pairData?.priceUsd || "N/A";
+              const marketCap =
+                price !== "N/A" && token.supply
+                  ? (price * token.supply).toFixed(2)
+                  : "N/A";
+
+              return {
+                ...token,
+                price,
+                volume24h: pairData?.volume.h24 || "N/A",
+                marketCap,
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching data for token ${token.address}:`,
+                error
+              );
+              return {
+                ...token,
+                price: "N/A",
+                volume24h: "N/A",
+                marketCap: "N/A",
+              };
+            }
+          })
         );
 
-        // Log tokens after sorting
-        console.log("Tokens after sorting:", sortedTokens);
+        const sortedTokens = updatedTokensArray.sort(
+          (a, b) => b.timestamp - a.timestamp
+        );
 
         setTokens(sortedTokens);
         setLoading(false);
@@ -66,10 +97,24 @@ function TokensList({ limit }) {
               <h2 className="token-title">
                 {token.name} ({token.symbol})
               </h2>
-              <h4 className="token-deployer">
+              <h4 className="token-deployer contract-address">
                 Contract Address: {token.address}
               </h4>
-              <h4 className="token-deployer">Chain: {token.chain}</h4>
+              <div className="token-details">
+                <h4 className="token-detail">Chain: {token.chain}</h4>
+                <h4 className="token-detail">
+                  Market Cap:{" "}
+                  {token.marketCap !== "N/A"
+                    ? `$${token.marketCap.toLocaleString()}`
+                    : "N/A"}
+                </h4>
+                <h4 className="token-detail">
+                  24h Volume:{" "}
+                  {token.volume24h !== "N/A"
+                    ? `$${token.volume24h.toLocaleString()}`
+                    : "N/A"}
+                </h4>
+              </div>
               <div className="social-links">
                 {token.website && (
                   <a
@@ -102,6 +147,14 @@ function TokensList({ limit }) {
                   </a>
                 )}
               </div>
+              <button
+                className="trade-button"
+                onClick={() =>
+                  (window.location.href = `/trading/${token.chain}/${token.address}`)
+                }
+              >
+                Trade
+              </button>
             </div>
           </div>
         ))}

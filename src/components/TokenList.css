@@ -56,6 +56,19 @@ margin-bottom:50px;}
     border-radius:360px;
 }
 
+
+.trade-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+
 .token-info {
     padding: 15px;
 }
