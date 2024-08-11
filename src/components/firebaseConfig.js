@@ -7,7 +7,7 @@ import "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const firebaseConf ig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "lp-provider-dapp.firebaseapp.com",
   projectId: "lp-provider-dapp",
