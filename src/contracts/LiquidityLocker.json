@@ -6,7 +6,7 @@
     {
       "inputs": [
         {
-          "internalType": "address",
+          "internalType": "address",s
           "name": "_positionManager",
           "type": "address"
         }

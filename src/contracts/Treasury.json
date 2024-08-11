@@ -7,7 +7,7 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "factory",
+            "name": "factory",s
             "type": "address"
           }
         ],

@@ -5,7 +5,7 @@
     "abi": [
       {
         "anonymous": false,
-        "inputs": [
+        "inputs": [s
           {
             "indexed": true,
             "internalType": "address",
