@@ -19,7 +19,7 @@ async function addRewards() {
 
   try {
     // Define the amount of ETH to send as rewards
-    const rewardAmount = ethers.parseEther("0.05"); // e.g., 1 ETH
+    const rewardAmount = ethers.parseEther("0.09"); // e.g., 1 ETH
 
     // Sending a transaction to add rewards
     const tx = await stakingContract.addRewards({ value: rewardAmount });
