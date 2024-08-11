@@ -1,0 +1,13 @@
+/* TokensPage.css */
+
+.token-list-wrapper {
+    /* Ensure the token list is visible by default */
+  }
+  
+  /* Hide the token list on mobile devices */
+  @media only screen and (max-width: 768px) {
+    .token-list-wrapper {
+      display: none;
+    }
+  }
+  
