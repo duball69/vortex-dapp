@@ -464,7 +464,7 @@ const StakingPage = () => {
         <h5 className="subtitlefactory">
           Lend your ETH and get a share of all revenues
         </h5>
-        <h6 className="texthome2">Currently only on Sepolia Testnet</h6>
+        <h6 className="texthome2">Currently only fully live on Sepolia</h6>
       </div>
       <div className="center-container">
         <div className="staking-container">

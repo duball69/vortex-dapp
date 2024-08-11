@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import Header from "../components/Header.js";
+import Header2 from "../components/Header2.js";
 import Footer from "../components/Footer.js";
 import "./TokenBuyTrackerPage.css";
 import { firestore } from "../components/firebaseConfig.js";
@@ -205,7 +205,7 @@ const TokenBuyTrackerPage = () => {
 
   return (
     <div>
-      <Header
+      <Header2
         connectWallet={connectWallet}
         isConnected={isConnected}
         chainId={chainId}
