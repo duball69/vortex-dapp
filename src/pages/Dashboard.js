@@ -29,7 +29,7 @@ const networkConfig = {
   // Example Chain IDs for Base and Sepolia
   8453: {
     // BASE (as an example; replace with the correct ID for "base")
-    factoryAddress: "0x3C927ec58E17BcF75ec72a53ED1F77568f114be7",
+    factoryAddress: "0xF686e6CAF7d823E4130339E6f2b02C37836fE90F",
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://base.blockscout.com/",
   },

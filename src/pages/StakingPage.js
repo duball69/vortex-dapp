@@ -29,7 +29,7 @@ const CHAIN_NAMES = {
 const networkConfig = {
   //base
   8453: {
-    stakingAddress: "0xd0C3B626162359E41a8Fe1BB0810d38E00432479",
+    stakingAddress: "0xAC4A1fD60e7a33c4cD89F7D08Dc2D61dB6B940C6",
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://base.blockscout.com/",
   },
