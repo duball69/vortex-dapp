@@ -2,7 +2,7 @@
 const deployedTokenAddresses = [];
 
 
-async function getTokenDeployedEvent(token, factoryAddress) {
+async functaion getTokenDeployedEvent(token, factoryAddress) {
     // Get the filter for the TokenDeployed event
     const filter = token.filters.TokenDeployed();
 
