@@ -268,15 +268,6 @@ function DashboardPage() {
       <div className="center-container">
         <div className="factory-container">
           <div></div>
-          <div className="wallet-status">
-            {isConnected ? (
-              <p className="connected-wallet">
-                Connected Wallet: {connectedWallet}
-              </p>
-            ) : (
-              <button onClick={connectWallet}>Connect Wallet</button>
-            )}
-          </div>
           <div className="token-info">
             {tokenDetails.imageUrl && (
               <img
