@@ -17,7 +17,9 @@
   margin-bottom:20px;}
 
   .your-token{font-size:20px;
-  margin-bottom:10px;}
+    margin-top:10px;
+    margin-bottom:10px;}
+    
   .connected-wallet{font-size:12px;}
 
   .dashboard-container h1 {

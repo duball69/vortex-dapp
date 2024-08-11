@@ -202,7 +202,7 @@ function TokensListTable({ limit }) {
               <td>
                 {token.name} ({token.symbol})
               </td>
-              <td>{token.address}</td>
+              <td className="address-cell">{token.address}</td>
               <td>{token.chain}</td>
               <td>
                 {token.timestamp ? token.timestamp.toLocaleDateString() : "N/A"}

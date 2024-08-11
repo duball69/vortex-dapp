@@ -33,7 +33,7 @@
 .tokens-grid{border-radius: 60px;}
 
 .tokens-table th, .tokens-table td {
-    border: 1px solid #000000a9;
+    border: 1px solid #ffffff00;
    
     padding: 8px;
     text-align: left;
@@ -303,37 +303,43 @@ h3 {
 }
 
 .trade-button-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0; /* Ensure no padding affects the centering */
-}
+    display: table-cell; /* Ensure it behaves like a table cell */
+    vertical-align: middle; /* Vertically center the content within the cell */
+    text-align: center; /* Horizontally center the content */
+    padding: 0; /* Remove padding to prevent it from affecting centering */
+    height: 100%; /* Ensure the cell takes up full height */
+  }
+  
+  .trade-button {
+    display: inline-block; /* Make the button behave like an inline element to center it */
+    padding: 7px 20px; /* Adjust padding for button size */
+    font-size: 16px;
+    border-radius: 30px;
+    background: linear-gradient(38deg, #ef10ffe1, #00CDFFF6);
+    border: 1px solid rgba(255, 255, 255, 0.519);
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-style: normal;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+  }
+  
 
-.trade-button {
-  margin: 0; /* Remove any margin that might affect centering */
-  padding: 7px 20px; /* Adjust padding as needed */
-  font-size: 16px;
-  border-radius: 30px;
-  background: linear-gradient(38deg, #ef10ffe1, #00CDFFF6);
-  border: 1px solid rgba(255, 255, 255, 0.519);
-  color: #ffffff;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-style: normal;
-  font-family: "Space Grotesk", sans-serif;
-  font-weight: 600;
-}
 
 .trade-button:hover {
   background-color: #ffffff;
 }
 
 .token-image {
-  width: 15px;
-  height: 15px;
+  width: 12px;
+  height: 12px;
  
 }
 
+.address-cell{
+    font-size: 12px;
+}
 
 .pagination {
     display: flex;
