@@ -122,7 +122,7 @@ contract SimpleStaking is ReentrancyGuard {
 
         notifyFactoryForFunds(totalQueueAmount);
     }
-a
+
     event NotifyFactoryForFunds(uint256 amountNeeded);
 
     function notifyFactoryForFunds(uint256 amountNeeded) internal {

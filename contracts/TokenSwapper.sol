@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-a
+
 // Interfaces for Uniswap V3 contracts
 interface INonfungiblePositionManager {
     // Define interface functions here
@@ -19,7 +19,12 @@ contract TokenSwapper {
     ISwapRouter public swapRouter;
     address public IWETH;
 
-    event Swap(address indexed tokenIn, uint256 amountIn, address indexed tokenOut, uint256 amountOut);
+    event Swap(
+        address indexed tokenIn,
+        uint256 amountIn,
+        address indexed tokenOut,
+        uint256 amountOut
+    );
 
     // Example constructor in TokenSwapper.sol
     constructor(address _positionManager, address _swapRouter, address _weth) {
@@ -48,10 +53,16 @@ contract TokenSwapper {
         uint256 amountIn,
         address tokenOut
     ) external {
-        require(supportedTokens[tokenIn] && supportedTokens[tokenOut], "Tokens not supported");
+        require(
+            supportedTokens[tokenIn] && supportedTokens[tokenOut],
+            "Tokens not supported"
+        );
 
         // Transfer tokenIn from sender
-        require(IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn), "TransferFrom failed");
+        require(
+            IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn),
+            "TransferFrom failed"
+        );
 
         // Perform token swap logic here (for example, swap via an external DEX or custom logic)
 

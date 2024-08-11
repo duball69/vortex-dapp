@@ -169,7 +169,7 @@ contract MyFactory {
             tokenIds,
             timestamps,
             liquidityRemovedStatus,
-            zerofeesdays,a
+            zerofeesdays,
             inactive,
             feefromswap,
             lockIds,
