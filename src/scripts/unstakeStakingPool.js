@@ -2,7 +2,7 @@
 
 const { ethers } = require("hardhat");
 
-async function unst akeEthFromStakingPool(stakingPoolAddress, amountToUnstake) {
+async function unstakeEthFromStakingPool(stakingPoolAddress, amountToUnstake) {
   try {
     const [sender] = await ethers.getSigners(); // Get the first signer (deployer)
 

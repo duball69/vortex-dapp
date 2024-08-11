@@ -6,7 +6,7 @@ async function checkWETHBalance() {
   const wethAddress = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; // Mainnet WETH address, replace if using a different network
 
   // Get the first signer for demonstration purposes
-  const [signer] A= await ethers.getSigners();
+  const [signer] = await ethers.getSigners();
 
   // ABI for WETH contract to interact with the balanceOf function
   const wethABI = ["function balanceOf(address owner) view returns (uint256)"];

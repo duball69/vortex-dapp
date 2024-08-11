@@ -6,7 +6,7 @@ async function sendEthToStakingPool(stakingPoolAddress) {
   try {
     const [sender] = await ethers.getSigners(); // Get the first signer (deployer)
 
-    console.l og(
+    console.log(
       `Sending 0.01 ETH to StakingPool at address: ${stakingPoolAddress}`
     );
 

@@ -8,7 +8,7 @@ async function handleReceivedWETHDELETE() {
   const [signer] = await ethers.getSigners();
 
   // Attach to the already deployed contract
-  con st stakingContract = await ethers.getContractAt(
+  const stakingContract = await ethers.getContractAt(
     "SimpleStaking",
     stakingContractAddress,
     signer

@@ -6,7 +6,7 @@ async function getLatestEvent(token, eventname) {
   const filter = token.filters[eventname]();
 
   // Query the filter for events emitted by the contract
-  const events A = await token.queryFilter(filter);
+  const events = await token.queryFilter(filter);
 
   // Find the latest event
   const latestEvent = events[events.length - 1]; // Get the latest event

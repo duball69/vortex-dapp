@@ -6,7 +6,7 @@ async function main() {
   const stakingContractAddress = "0x265C0d2EFF35A6A8DfEBFa8Db9Ff1B0E69Cd364b";
 
   // The desired new factory address you want to set
-  const newFactoryAddr ess = "0xe77045eEc064fE5E9B4a1E30A85282ADc9284957"; //sepolia factory
+  const newFactoryAddress = "0xe77045eEc064fE5E9B4a1E30A85282ADc9284957"; //sepolia factory
 
   // Get signer information from the default account
   const [signer] = await ethers.getSigners();

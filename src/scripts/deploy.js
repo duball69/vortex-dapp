@@ -71,7 +71,7 @@ async function main() {
     "Setting staking and treasury address in the factory contract..."
   );
   tx3 = await factory.setStakingAndTreasuryAddress(
-    stakingAddress, A
+    stakingAddress,
     treasuryAddress
   );
   await tx3.wait();

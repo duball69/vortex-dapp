@@ -47,7 +47,7 @@ async function main() {
 
   // Connect to the factory contract using its ABI and address
   const Factory = await ethers.getContractFactory("MyFactory");
-  co nst factory = await Factory.attach(factoryAddress);
+  const factory = await Factory.attach(factoryAddress);
 
   // Retrieve the contract address of the deployed token
   const provider = ethers.getDefaultProvider(); // Update with your WebSocket provider URL
