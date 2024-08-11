@@ -1,83 +1,84 @@
 // Array to store deployed token contract addresses
 const deployedTokenAddresses = [];
 
+async function getTokenDeployedEvent(token, factoryAddress) {
+  // Get the filter for the TokenDeployed event
+  const filter = token.filters.TokenDeployed();
 
-async functaion getTokenDeployedEvent(token, factoryAddress) {
-    // Get the filter for the TokenDeployed event
-    const filter = token.filters.TokenDeployed();
+  // Query the filter for events emitted by the token contract
+  const events = await token.queryFilter(filter);
 
-    // Query the filter for events emitted by the token contract
-    const events = await token.queryFilter(filter);
+  // Find the TokenDeployed event emitted by the token contract
+  const tokenDeployedEvent = events[events.length - 1]; // Get the latest event
 
-    // Find the TokenDeployed event emitted by the token contract
-    const tokenDeployedEvent = events[events.length - 1]; // Get the latest event
-
-    return tokenDeployedEvent;
+  return tokenDeployedEvent;
 }
 
 async function getPoolCreatedEvent(factory, tokenAddress) {
-    // Get the filter for the PoolCreated event
-    const filter = factory.filters.PoolCreated();
+  // Get the filter for the PoolCreated event
+  const filter = factory.filters.PoolCreated();
 
-    // Query the filter for events emitted by the factory contract
-    const events = await factory.queryFilter(filter);
+  // Query the filter for events emitted by the factory contract
+  const events = await factory.queryFilter(filter);
 
-    // Log the events array to inspect its contents
-    //console.log("Events array:", events);
+  // Log the events array to inspect its contents
+  //console.log("Events array:", events);
 
-    // Find the PoolCreated event matching the token address
-    const poolCreatedEvent = events[events.length - 1]; // Assuming the latest event corresponds to the pool creation
+  // Find the PoolCreated event matching the token address
+  const poolCreatedEvent = events[events.length - 1]; // Assuming the latest event corresponds to the pool creation
 
-    return poolCreatedEvent;
+  return poolCreatedEvent;
 }
 
 // Babylonian method for square root calculation using BigInt
 function sqrt(value) {
-    if (value < 0n) {
-        throw new Error("Square root of negative numbers is not supported");
-    }
-    if (value === 0n) return 0n;
-    let z = value;
-    let x = value / 2n + 1n;
-    while (x < z) {
-        z = x;
-        x = (value / x + x) / 2n;
-    }
-    return z;
+  if (value < 0n) {
+    throw new Error("Square root of negative numbers is not supported");
+  }
+  if (value === 0n) return 0n;
+  let z = value;
+  let x = value / 2n + 1n;
+  while (x < z) {
+    z = x;
+    x = (value / x + x) / 2n;
+  }
+  return z;
 }
 
-
 async function main() {
-    const [deployer] = await ethers.getSigners();
-  
-    console.log("Interacting with the factory contract using the account:", deployer.address);
+  const [deployer] = await ethers.getSigners();
 
-    // Replace these with your desired token name, symbol, and total supply
-    const tokenName = "MakuToken";
-    const tokenSymbol = "MAKU420";
-    const tokenSupply = "420";
-    //const totalSupply = "3000";
+  console.log(
+    "Interacting with the factory contract using the account:",
+    deployer.address
+  );
 
-    // Replace this with the address of the deployed factory contract
-    const factoryAddress = "0x4CAA8b4845F3dB19Dc67E394cc686eFd6116ef64";
+  // Replace these with your desired token name, symbol, and total supply
+  const tokenName = "MakuToken";
+  const tokenSymbol = "MAKU420";
+  const tokenSupply = "420";
+  //const totalSupply = "3000";
 
-    const WETH_address = "0x4200000000000000000000000000000000000006";
-    const positionManager_address = "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1";
-    const swapRouterAddress = "0x2626664c2603336E57B271c5C0b26F421741e481"; // Replace with the SwapRouter address on Sepolia
+  // Replace this with the address of the deployed factory contract
+  const factoryAddress = "0x4CAA8b4845F3dB19Dc67E394cc686eFd6116ef64";
 
-    const tokenAddress = "0x6322Cd7C35E3eb9A654699C9AE615e3c406f4795";
-    const pool_Address = "0xc28FE4D9ecd71A3B71FF469cE4C23671cd6dc180";
-    
-    // Connect to the factory contract using its ABI and address
-    const Factory = await ethers.getContractFactory("MyFactory");
-    const factory = await Factory.attach(factoryAddress);
-    
-    // Retrieve the contract address of the deployed token
-    const provider = ethers.getDefaultProvider(); // Update with your WebSocket provider URL
+  const WETH_address = "0x4200000000000000000000000000000000000006";
+  const positionManager_address = "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1";
+  const swapRouterAddress = "0x2626664c2603336E57B271c5C0b26F421741e481"; // Replace with the SwapRouter address on Sepolia
 
-    const tokenAmount = ethers.parseUnits(tokenSupply, 18); // 1,000,000 tokens with 18 decimals
-    const wethAmount = ethers.parseUnits("0.001", 18); // 0.1 WETH
-/*
+  const tokenAddress = "0x6322Cd7C35E3eb9A654699C9AE615e3c406f4795";
+  const pool_Address = "0xc28FE4D9ecd71A3B71FF469cE4C23671cd6dc180";
+
+  // Connect to the factory contract using its ABI and address
+  const Factory = await ethers.getContractFactory("MyFactory");
+  const factory = await Factory.attach(factoryAddress);
+
+  // Retrieve the contract address of the deployed token
+  const provider = ethers.getDefaultProvider(); // Update with your WebSocket provider URL
+
+  const tokenAmount = ethers.parseUnits(tokenSupply, 18); // 1,000,000 tokens with 18 decimals
+  const wethAmount = ethers.parseUnits("0.001", 18); // 0.1 WETH
+  /*
     // Call the deployToken function of the factory contract
     const tx = await factory.deployToken(tokenName, tokenSymbol, tokenSupply);  //DEPLOY
 
@@ -123,31 +124,37 @@ async function main() {
     await approveWETHTx.wait();
     console.log("WETH approved.");
 */
-    console.log("Adding liquidity to the pool...");
-    const tx2 = await factory.addInitialLiquidity(tokenAddress, pool_Address, factoryAddress, tokenAmount, wethAmount,{
-        gasLimit: 10000000 // Set a higher gas limit for adding liquidity
-    });
+  console.log("Adding liquidity to the pool...");
+  const tx2 = await factory.addInitialLiquidity(
+    tokenAddress,
+    pool_Address,
+    factoryAddress,
+    tokenAmount,
+    wethAmount,
+    {
+      gasLimit: 10000000, // Set a higher gas limit for adding liquidity
+    }
+  );
 
-    await tx2.wait();
+  await tx2.wait();
 
-    console.log("Liquidity added successfully!");
+  console.log("Liquidity added successfully!");
 
-    const tokenContract = await ethers.getContractAt("IERC20", tokenAddress);
-    const wethContract = await ethers.getContractAt("IERC20", WETH_address);
-    //const tx3 = await tokenContract.approve(swapRouterAddress, tokenSupply);
-    
+  const tokenContract = await ethers.getContractAt("IERC20", tokenAddress);
+  const wethContract = await ethers.getContractAt("IERC20", WETH_address);
+  //const tx3 = await tokenContract.approve(swapRouterAddress, tokenSupply);
 
-     //await factory.approveToken(tokenAddress, positionManager_address, tokenSupply);
-     //await factory.approveToken(WETH_address, positionManager_address, wethAmount);
+  //await factory.approveToken(tokenAddress, positionManager_address, tokenSupply);
+  //await factory.approveToken(WETH_address, positionManager_address, wethAmount);
 
-    //await tx3.wait();
+  //await tx3.wait();
 
-    //await wethContract.approve(swapRouterAddress, ethers.parseEther("0.1"));
+  //await wethContract.approve(swapRouterAddress, ethers.parseEther("0.1"));
 
-    //console.log("Token approved for SwapRouter!");
+  //console.log("Token approved for SwapRouter!");
 
-    //const amountIn = ethers.parseUnits("0.1", 18); // Amount of tokens to swap
-/*
+  //const amountIn = ethers.parseUnits("0.1", 18); // Amount of tokens to swap
+  /*
     console.log("Performing a swap from ETH to the token...");
     const swapTx = await factory.swapETHForToken(tokenAddress, ethers.parseEther("0.1"), 0, {
         value: ethers.parseEther("0.1")
@@ -155,13 +162,11 @@ async function main() {
     await swapTx.wait();
     console.log("Swap performed successfully!");
     await swapTx.wait();*/
-
-
 }
 
 main()
-    .then(() => process.exit(0))
-    .catch((error) => {
-        console.error(error);
-        process.exit(1);
-    });
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
