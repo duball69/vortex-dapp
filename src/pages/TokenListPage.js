@@ -8,7 +8,10 @@ function TokensPage() {
   return (
     <div>
       <Header2 />
-      <div className="token-list-wrapper">
+      <div className="token-list-desktop">
+        <TokenListTable />
+      </div>
+      <div className="token-list-mobile">
         <TokenListTable />
       </div>
       <Footer />
