@@ -61,8 +61,6 @@ function HomePage() {
         </div>
       </div>
 
-      <TokensList limit={6} />
-      <TokenListTable />
       <div className="container">
         <Link to="/tokens">
           <button>View All </button>
