@@ -12,7 +12,7 @@
     }
   
     .token-list-mobile {
-      
+      display: block; /* Show only on mobile */
     }
   }
   
