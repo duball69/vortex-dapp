@@ -61,9 +61,8 @@ contract MyToken is ERC20 {
         allTokens[index].maxWalletEnabled = true;
         allTokens[index].poolAddress = poolAddress;
         maxWalletAmount = (totalSupply() * MAX_WALLET_PERCENTAGE) / 100;
-        maxWalletEnabled = true;
+        maxWalletEnabled = true;aa
     }
-
     
     function _update(
         address from,

@@ -1,5 +1,5 @@
 {
-  "_format": "hh-sol-artifact-1",s
+  "_format": "hh-sol-artifact-1",
   "contractName": "MyFactory",
   "sourceName": "contracts/TestFactory.sol",
   "abi": [

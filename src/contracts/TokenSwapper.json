@@ -8,7 +8,7 @@
         {
           "internalType": "address",
           "name": "_positionManager",
-          "type": "address"s
+          "type": "address"
         },
         {
           "internalType": "address",

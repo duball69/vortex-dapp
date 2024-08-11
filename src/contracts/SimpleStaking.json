@@ -7,7 +7,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_weth",s
+          "name": "_weth",
           "type": "address"
         },
         {

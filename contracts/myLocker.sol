@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
+import "@uaniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
 contract LiquidityLocker is ERC721Holder {
     struct Lock {
@@ -13,7 +13,6 @@ contract LiquidityLocker is ERC721Holder {
         uint256 lockID;
         uint256 unlockTime;
     }
-
 
     mapping(uint256 => uint256) private tokenIndex; // Maps tokenId to index in allTokens array
 
@@ -24,8 +23,17 @@ contract LiquidityLocker is ERC721Holder {
     address nftAddress;
     address public factoryAddress;
 
-    event LiquidityLocked(uint256 indexed lockId, address indexed tokenAddress, uint256 tokenId, uint256 unlockTime);
-    event LiquidityUnlocked(uint256 indexed lockId, address indexed tokenAddress, uint256 tokenId);
+    event LiquidityLocked(
+        uint256 indexed lockId,
+        address indexed tokenAddress,
+        uint256 tokenId,
+        uint256 unlockTime
+    );
+    event LiquidityUnlocked(
+        uint256 indexed lockId,
+        address indexed tokenAddress,
+        uint256 tokenId
+    );
     event FeesCollected(uint256, uint256, uint256);
 
     modifier onlyOwner() {
@@ -34,7 +42,10 @@ contract LiquidityLocker is ERC721Holder {
     }
 
     modifier onlyAuth() {
-        require(msg.sender == owner || msg.sender == factoryAddress, "Caller is not authorized");
+        require(
+            msg.sender == owner || msg.sender == factoryAddress,
+            "Caller is not authorized"
+        );
         _;
     }
 
@@ -47,7 +58,6 @@ contract LiquidityLocker is ERC721Holder {
         owner = msg.sender; // Set the owner to the deployer of the contract
         positionManager = INonfungiblePositionManager(_positionManager);
         nftAddress = _positionManager;
-        
     }
 
     /* // Method to get all token addresses
@@ -68,7 +78,12 @@ contract LiquidityLocker is ERC721Holder {
 } */
 
     // Locks the liquidity NFT
-    function lockLiquidity(address _nftAddress, uint256 _tokenId, uint256 _duration, address factory) external onlyAuth returns (uint256 lockId) {
+    function lockLiquidity(
+        address _nftAddress,
+        uint256 _tokenId,
+        uint256 _duration,
+        address factory
+    ) external onlyAuth returns (uint256 lockId) {
         require(_nftAddress != address(0), "Invalid NFT address");
 
         // Transfer the NFT from the sender to this contract
@@ -85,22 +100,24 @@ contract LiquidityLocker is ERC721Holder {
             unlockTime: unlockTime
         });
 
-
-        
         // Save the index of the new token details in the mapping
         //tokenIndex[_tokenId] = allTokens.length - 1;
 
         emit LiquidityLocked(lockId, _nftAddress, _tokenId, unlockTime);
 
-        
-
         return lockId;
     }
 
     // Unlocks the liquidity NFT
-    function unlockLiquidity(uint256 _lockId, address factory) external onlyOwner {
+    function unlockLiquidity(
+        uint256 _lockId,
+        address factory
+    ) external onlyOwner {
         Lock storage lock = locks[_lockId];
-        require(block.timestamp >= lock.unlockTime, "Liquidity is still locked");
+        require(
+            block.timestamp >= lock.unlockTime,
+            "Liquidity is still locked"
+        );
 
         uint256 token_Id = lock.tokenId;
 
@@ -120,10 +137,10 @@ contract LiquidityLocker is ERC721Holder {
         IERC721(nftAddress).approve(factory, tokenId);
     }
 
-// Function to collect fees from the locked NFT
+    // Function to collect fees from the locked NFT
     function collectFees(uint256 tokenId, address factory) external onlyOwner {
-        INonfungiblePositionManager.CollectParams memory params =
-            INonfungiblePositionManager.CollectParams({
+        INonfungiblePositionManager.CollectParams
+            memory params = INonfungiblePositionManager.CollectParams({
                 tokenId: tokenId,
                 recipient: factory,
                 amount0Max: type(uint128).max,
@@ -133,10 +150,7 @@ contract LiquidityLocker is ERC721Holder {
         (uint256 amount0, uint256 amount1) = positionManager.collect(params);
 
         emit FeesCollected(tokenId, amount0, amount1);
-
-        
     }
-
 
     // Utility function to change ownership
     function transferOwnership(address newOwner) public onlyOwner {
