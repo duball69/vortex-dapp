@@ -6,8 +6,7 @@ const Features = () => {
       <h2>Features</h2>
       <ul>
         <li>Code-free token creation</li>
-        <li>0.5 ETH of initial liquidity provided for free</li>
-        <li>Exclusive support for Sepolia Testnet</li>
+        <li>Get 0.5 ETH of initial liquidity provided for free</li>
       </ul>
     </div>
   );

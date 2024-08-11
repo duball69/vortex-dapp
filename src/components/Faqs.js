@@ -3,7 +3,7 @@ import React from "react";
 const FAQ = () => {
   return (
     <div className="faq">
-      <h2>Frequently Asked Questions</h2>
+      <h2>FAQs</h2>
       <ul>
         <li>How can I start using the platform?</li>
         <li>What fees are involved?</li>

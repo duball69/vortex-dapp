@@ -5,8 +5,8 @@ const Contact = () => {
     <div className="contact">
       <h2>Contact Us</h2>
       <p>
-        Have any questions? Reach out to our support team at{" "}
-        <a href="mailto:support@yourplatform.com">support@yourplatform.com</a>.
+        Do you h1ave any questions? Reach out to our support team at{" "}
+        <a href="mailto:team@vortexdapp.com">team@vortexdapp.com</a>.
       </p>
     </div>
   );
