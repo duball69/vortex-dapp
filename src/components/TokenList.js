@@ -21,16 +21,10 @@ function TokensList({ limit }) {
           };
         });
 
-        // Log tokens before sorting
-        console.log("Tokens before sorting:", tokensArray);
-
         // Sort tokens by timestamp in descending order (most recent first)
         const sortedTokens = tokensArray.sort(
           (a, b) => b.timestamp - a.timestamp
         );
-
-        // Log tokens after sorting
-        console.log("Tokens after sorting:", sortedTokens);
 
         setTokens(sortedTokens);
         setLoading(false);
@@ -102,6 +96,14 @@ function TokensList({ limit }) {
                   </a>
                 )}
               </div>
+              <button
+                className="trade-button"
+                onClick={() =>
+                  (window.location.href = `/trading/${token.chain}/${token.address}`)
+                }
+              >
+                Trade
+              </button>
             </div>
           </div>
         ))}
