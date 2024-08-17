@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { createWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react";
+import {
+  createWeb3Modal,
+  defaultConfig,
+  useWeb3ModalAccount,
+} from "@web3modal/ethers/react";
 
 const Web3ModalContext = createContext();
 
@@ -10,19 +13,11 @@ export const Web3ModalProvider = ({ children }) => {
     useWeb3ModalAccount(web3Modal);
 
   useEffect(() => {
-    const config = {
-      metadata: {
-        name: "Vortex Dapp",
-        description: "An EVM liquidity lender and token launcher",
-        url: "https://vortexdapp.com",
-        icons: ["https://vortexdapp.com/favicon.ico"],
-      },
-      enableEIP6963: true, //metamask
-      enableInjected: true, //metamask
-      enableCoinbase: false, //coinbase
-      rpcUrl:
-        "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Ensure this matches your FactoryPage configuration
-      defaultChainId: 1,
+    const metadata = {
+      name: "Vortex Dapp",
+      description: "An EVM liquidity lender and token launcher",
+      url: "https://vortexdapp.com",
+      icons: ["https://vortexdapp.com/favicon.ico"],
     };
 
     const sepoliaMainnet = {
@@ -35,7 +30,23 @@ export const Web3ModalProvider = ({ children }) => {
     const projectId = process.env.WALLETCONNECT_PROJECT_ID;
 
     const initWeb3Modal = createWeb3Modal({
-      config,
+      ethersConfig: defaultConfig({
+        metadata,
+        enableEIP6963: true, // Enable MetaMask
+        enableInjected: true, // Enable MetaMask
+        enableCoinbase: true, // Enable Coinbase Wallet
+        rpcUrl:
+          "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Replace with your RPC URL
+        defaultChainId: 11155111, // Sepolia Testnet Chain ID
+
+        defaultChainId: 11155111,
+        auth: {
+          email: true, // Enable email login
+          socials: ["google", "x", "github", "discord", "apple", "facebook"], // List of supported social platforms
+          showWallets: true, // Show wallet options alongside email and social logins
+          walletFeatures: true, // Enable wallet features like balance viewing and transactions
+        },
+      }),
       chains: [sepoliaMainnet],
       projectId,
       enableAnalytics: true,
