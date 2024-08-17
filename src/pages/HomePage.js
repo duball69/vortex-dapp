@@ -96,7 +96,8 @@ function HomePage() {
         <img src="logo512.png" alt="Logo" className="logo2" />
 
         <h1 className="titlehome">
-          Launch ERC20 tokens for free <br />
+          Launch ERC20 tokens and get initial liquidity
+          <br />
         </h1>
         <h4 className="subtitlehome">Currently only on Sepolia Testnet</h4>
 

@@ -120,9 +120,15 @@ const ethersConfig = defaultConfig({
   metadata,
   enableEIP6963: true,
   enableInjected: true,
-  enableCoinbase: true,
+  enableCoinbase: false,
   rpcUrl: "...",
   defaultChainId: 1,
+  auth: {
+    email: true, // Enable email login
+    socials: ["google", "x", "github", "telegram", "apple", "facebook"], // List of supported social platforms
+    showWallets: true, // Show wallet options alongside email and social logins
+    walletFeatures: true, // Enable wallet features like balance viewing and transactions
+  },
 });
 
 const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
