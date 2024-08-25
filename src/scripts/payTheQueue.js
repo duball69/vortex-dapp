@@ -30,7 +30,7 @@ async function handleReceivedWETHDELETE() {
 
 async function main() {
   try {
-    await handleReceivedWETHDELETE();
+    await handleReceivedWETHFromScript();
   } catch (error) {
     console.error(error);
     process.exit(1); // Exit with failure in case of an error

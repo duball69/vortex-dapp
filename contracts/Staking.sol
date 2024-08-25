@@ -14,9 +14,9 @@ contract SimpleStaking is ReentrancyGuard {
     address public owner;
     uint256 public totalStaked;
     uint256 public totalRewards;
-    uint256 public accRewardPerShare; // Accumulated rewards per share, times 1e12 to prevent precision loss
+    uint256 public accRewardPerShare;
     uint256 public lastRewardTime;
-    uint256 public constant REWARD_INTERVAL = 10 minutes; // Reward distribution interval
+    uint256 public constant REWARD_INTERVAL = 7 days;
 
     event Stake(address indexed user, uint256 amount);
     event Unstake(address indexed user, uint256 amount);
@@ -42,13 +42,13 @@ contract SimpleStaking is ReentrancyGuard {
     struct UnstakeRequest {
         address user;
         uint256 amount;
-        uint256 timestamp; // Optional, for tracking when the request was made
+        uint256 timestamp;
     }
 
     UnstakeRequest[] public unstakeQueue;
 
     constructor(address _weth, address factory) {
-        owner = msg.sender; // Set the deployer as the owner
+        owner = msg.sender;
         lastRewardTime = block.timestamp;
         weth = _weth;
         factoryAddress = factory;
@@ -58,19 +58,16 @@ contract SimpleStaking is ReentrancyGuard {
         require(msg.value > 0, "Cannot stake 0 ETH");
         updatePool();
 
-        // Convert the entire ETH amount to WETH
         IWETH(weth).deposit{value: msg.value}();
 
-        uint256 factoryShare = (msg.value * 70) / 100; // 70% to factory
-        uint256 reserveShare = msg.value - factoryShare; // 30% stays in the contract as WETH
+        uint256 factoryShare = (msg.value * 70) / 100;
+        uint256 reserveShare = msg.value - factoryShare;
 
-        // Send 70% WETH to the factory address
         require(
             IWETH(weth).transfer(factoryAddress, factoryShare),
             "Failed to send WETH to factory"
         );
 
-        // Handle rewards and stake recording
         if (stakes[msg.sender] > 0) {
             uint256 pending = ((stakes[msg.sender] * accRewardPerShare) /
                 1e12) - rewardDebt[msg.sender];
@@ -81,7 +78,6 @@ contract SimpleStaking is ReentrancyGuard {
             }
         }
 
-        // Record the full amount staked, not just the reserve share
         stakes[msg.sender] += msg.value;
         totalStaked += msg.value;
         rewardDebt[msg.sender] =
@@ -92,13 +88,8 @@ contract SimpleStaking is ReentrancyGuard {
     }
 
     function processImmediateUnstake(address user, uint256 amount) internal {
-        // Withdraw the WETH amount to this contract
         IWETH(weth).withdraw(amount);
-
-        // Transfer ETH to the user
         payable(user).transfer(amount);
-
-        // Update the user's staked amount and total staked
         stakes[user] -= amount;
         totalStaked -= amount;
         rewardDebt[user] = (stakes[user] * accRewardPerShare) / 1e12;
@@ -112,12 +103,10 @@ contract SimpleStaking is ReentrancyGuard {
         UnstakeRequest memory request = UnstakeRequest({
             user: user,
             amount: amount,
-            timestamp: block.timestamp // Storing the timestamp can help with processing logic later if needed
+            timestamp: block.timestamp
         });
         unstakeQueue.push(request);
-        emit UnstakeQueued(user, amount, block.timestamp); // Emit an event for a queued unstake request
-
-        // Update the total funds needed to include the total amount needed in the queue
+        emit UnstakeQueued(user, amount, block.timestamp);
         uint256 totalQueueAmount = getTotalUnstakeQueueAmount();
 
         notifyFactoryForFunds(totalQueueAmount);
@@ -138,18 +127,17 @@ contract SimpleStaking is ReentrancyGuard {
         if (wethBalance >= amount) {
             processImmediateUnstake(msg.sender, amount);
         } else {
-            // Try to get funds from the factory before queuing
             IFundsInterface(factoryAddress).provideFundsIfNeeded(
                 address(this),
                 amount
             );
-            // Check balance again after factory interaction
+
             wethBalance = IWETH(weth).balanceOf(address(this));
 
             if (wethBalance >= amount) {
                 processImmediateUnstake(msg.sender, amount);
             } else {
-                pendingUnstakes[msg.sender] += amount; // Only lock funds if they need to be queued
+                pendingUnstakes[msg.sender] += amount;
                 addToUnstakeQueue(msg.sender, amount);
             }
         }
@@ -176,7 +164,6 @@ contract SimpleStaking is ReentrancyGuard {
 
         if (reward > 0) {
             accRewardPerShare += (reward * 1e12) / totalStaked;
-            // Do not deduct from totalRewards here; only deduct when rewards are claimed
         }
 
         lastRewardTime = block.timestamp;
@@ -184,14 +171,9 @@ contract SimpleStaking is ReentrancyGuard {
 
     function addRewards() external payable {
         require(msg.value > 0, "No rewards to add");
-
-        // Deposit the received ETH and mint WETH
         IWETH(weth).deposit{value: msg.value}();
-
-        // Update the total rewards with the newly minted WETH amount
-        totalRewards += msg.value; // Assuming the WETH value is 1:1 with ETH
-        updatePool(); // Update the pool after changing the totalRewards
-
+        totalRewards += msg.value;
+        updatePool();
         emit RewardsAdded(msg.value);
     }
 
@@ -211,7 +193,7 @@ contract SimpleStaking is ReentrancyGuard {
     }
 
     function claimRewards() external nonReentrant {
-        updatePool(); // Make sure the pool is updated before claiming
+        updatePool();
 
         uint256 userStake = stakes[msg.sender];
         require(userStake > 0, "No staked amount to claim rewards for");
@@ -223,24 +205,17 @@ contract SimpleStaking is ReentrancyGuard {
         require(totalRewards >= pendingReward, "Not enough rewards in pool");
 
         totalRewards -= pendingReward;
-        rewardDebt[msg.sender] = accumulatedReward; // Update the reward debt post-claim
+        rewardDebt[msg.sender] = accumulatedReward;
 
         IWETH(weth).withdraw(pendingReward);
         (bool sent, ) = payable(msg.sender).call{value: pendingReward}("");
         require(sent, "Failed to send ETH");
-
         emit RewardClaimed(msg.sender, pendingReward);
     }
 
-    // Fallback function to receive Ether
-    fallback() external payable {
-        // Handle received Ether if necessary
-    }
+    fallback() external payable {}
 
-    // Receive function to handle incoming Ether
-    receive() external payable {
-        // Handle received Ether
-    }
+    receive() external payable {}
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not the owner");
@@ -253,8 +228,6 @@ contract SimpleStaking is ReentrancyGuard {
 
     function notifyFundsReceived(uint256 amount) external {
         require(msg.sender == factoryAddress, "Only factory can notify");
-
-        // Optionally, you can add logic here if you need to adjust any balances or states based on the received funds
         emit FundsReceived(amount, block.timestamp);
         handleReceivedWETHALLQUEUE();
     }
@@ -282,58 +255,58 @@ contract SimpleStaking is ReentrancyGuard {
 
     function handleReceivedWETH() internal {
         uint256 availableWETH = IWETH(weth).balanceOf(address(this));
-        emit DebugAvailableWETH(availableWETH); // Log the available WETH balance
+        emit DebugAvailableWETH(availableWETH);
 
         if (unstakeQueue.length > 0) {
-            UnstakeRequest storage request = unstakeQueue[0]; // Get the first request in the queue
+            UnstakeRequest storage request = unstakeQueue[0];
             emit UnstakeRequestDetails(
                 0,
                 request.user,
                 request.amount,
                 request.timestamp
-            ); // Log details of the request
+            );
 
             if (availableWETH >= request.amount) {
-                processImmediateUnstake(request.user, request.amount); // Process the unstake immediately
-                removeFromQueue(0); // Remove the processed request from the queue
-                totalFundsNeeded -= ((request.amount * 70) / 100); // Reduce the total funds needed
-                // Update available WETH after processing this unstake
+                processImmediateUnstake(request.user, request.amount);
+                removeFromQueue(0);
+                totalFundsNeeded -= ((request.amount * 70) / 100);
+
                 availableWETH = IWETH(weth).balanceOf(address(this));
             } else {
                 uint256 wethShortfall = request.amount - availableWETH;
-                notifyFactoryForFunds(wethShortfall); // Request the exact needed funds from the factory
-                emit FundsRequested(wethShortfall); // Optionally log this event
+                notifyFactoryForFunds(wethShortfall);
+                emit FundsRequested(wethShortfall);
             }
         }
     }
 
-    function handleReceivedWETHDELETE() external {
+    function handleReceivedWETHFromScript() external {
         uint256 availableWETH = IWETH(weth).balanceOf(address(this));
-        emit DebugAvailableWETH(availableWETH); // Log the available WETH balance
+        emit DebugAvailableWETH(availableWETH);
 
         if (unstakeQueue.length > 0) {
-            UnstakeRequest storage request = unstakeQueue[0]; // Get the first request in the queue
+            UnstakeRequest storage request = unstakeQueue[0];
             emit UnstakeRequestDetails(
                 0,
                 request.user,
                 request.amount,
                 request.timestamp
-            ); // Log details of the request
+            );
 
             if (availableWETH >= request.amount) {
-                processImmediateUnstake(request.user, request.amount); // Process the unstake immediately
-                removeFromQueue(0); // Remove the processed request from the queue
+                processImmediateUnstake(request.user, request.amount);
+                removeFromQueue(0);
             } else {
                 uint256 wethShortfall = request.amount - availableWETH;
-                notifyFactoryForFunds(wethShortfall); // Request the exact needed funds from the factory
-                emit FundsRequested(wethShortfall); // Optionally log this event
+                notifyFactoryForFunds(wethShortfall);
+                emit FundsRequested(wethShortfall);
             }
         }
     }
 
     function handleReceivedWETHALLQUEUE() internal {
         uint256 availableWETH = IWETH(weth).balanceOf(address(this));
-        emit DebugAvailableWETH(availableWETH); // Log the available WETH balance
+        emit DebugAvailableWETH(availableWETH);
 
         uint256 fundsNeeded = 0;
 
@@ -342,13 +315,13 @@ contract SimpleStaking is ReentrancyGuard {
 
             if (availableWETH >= request.amount) {
                 processImmediateUnstake(request.user, request.amount);
-                availableWETH -= request.amount; // Update available WETH after processing this unstake
+                availableWETH -= request.amount;
 
-                unstakeQueue[i] = unstakeQueue[unstakeQueue.length - 1]; // Efficient removal of processed request
-                unstakeQueue.pop(); // Adjust the length of the queue
+                unstakeQueue[i] = unstakeQueue[unstakeQueue.length - 1];
+                unstakeQueue.pop();
             } else {
                 fundsNeeded += request.amount - availableWETH;
-                i++; // Only increment if the unstake is not processed
+                i++;
             }
         }
 
@@ -361,25 +334,22 @@ contract SimpleStaking is ReentrancyGuard {
     function removeFromQueue(uint index) internal {
         require(index < unstakeQueue.length, "Index out of bounds.");
         unstakeQueue[index] = unstakeQueue[unstakeQueue.length - 1];
-        unstakeQueue.pop(); // Remove the last element after moving it to replace the processed one
+        unstakeQueue.pop();
     }
 
     function canProcessUnstake(
         address user,
         uint256 amount
     ) internal view returns (bool) {
-        // Example check that needs to be tailored to actual requirements
         return
             IWETH(weth).balanceOf(address(this)) >= amount &&
             pendingUnstakes[user] >= amount;
     }
 
-    // Function to get the length of the unstake queue
     function getUnstakeQueueLength() public view returns (uint) {
         return unstakeQueue.length;
     }
 
-    // Function to get details of a request by index
     function getUnstakeRequest(
         uint index
     ) public view returns (address user, uint256 amount, uint256 timestamp) {
@@ -388,7 +358,6 @@ contract SimpleStaking is ReentrancyGuard {
         return (request.user, request.amount, request.timestamp);
     }
 
-    // know the total amount in weth on the unstake queue
     function getTotalUnstakeQueueAmount()
         public
         view

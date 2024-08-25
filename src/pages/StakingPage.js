@@ -462,9 +462,8 @@ const StakingPage = () => {
           Earn from every token deployed through Vortex
         </h1>
         <h5 className="subtitlefactory">
-          Lend your ETH and get a share of all revenues
+          Lend your ETH and get a share of all revenues. Only live on Sepolia.
         </h5>
-        <h6 className="texthome2">Currently only fully live on Sepolia</h6>
       </div>
       <div className="center-container">
         <div className="staking-container">
