@@ -1,8 +1,7 @@
 h5 {
   text-align: center;
   color: white;
-  margin-bottom: -20px;
-  margin-top: -25px;
+  margin-bottom: 10px; /* Adjusted for better spacing */
   font-size: 16px;
 }
 
@@ -15,8 +14,8 @@ h5 {
 
 .staking-container {
   max-width: 600px;
-  padding: 30px 70px 30px 70px;
-  margin-top:-350px;
+  padding: 20px; /* Reduced padding */
+  margin: 20px; /* Reduced margin */
   border: 1px solid #cccccc81;
   border-radius: 30px;
   background-color: #0000006c;
@@ -27,6 +26,21 @@ h5 {
   align-items: center; /* Horizontally center */
   height: 50%; /* Ensure the container takes the full height of the viewport */
   text-align: center;
+}
+
+.info-container {
+  max-width: 600px; /* Match the staking container */
+  padding: 30px 70px; /* Match the staking container padding */
+  margin: 50px; /* Match the staking container margin */
+  border: 1px solid #cccccc81; /* Match the staking container border */
+  border-radius: 30px; /* Match the staking container border radius */
+  background-color: #000000; /* Match the staking container background color */
+  color: rgba(255, 255, 255, 0); /* Match the staking container text color */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center */
+  align-items: center; /* Horizontally center */
+  text-align: center; /* Center text */
 }
 
 @media only screen and (max-width: 600px) {

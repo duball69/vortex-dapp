@@ -369,6 +369,10 @@ contract SimpleStaking is ReentrancyGuard {
         }
         return total;
     }
+
+    function getTotalRewards() external view returns (uint256) {
+        return totalRewards;
+    }
 }
 
 interface IWETH {

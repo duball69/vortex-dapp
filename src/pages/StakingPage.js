@@ -43,7 +43,7 @@ const networkConfig = {
 
   //sepolia
   11155111: {
-    stakingAddress: "0x1bC77d9f56BAd00Bc10AeCE29ff65C6273fd3826",
+    stakingAddress: "0x73d11D624f3cAf8D649CAE5712e00e72a98a0a61",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -94,6 +94,8 @@ const StakingPage = () => {
   const StakingChainAddress =
     networkConfig[chainId]?.stakingAddress || "DefaultFactoryAddress";
   const [isInitialized, setIsInitialized] = useState(false);
+  const [totalStaked, setTotalStaked] = useState("0.0000");
+  const [totalRewards, setTotalRewards] = useState("0.0000");
 
   useEffect(() => {
     if (!isInitialized && chainId && networkConfig[chainId]) {
@@ -194,9 +196,28 @@ const StakingPage = () => {
       }
     };
 
+    const fetchStatistics = async () => {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const stakingPoolContract = new ethers.Contract(
+        StakingChainAddress,
+        SimpleStakingJson.abi,
+        signer
+      );
+
+      // Fetch total staked and total rewards
+      const totalStaked = await stakingPoolContract.getTotalStaked();
+      const totalRewards = await stakingPoolContract.getTotalRewards();
+
+      // Set the state with the fetched values
+      setTotalStaked(ethers.formatEther(totalStaked));
+      setTotalRewards(ethers.formatEther(totalRewards));
+    };
+
     if (isConnected) {
       checkStakingStatus();
       calculateAPY();
+      fetchStatistics();
     }
   }, [connectedWallet, isConnected]);
 
@@ -451,7 +472,7 @@ const StakingPage = () => {
   };
 
   return (
-    <div>
+    <div style={{ position: "relative", textAlign: "center" }}>
       <Header
         connectWallet={connectWallet}
         isConnected={isConnected}
@@ -465,76 +486,127 @@ const StakingPage = () => {
           Lend your ETH and get a share of all revenues. Only live on Sepolia.
         </h5>
       </div>
-      <div className="center-container">
-        <div className="staking-container">
-          <h2>Vortex ETH Pool</h2>
-          {!isConnected && (
-            <button onClick={connectWallet}>Connect Wallet</button>
-          )}
-          {isConnected && (
-            <>
+      <div className="staking-container">
+        {/* Staking container in the center */}
+        <h2 className="vortex-title">Vortex ETH Pool</h2>
+        {!isConnected && (
+          <button onClick={connectWallet}>Connect Wallet</button>
+        )}
+        {isConnected && (
+          <>
+            <div>
               <div>
-                <div>
-                  <h4>APY: {apy}</h4>
-                </div>
-                {pendingUnstake > 0n && (
-                  <p>
-                    Pending amount unstaking:{" "}
-                    {ethers.formatEther(pendingUnstake.toString())} ETH
-                  </p>
-                )}
-                <p>{stakedMessage}</p>
-                <input
-                  type="text"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount (ETH)"
-                />
-                <div>
-                  {" "}
-                  <button
-                    className="stake-button"
-                    onClick={handleStake}
-                    disabled={loadingStake || loadingUnstake}
-                  >
-                    {loadingStake ? "Staking..." : "Stake"}
-                  </button>
-                  {isStaked && canUnstake && (
-                    <button
-                      className="unstake-button"
-                      onClick={handleUnstake}
-                      disabled={
-                        loadingStake ||
-                        loadingUnstake ||
-                        !canUnstake ||
-                        calculateMaxUnstakable(stakedAmount, pendingUnstake) <=
-                          0n
-                      }
-                    >
-                      {loadingUnstake ? "Unstaking..." : "Unstake"}
-                    </button>
-                  )}
-                </div>
-
-                {isConnected && isStaked && (
+                <h4 className="apy-title">APY: {apy}</h4>
+              </div>
+              {pendingUnstake > 0n && (
+                <p>
+                  Pending amount unstaking:{" "}
+                  {ethers.formatEther(pendingUnstake.toString())} ETH
+                </p>
+              )}
+              <p>{stakedMessage}</p>
+              <input
+                type="text"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Enter amount (ETH)"
+              />
+              <div>
+                <button
+                  className="stake-button"
+                  onClick={handleStake}
+                  disabled={loadingStake || loadingUnstake}
+                >
+                  {loadingStake ? "Staking..." : "Stake"}
+                </button>
+                {isStaked && canUnstake && (
                   <button
                     className="unstake-button"
-                    onClick={handleClaimRewards}
-                    disabled={loadingClaim}
+                    onClick={handleUnstake}
+                    disabled={
+                      loadingStake ||
+                      loadingUnstake ||
+                      !canUnstake ||
+                      calculateMaxUnstakable(stakedAmount, pendingUnstake) <= 0n
+                    }
                   >
-                    {loadingClaim ? "Claiming..." : "Claim"}
+                    {loadingUnstake ? "Unstaking..." : "Unstake"}
                   </button>
                 )}
-
-                {errorMessage && (
-                  <p className="error-message">{errorMessage}</p>
-                )}
               </div>
-            </>
-          )}
+
+              {isConnected && isStaked && (
+                <button
+                  className="unstake-button"
+                  onClick={handleClaimRewards}
+                  disabled={loadingClaim}
+                >
+                  {loadingClaim ? "Claiming..." : "Claim"}
+                </button>
+              )}
+
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="info-container">
+        {/* Info container below the staking container */}
+        <div className="stats-row">
+          <div className="stat-item">
+            <strong>Total Staked:</strong> {totalStaked} ETH
+          </div>
+          <div className="stat-item">
+            <strong>Total Rewards:</strong> {totalRewards} ETH
+          </div>
         </div>
       </div>
       <Footer />
+      <style jsx>{`
+        .staking-container {
+          max-width: 600px;
+          padding: 20px; /* Reduced padding */
+          margin: 20px auto; /* Center horizontally */
+          border: 1px solid #cccccc81;
+          border-radius: 30px;
+          background-color: #0000006c;
+          color: white;
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* Vertically center */
+          align-items: center; /* Horizontally center */
+          text-align: center;
+        }
+        .vortex-title {
+          margin-bottom: 5px; /* Reduced margin to decrease distance */
+        }
+        .apy-title {
+          margin-top: 10; /* Remove top margin to decrease distance */
+        }
+        .info-container {
+          max-width: 600px; /* Match the staking container */
+          padding: 20px; /* Match the staking container padding */
+          margin: 20px auto; /* Center horizontally */
+          border: 1px solid #cccccc81; /* Match the staking container border */
+          border-radius: 30px; /* Match the staking container border radius */
+          background-color: #000000; /* Match the staking container background color */
+          color: white; /* Changed to white for better visibility */
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* Vertically center */
+          align-items: center; /* Horizontally center */
+          text-align: center; /* Center text */
+        }
+        .stats-row {
+          display: flex; /* Use flexbox for horizontal layout */
+          justify-content: space-between; /* Space between items */
+          width: 100%; /* Full width */
+        }
+        .stat-item {
+          flex: 1; /* Equal space for each item */
+          text-align: center; /* Center text within each item */
+        }
+      `}</style>
     </div>
   );
 };
