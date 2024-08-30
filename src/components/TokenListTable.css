@@ -283,6 +283,7 @@ h3 {
   display: flex;
   flex-direction: column;
   position: absolute;
+  font-size: 10px;
   background-color: rgb(0, 0, 0);
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -313,7 +314,7 @@ h3 {
   .trade-button {
     display: inline-block; /* Make the button behave like an inline element to center it */
     padding: 7px 20px; /* Adjust padding for button size */
-    font-size: 16px;
+    font-size: 12px;
     border-radius: 30px;
     background: linear-gradient(38deg, #ef10ffe1, #00CDFFF6);
     border: 1px solid rgba(255, 255, 255, 0.519);
@@ -373,4 +374,71 @@ h3 {
   justify-content: center;
   align-items: center;
   height: 100vh; /* Adjust as needed */
+}
+
+.filter-button,
+.sort-button {
+    padding: 10px 20px; /* Adjust padding for button size */
+    font-size: 12px; /* Font size */
+    border-radius: 30px; /* Rounded corners */
+    background: linear-gradient(38deg, #ef10ffe1, #00CDFFF6); /* Gradient background */
+    border: 1px solid rgba(255, 255, 255, 0.519); /* Border style */
+    color: #ffffff; /* Text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    margin: 0 5px; /* Margin between buttons */
+}
+
+.filter-button:hover,
+.sort-button:hover {
+    background-color: #ffffff; /* Change background on hover */
+    color: #000000; /* Change text color on hover */
+}
+
+.filter-button:disabled,
+.sort-button:disabled {
+    background-color: #ccc; /* Disabled background color */
+    color: #666; /* Disabled text color */
+    cursor: not-allowed; /* Not allowed cursor */
+}
+
+.copy-button {
+   margin-top:4px;
+    padding: 6px 12px; /* Adjust padding for a more comfortable size */
+    font-size: 11px; /* Slightly larger font size for better readability */
+    border-radius: 20px; /* More rounded corners for a modern look */
+    background: linear-gradient(38deg, #ef10ffe1, #00CDFFF6); /* Gradient background */
+    border: none; /* Remove border for a cleaner look */
+    color: #ffffff; /* Text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for background and transform */
+    margin-left: px; /* Space between address and button */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.copy-button:hover {
+    background-color: #ffffff; /* Change background on hover */
+    color: #000000; /* Change text color on hover */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.copy-button:active {
+    transform: scale(0.95); /* Slightly shrink the button when clicked */
+}
+
+.chain-list {
+    font-size: 12px; /* Set font size to 11px */
+    padding: 5px 10px; /* Adjust padding for button size */
+    border-radius: 20px; /* Rounded corners */
+    background: linear-gradient(38deg, #ef10ffe1, #00CDFFF6); /* Gradient background */
+    border: none; /* Remove border for a cleaner look */
+    color: #ffffff; /* Text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+    margin: 5 5px; /* Margin between buttons */
+}
+
+.chain-list:hover {
+    background-color: #ffffff; /* Change background on hover */
+    color: #000000; /* Change text color on hover */
 }

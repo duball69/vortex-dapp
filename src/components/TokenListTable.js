@@ -122,6 +122,18 @@ function TokensListTable({ limit }) {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
+  const copyToClipboard = () => {
+    const address = document.getElementById("contractAddress").innerText;
+    navigator.clipboard
+      .writeText(address)
+      .then(() => {
+        alert("Contract address copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  };
+
   if (loading)
     return (
       <div className="loading-container">
@@ -148,6 +160,7 @@ function TokensListTable({ limit }) {
       <h5 className="subtitletokens">Choose a token and start trading</h5>
       <div className="sort-container">
         <button
+          className="sort-button"
           onClick={() =>
             sortTokens("date", sortOrder === "newest" ? "oldest" : "newest")
           }
@@ -155,20 +168,56 @@ function TokensListTable({ limit }) {
           Sort by {sortOrder === "newest" ? "Oldest" : "Newest"} ↓
         </button>
         <div className="filter-container">
-          <button onClick={() => setShowFilterOptions(!showFilterOptions)}>
+          <button
+            className="filter-button"
+            onClick={() => setShowFilterOptions(!showFilterOptions)}
+          >
             Filter by Chain
           </button>
           {showFilterOptions && (
             <div className="filter-options">
-              <button onClick={() => filterByChain("all")}>All Chains</button>
-              <button onClick={() => filterByChain("Sepolia")}>Sepolia</button>
-              <button onClick={() => filterByChain("Base")}>Base</button>
-              <button onClick={() => filterByChain("BSC")}>BSC</button>
-              <button onClick={() => filterByChain("Optimism")}>OP</button>
-              <button onClick={() => filterByChain("Arbitrum")}>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("all")}
+              >
+                All Chains
+              </button>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("Sepolia")}
+              >
+                Sepolia
+              </button>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("Base")}
+              >
+                Base
+              </button>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("BSC")}
+              >
+                BSC
+              </button>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("Optimism")}
+              >
+                OP
+              </button>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("Arbitrum")}
+              >
                 Arbitrum
               </button>
-              <button onClick={() => filterByChain("Blast")}>Blast</button>
+              <button
+                className="chain-list"
+                onClick={() => filterByChain("Blast")}
+              >
+                Blast
+              </button>
             </div>
           )}
         </div>
@@ -202,7 +251,16 @@ function TokensListTable({ limit }) {
               <td>
                 {token.name} ({token.symbol})
               </td>
-              <td className="address-cell">{token.address}</td>
+              <td className="address-cell">
+                <span id="contractAddress">{token.address}</span>{" "}
+                <button
+                  className="copy-button"
+                  onClick={() => copyToClipboard(token.address)}
+                >
+                  Copy
+                </button>
+                {/* Display the contract address */}
+              </td>
               <td>{token.chain}</td>
               <td>
                 {token.timestamp ? token.timestamp.toLocaleDateString() : "N/A"}
