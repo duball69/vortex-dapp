@@ -24,7 +24,7 @@ function Header2({ connectWallet, isConnected, chainId }) {
     <header>
       <div className="header-content">
         <div className="div-logo">
-          <Link to="/">
+          <Link to="https://vortexdapp.com">
             <img
               src="https://i.imgur.com/XDHnW0R.png"
               alt="VortexLogo png"
