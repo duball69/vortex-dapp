@@ -393,6 +393,35 @@ function FactoryPage() {
           )}
         </div>
       </div>{" "}
+      <div className="info-footer">
+        <p>
+          Select your token name, symbol, and total supply, and click "Create
+          Token". Vortex smart contracts allow you to deploy your token with an
+          initial liquidity of 0.5 ETH. You will be able to purchase tokens on
+          the first block, in the next step.
+        </p>
+        <p>
+          If you have questions, please check our
+          <a
+            href="https://docs.vortexdapp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {" "}
+            Docs{" "}
+          </a>
+          or ask us on our
+          <a
+            href="https://t.me/vortexdapp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {" "}
+            Telegram
+          </a>
+          .
+        </p>
+      </div>
       <Footer />
     </div>
   );

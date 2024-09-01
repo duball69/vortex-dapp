@@ -244,3 +244,25 @@ button.deploy-button:hover {
     font-size: 0.9rem; /* Adjust the size as needed */
     color: #ffffff; /* Example color */
 }
+
+.info-footer {
+    margin-top: -50px; /* Space above the footer */
+    padding: 10px; /* Padding for the footer */
+    background-color: #0000006c; /* Semi-transparent background */
+    color: white; /* Text color */
+    border-radius: 10px; /* Rounded corners */
+    text-align: center; /* Center the text */
+    max-width: 1000px; /* Limit the width of the box */
+    margin-left: auto; /* Center horizontally */
+    margin-right: auto; /* Center horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+.info-footer a {
+    color: #00CDFFF6; /* Link color */
+    text-decoration: underline; /* Underline links */
+}
+
+.info-footer a:hover {
+    color: #ffffff; /* Change link color on hover */
+}
