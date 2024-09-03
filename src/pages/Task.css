@@ -1,0 +1,16 @@
+/* Desktop and tablet */
+.token-list-mobile {
+    display: none; /* Hide on desktop and tablet */
+  }
+  
+  /* Mobile devices */
+  @media only screen and (max-width: 768px) {
+    .token-list-desktop {
+      display: none; /* Hide on mobile */
+    }
+  
+    .token-list-mobile {
+      display: block; /* Show only on mobile */
+    }
+  }
+  
