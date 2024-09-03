@@ -1,0 +1,53 @@
+.tasks-container {
+    padding: 20px;
+}
+
+.deployedtaskstitle {
+    font-size: 34px;
+    margin-bottom: 10px;
+    color: white; /* Set title text to white */
+}
+
+.subtitletasks {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: white; /* Set subtitle text to white */
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px; /* Space between cards */
+}
+
+.task-card {
+    background-color: rgba(255, 255, 255, 0.1); /* Light background for cards */
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    color: white; /* Set text color to white */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+
+.task-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* Button color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.task-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('https://i.imgur.com/EeSiiMV.jpeg'); /* Background image */
+    background-size: cover;
+    background-attachment: fixed;
+}

@@ -1,0 +1,65 @@
+.tasks-container {
+    padding: 20px;
+}
+
+.deployedtaskstitle {
+    font-size: 34px;
+    margin-bottom: -5px;
+    color: white; /* Set title text to white */
+}
+
+.subtitletasks {
+    font-size: 18px;
+    margin-bottom: 50px;
+    margin-top: 5px;
+    color: white; /* Set subtitle text to white */
+}
+
+.tasks-table {
+    width: 100%;
+    border-collapse: collapse; /* Collapse borders for a cleaner look */
+}
+
+.tasks-table th, .tasks-table td {
+    border: 1px solid #ffffff00; /* Transparent border */
+    padding: 8px;
+    text-align: left;
+    color: white; /* Set table text to white */
+}
+
+.tasks-table th {
+    background-color: #000000; /* Header background */
+    font-weight: bold;
+    color: white; /* Set table header text to white */
+}
+
+.tasks-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.1); /* Light background for even rows */
+}
+
+.tasks-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Highlight row on hover */
+}
+
+.task-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* Button color */
+    color: white; /* Button text color */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.task-button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('https://i.imgur.com/EeSiiMV.jpeg'); /* Background image */
+    background-size: cover;
+    background-attachment: fixed;
+}

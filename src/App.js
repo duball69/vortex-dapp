@@ -7,6 +7,7 @@ import DashboardPage from "./pages/Dashboard";
 import RecentlyLaunched from "./pages/RecentlyLaunched";
 import FactoryPage from "./pages/FactoryPage";
 import PointsPage from "./pages/Points";
+import TaskPage from "./pages/Task";
 import AfterLaunch from "./pages/AfterLaunch";
 import TokensPage from "./pages/TokenListPage";
 import TokenBuyTrackerPage from "./pages/TokenBuyTrackerPage";
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/factory" element={<FactoryPage />} />
           <Route path="/points" element={<PointsPage />} />
+          <Route path="/tasks" element={<TaskPage />} />
           <Route
             path="/dashboard/:contractAddress"
             element={<DashboardPage />}
