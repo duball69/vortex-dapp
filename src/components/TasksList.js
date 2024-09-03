@@ -31,6 +31,13 @@ const tasks = [
     link: "/factory", // Link for this task
   },
   {
+    id: 13,
+    description: "Trade tokens",
+    points: "1 point per $ traded",
+    category: "Trade",
+    link: "/tokens", // Link for this task
+  },
+  {
     id: 5,
     description: "Hit a market cap of 10,000",
     points: 20,
@@ -85,13 +92,6 @@ const tasks = [
     points: 1000,
     category: "Market Cap",
     link: "/factory", // Link for this task
-  },
-  {
-    id: 13,
-    description: "Trade tokens",
-    points: "1 point per $ traded",
-    category: "Trade",
-    link: "/tokens", // Link for this task
   },
 ];
 
