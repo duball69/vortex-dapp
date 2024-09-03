@@ -1,11 +1,15 @@
 /* Header.css */
 .header {
   background-color: #00000000;
-  padding: 11px 20px;
+  padding: 11px 20px; /* Adjust padding as needed */
   color: white;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Space between logo and button */
   align-items: center;
+  width: 100%; /* Ensure header takes full width */
+  max-width: 600px; /* Set a maximum width for the header */
+  margin: 0 auto; /* Center the header horizontally */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .logo {
@@ -13,52 +17,90 @@
   height: auto; /* Maintain aspect ratio */
 }
 
-/* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
-@media only screen and (max-width: 600px) {
-  .logo {
-      width: 70px; /* Adjust the width for smaller screens */
-      align-items: center;
-      display: flex;
-  }
-
-
-  div-button{ display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1; /* Allow the button div to take up available space */}
-    
-  .div-logo, .div-burger, .div-button {
-    max-width: 33%; /* Each div takes 33% of the width */
+.Connect {
+  border-radius: 30px; /* Rounded corners */
+  padding: 7px 25px; /* Padding for the button */
+  background: linear-gradient(38deg, #00CDFFF6, #fb00dec5); /* Gradient background */
+  color: white; /* Text color */
+  border: 1px solid rgba(255, 255, 255, 0.519); /* Border */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+  margin: 0 20px; /* Add horizontal margin for spacing */
 }
 
+.Connect:hover {
+  background-color: #0056b3; /* Change to a darker shade on hover */
+  transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.Launch {
+  border-radius: 30px; /* Rounded corners */
+  padding: 7px 25px; /* Padding for the button */
+  background: linear-gradient(38deg, #00CDFFF6, #fb00dec5); /* Gradient background */
+  color: white; /* Text color */
+  border: 1px solid rgba(255, 255, 255, 0.519); /* Border */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.Launch:hover {
+  background-color: #0056b3; /* Change to a darker shade on hover */
+  transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+/* Media query for screens with a maximum width of 600 pixels (typical for mobile devices) */
+@media only screen and (max-width: 600px) {
+  .header {
+    padding: 10px; /* Adjust padding for mobile */
+    max-width: 100%; /* Ensure header takes full width on mobile */
+  }
+
+  .logo {
+    width: 70px; /* Adjust the width for smaller screens */
+  }
+
+  .div-button {
+    flex-grow: 0; /* Prevent the button div from growing */
+    text-align: center; /* Center the button */
+  }
+
+  .Connect {
+    width: auto; /* Set width to auto to prevent stretching */
+    padding: 7px 10px; /* Adjust padding for a smaller button */
+    margin: 0; /* Remove horizontal margin */
+  }
+
+  .div-logo, .div-burger {
+    max-width: 33%; /* Each div takes 33% of the width */
+  }
+
+  
   /* Ensure each column occupies 33% of the screen width */
   .header-content > * {
-      width: 33%;
+      width: auto; /* Allow content to adjust based on its size */
       text-align: center; /* Center content within each column */
   }
 
   .burger-menu {
-
       text-align: center; /* Align burger menu to the right */
   }
-
-
 }
 
 .header-content {
-  padding: 10px 20px;
+  padding: 10px 0; /* Adjust padding for header content */
   max-width: 100%; /* Ensure content does not exceed viewport width */
   margin: 0 auto; /* Center the content horizontally */
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Space between logo and button */
   align-items: center;
+  width: 100%; /* Ensure header content takes full width */
 }
 
 button {
-  padding: 7px 25px;
+  padding: 7px 15px;
   margin-top: 30px;
   font-size: 16px;
-  border-radius: 30px;
+  border-radius: 60px;
   /* Gradient background */
   background: linear-gradient(38deg, #00CDFFF6, #fb00dec5); /* Replace #FF5733 with your desired color */
   border: 1px solid rgba(255, 255, 255, 0.519);

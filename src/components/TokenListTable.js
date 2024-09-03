@@ -225,7 +225,7 @@ function TokensListTable({ limit }) {
       <table className="tokens-table">
         <thead>
           <tr>
-            <th>Image</th>
+            <th>Logo</th>
             <th>Name</th>
             <th>Contract Address</th>
             <th>Chain</th>

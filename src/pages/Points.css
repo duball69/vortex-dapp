@@ -1,0 +1,120 @@
+html, body {
+    height: 80%;
+    margin: 0;
+    padding: 0;
+    background-image: url('https://i.imgur.com/EeSiiMV.jpeg'); /* Background image */
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+body {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    padding: 0px; /* Padding around the center container */
+}
+
+.points-page-container {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between the boxes */
+    max-width: 1000px; /* Max width for the container */
+    margin-top: -300px; /* Center the container horizontally */
+    padding: 0px; /* Padding for the container */
+    background-color: #00000000; /* Light background for contrast */
+    border-radius: 15px; /* Rounded corners for the container */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0); /* Enhanced shadow for depth */
+}
+
+.points-box,
+.referral-box {
+    flex: 1; /* Allow both boxes to grow equally */
+    margin: 10px; /* Space between the boxes */
+    padding: 40px; /* Padding inside the boxes */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Light border for the boxes */
+    border-radius: 10px; /* Rounded corners */
+    background-color: #0000006c;  /* Semi-transparent background */
+    color: white; /* Text color */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+    transition: transform 0.2s; /* Smooth transition for hover effect */
+}
+
+.points-box:hover,
+.referral-box:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+}
+
+h1,
+h2 {
+    margin: 0; /* Remove default margin */
+    font-weight: bold; /* Bold titles */
+}
+
+h1 {
+    font-size: 24px; /* Adjusted title font size */
+    margin-bottom: 10px; /* Space below the title */
+}
+
+h2 {
+    font-size: 20px; /* Adjusted subtitle font size */
+    margin-bottom: 10px; /* Space below the subtitle */
+}
+
+.referral-link {
+    display: flex; /* Flexbox for input and button */
+    justify-content: center; /* Center items */
+    align-items: center; /* Center items vertically */
+    margin-top: 10px; /* Space above the referral link */
+}
+
+.referral-link input {
+    width: 100%; /* Width of the input field */
+    padding: 10px; /* Padding for the input */
+    border: 1px solid #ddd; /* Border for the input */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 11px; /* Font size for the input */
+}
+
+button {
+    padding: 10px 20px; /* Padding for the button */
+    margin-top:10px;
+    background-color: #4caf50; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 32px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    margin-left: 10px; /* Space between input and button */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Add this to your existing CSS */
+
+.referral-box p {
+    font-size: 12px; /* Adjust the font size to make it smaller */
+    line-height: 1.4; /* Adjust line height for better readability */
+    margin-bottom: 10px; /* Space below the paragraph */
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .points-page-container {
+        flex-direction: column; /* Stack items in a single column */
+        margin-top: 0; /* Remove top margin */
+        padding: 0; /* Remove padding for mobile */
+    }
+
+    .points-box,
+    .referral-box {
+        width: calc(100% - 40px); /* Full width minus horizontal margins */
+        margin: 20 30px; /* Add horizontal margin of 20px */
+        padding: 20px; /* Adjust padding for mobile if needed */
+        box-sizing: border-box; /* Include padding and border in the element's total width */
+    }
+}

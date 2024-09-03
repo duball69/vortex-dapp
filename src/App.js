@@ -6,6 +6,7 @@ import StakingPage from "./pages/StakingPage";
 import DashboardPage from "./pages/Dashboard";
 import RecentlyLaunched from "./pages/RecentlyLaunched";
 import FactoryPage from "./pages/FactoryPage";
+import PointsPage from "./pages/Points";
 import AfterLaunch from "./pages/AfterLaunch";
 import TokensPage from "./pages/TokenListPage";
 import TokenBuyTrackerPage from "./pages/TokenBuyTrackerPage";
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/factory" element={<FactoryPage />} />
+          <Route path="/points" element={<PointsPage />} />
           <Route
             path="/dashboard/:contractAddress"
             element={<DashboardPage />}

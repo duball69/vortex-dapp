@@ -403,7 +403,7 @@ h3 {
 }
 
 .copy-button {
-   margin-top:4px;
+   margin-top:10px;
     padding: 6px 12px; /* Adjust padding for a more comfortable size */
     font-size: 11px; /* Slightly larger font size for better readability */
     border-radius: 20px; /* More rounded corners for a modern look */

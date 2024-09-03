@@ -311,7 +311,7 @@ function FactoryPage() {
       </div>
       <div className="center-container">
         <div className="factory-container">
-          <h2 className="createerc">Create Your ERC20 Token</h2>
+          <h2 className="createerc">Create Your New Token</h2>
           {isConnected} {/* Display connected wallet address */}
           <form onSubmit={deployToken} className="token-form">
             <div className="custom-file-input">

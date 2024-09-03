@@ -16,7 +16,8 @@ html, body {
     }
 
 .subtitlefactory {font-size:18px;
-    margin-top:5px;
+
+    margin-top:-20px;
     font-weight: 300;
     margin-bottom: 20px;
 }
@@ -43,6 +44,8 @@ html, body {
     text-align: center;
  margin-top:-150px;
 }
+
+
 
 .center-container{
     display: flex;

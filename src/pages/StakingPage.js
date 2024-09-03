@@ -565,8 +565,9 @@ const StakingPage = () => {
       <style jsx>{`
         .staking-container {
           max-width: 600px;
+
           padding: 20px; /* Reduced padding */
-          margin: 20px auto; /* Center horizontally */
+          margin: 50px auto; /* Center horizontally */
           border: 1px solid #cccccc81;
           border-radius: 30px;
           background-color: #0000006c;
@@ -577,6 +578,7 @@ const StakingPage = () => {
           align-items: center; /* Horizontally center */
           text-align: center;
         }
+
         .vortex-title {
           margin-bottom: 5px; /* Reduced margin to decrease distance */
         }
@@ -587,6 +589,7 @@ const StakingPage = () => {
           max-width: 600px; /* Match the staking container */
           padding: 20px; /* Match the staking container padding */
           margin: 20px auto; /* Center horizontally */
+          margin-top: -30px;
           border: 1px solid #cccccc81; /* Match the staking container border */
           border-radius: 30px; /* Match the staking container border radius */
           background-color: #000000; /* Match the staking container background color */
@@ -596,6 +599,10 @@ const StakingPage = () => {
           justify-content: center; /* Vertically center */
           align-items: center; /* Horizontally center */
           text-align: center; /* Center text */
+        }
+
+        .info-container:hover {
+          transform: translateY(-5px); /* Lift effect on hover */
         }
         .stats-row {
           display: flex; /* Use flexbox for horizontal layout */
