@@ -121,7 +121,7 @@ function TaskMobile() {
               className="task-button"
               onClick={() => handleTaskButtonClick(task.link)}
             >
-              Complete
+              Start
             </button>
           </div>
         ))}

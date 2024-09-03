@@ -131,7 +131,7 @@ function TasksList() {
                   className="task-button"
                   onClick={() => handleTaskButtonClick(task.link)}
                 >
-                  Complete
+                  Start
                 </button>
               </td>
             </tr>
