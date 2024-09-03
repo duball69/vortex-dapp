@@ -91,6 +91,13 @@ const PointsPage = () => {
                 You have <strong>{points}</strong> points!
               </p>
             )}
+            <p>
+              Earn more points by completing tasks and engaging with the Vortex
+              ecosystem.
+            </p>
+            <button onClick={() => (window.location.href = "/tasks")}>
+              View Tasks
+            </button>
           </div>
 
           <div className="referral-box">
