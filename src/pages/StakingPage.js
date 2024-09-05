@@ -148,8 +148,6 @@ const StakingPage = () => {
           signer
         );
 
-        showPendingRewards(connectedWallet);
-
         const stakedAmount = await stakingPoolContract.getStake(
           connectedWallet
         );
@@ -439,7 +437,6 @@ const StakingPage = () => {
       await tx.wait();
 
       setLoadingClaim(false);
-      showPendingRewards(connectedWallet);
       setStakedMessage("Your rewards have been claimed!");
       setErrorMessage("");
     } catch (error) {
@@ -448,26 +445,6 @@ const StakingPage = () => {
         "An error occurred while claiming rewards. Please try again."
       );
       setLoadingClaim(false);
-    }
-  };
-
-  const showPendingRewards = async (userAddress) => {
-    if (!userAddress) return;
-
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = provider.getSigner();
-    const stakingContract = new ethers.Contract(
-      StakingChainAddress,
-      SimpleStakingJson.abi,
-      signer
-    );
-
-    try {
-      const pendingRewards = await stakingContract.pendingReward(userAddress);
-      console.log("Pending Rewards:", ethers.formatEther(pendingRewards));
-      setPendingRewards(ethers.formatEther(pendingRewards));
-    } catch (error) {
-      console.error("Error getting pending rewards:", error);
     }
   };
 
@@ -562,58 +539,6 @@ const StakingPage = () => {
         </div>
       </div>
       <Footer />
-      <style jsx>{`
-        .staking-container {
-          max-width: 600px;
-
-          padding: 20px; /* Reduced padding */
-          margin: 50px auto; /* Center horizontally */
-          border: 1px solid #cccccc81;
-          border-radius: 30px;
-          background-color: #0000006c;
-          color: white;
-          display: flex;
-          flex-direction: column;
-          justify-content: center; /* Vertically center */
-          align-items: center; /* Horizontally center */
-          text-align: center;
-        }
-
-        .vortex-title {
-          margin-bottom: 5px; /* Reduced margin to decrease distance */
-        }
-        .apy-title {
-          margin-top: 10; /* Remove top margin to decrease distance */
-        }
-        .info-container {
-          max-width: 600px; /* Match the staking container */
-          padding: 20px; /* Match the staking container padding */
-          margin: 20px auto; /* Center horizontally */
-          margin-top: -30px;
-          border: 1px solid #cccccc81; /* Match the staking container border */
-          border-radius: 30px; /* Match the staking container border radius */
-          background-color: #000000; /* Match the staking container background color */
-          color: white; /* Changed to white for better visibility */
-          display: flex;
-          flex-direction: column;
-          justify-content: center; /* Vertically center */
-          align-items: center; /* Horizontally center */
-          text-align: center; /* Center text */
-        }
-
-        .info-container:hover {
-          transform: translateY(-5px); /* Lift effect on hover */
-        }
-        .stats-row {
-          display: flex; /* Use flexbox for horizontal layout */
-          justify-content: space-between; /* Space between items */
-          width: 100%; /* Full width */
-        }
-        .stat-item {
-          flex: 1; /* Equal space for each item */
-          text-align: center; /* Center text within each item */
-        }
-      `}</style>
     </div>
   );
 };
