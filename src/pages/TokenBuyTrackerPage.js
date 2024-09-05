@@ -17,7 +17,6 @@ import {
 /* global BigInt */
 
 const TOKEN_ADDRESS = "0x02A54dD4ED8A088935486f435B1b686172e1AbA7"; // Replace with your token address
-const ALCHEMY_API_KEY = "szbuLvp-G7QOedbNPfL89Fn78DgCJqGh"; // Replace with your Alchemy API key
 
 const TokenBuyTrackerPage = () => {
   const [transactions, setTransactions] = useState([]);
@@ -64,7 +63,8 @@ const TokenBuyTrackerPage = () => {
     setError(null);
     try {
       const response = await fetch(
-        `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_BASE_API_KEY}`,
+
         {
           method: "POST",
           headers: {

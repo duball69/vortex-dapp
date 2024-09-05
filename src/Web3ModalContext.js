@@ -42,15 +42,7 @@ export const Web3ModalProvider = ({ children }) => {
         defaultChainId: 11155111,
         auth: {
           email: true, // Enable email login
-          socials: [
-            "google",
-            "x",
-            "github",
-            "discord",
-            "apple",
-            "facebook",
-            "farcaster",
-          ], // List of supported social platforms
+          socials: ["google", "x", "github", "discord", "apple", "facebook"], // List of supported social platforms
           showWallets: true, // Show wallet options alongside email and social logins
           walletFeatures: true, // Enable wallet features like balance viewing and transactions
         },
