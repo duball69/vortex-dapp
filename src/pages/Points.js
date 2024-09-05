@@ -19,51 +19,6 @@ const PointsPage = () => {
   const [signer, setSigner] = useState(null);
   const [contract, setContract] = useState(null);
 
-  // Initialize Ethers.js
-  useEffect(() => {
-    const initEthers = async () => {
-      if (window.ethereum) {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contr = new ethers.Contract(
-          referralContractAddress,
-          referralContractABI,
-          signer
-        );
-
-        setProvider(provider);
-        setSigner(signer);
-        setContract(contr);
-
-        try {
-          const address = await signer.getAddress();
-          setWalletAddress(address);
-          setReferralLink(`${window.location.origin}/?ref=${address}`);
-          await fetchUserPoints(address, contr);
-        } catch (error) {
-          console.error("Error fetching wallet address:", error);
-        }
-      } else {
-        alert("Please install MetaMask!");
-      }
-    };
-
-    initEthers();
-  }, []);
-
-  // Fetch user points from the contract
-  const fetchUserPoints = async (address, contractInstance) => {
-    try {
-      setLoading(true);
-      const userPoints = await contractInstance.referralPoints(address);
-      setPoints(userPoints.toNumber());
-    } catch (error) {
-      console.error("Error fetching points:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Copy referral link to clipboard
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink).then(() => {
@@ -84,13 +39,11 @@ const PointsPage = () => {
         <div className="points-page-container">
           <div className="points-box">
             <h2>Your Points</h2>
-            {loading ? (
-              <p>Loading points...</p>
-            ) : (
-              <p>
-                You have <strong>{points}</strong> points!
-              </p>
-            )}
+
+            <p>
+              You have <strong>{points}</strong> points!
+            </p>
+
             <p>
               Earn more points by completing tasks and engaging with the Vortex
               ecosystem.
