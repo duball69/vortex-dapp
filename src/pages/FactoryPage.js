@@ -121,19 +121,12 @@ const ethersConfig = defaultConfig({
   enableEIP6963: true,
   enableInjected: true,
   enableCoinbase: false,
-  rpcUrl: "...",
-  defaultChainId: 1,
+  rpcUrl:
+    "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Replace with your RPC URL
+  defaultChainId: 11155111,
   auth: {
     email: true, // Enable email login
-    socials: [
-      "google",
-      "x",
-      "github",
-      "discord",
-      "apple",
-      "facebook",
-      "farcaster",
-    ], // List of supported social platforms
+    socials: ["google", "x", "github", "discord", "apple", "facebook"], // List of supported social platforms
     showWallets: true, // Show wallet options alongside email and social logins
     walletFeatures: true, // Enable wallet features like balance viewing and transactions
   },

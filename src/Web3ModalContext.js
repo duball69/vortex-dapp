@@ -39,7 +39,6 @@ export const Web3ModalProvider = ({ children }) => {
           "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Replace with your RPC URL
         defaultChainId: 11155111, // Sepolia Testnet Chain ID
 
-        defaultChainId: 11155111,
         auth: {
           email: true, // Enable email login
           socials: ["google", "x", "github", "discord", "apple", "facebook"], // List of supported social platforms
