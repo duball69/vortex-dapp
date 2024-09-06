@@ -32,7 +32,7 @@ module.exports = {
       accounts: [process.env.SEPOLIA_PRIVATE_KEY],
     },
     localhost: {
-      url: "http://127.0.0.1:8545", // This is the default URL for the Hardhat node
+      url: process.env.SEPOLIA_RPC_URL, // This is the default URL for the Hardhat node
       allowCors: true,
     },
   },

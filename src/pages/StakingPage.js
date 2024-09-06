@@ -5,7 +5,7 @@ import { useWeb3ModalAccount, useWeb3Modal } from "@web3modal/ethers/react";
 import Header from "../components/Header.js";
 import "./StakingPage.css";
 import Footer from "../components/Footer.js";
-import { ethers, BrowserProvider } from "ethers";
+import { ethers } from "ethers";
 import SimpleStakingJson from "../contracts/SimpleStaking.json";
 import { firestore } from "../components/firebaseConfig.js";
 import {
@@ -14,7 +14,6 @@ import {
   setDoc,
   updateDoc,
   increment,
-  gt,
 } from "firebase/firestore";
 
 const CHAIN_NAMES = {
@@ -86,7 +85,6 @@ const StakingPage = () => {
     isConnected,
   } = useWeb3ModalAccount();
   const { open } = useWeb3Modal();
-  const [pendingRewards, setPendingRewards] = useState("0.0000");
   const [loadingClaim, setLoadingClaim] = useState(false);
   const [apy, setApy] = useState("Calculating...");
   const explorerUrl =
@@ -102,7 +100,7 @@ const StakingPage = () => {
       console.log("Initialization with chainId:", chainId);
       setIsInitialized(true);
     }
-  }, [chainId]);
+  }, [chainId, isInitialized]); // Add isInitialized to the dependency array
 
   useEffect(() => {
     const calculateAPY = async () => {
@@ -153,14 +151,31 @@ const StakingPage = () => {
         );
         const stakedAmountBN = BigInt(stakedAmount.toString());
 
+        const fetchPendingUnstakes = async (userAddress) => {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const stakingContract = new ethers.Contract(
+            StakingChainAddress,
+            SimpleStakingJson.abi,
+            signer
+          );
+
+          let totalPendingUnstakes = BigInt(0);
+          const queueLength = await stakingContract.getUnstakeQueueLength();
+          for (let i = 0; i < queueLength; i++) {
+            const request = await stakingContract.getUnstakeRequest(i);
+            if (request.user.toLowerCase() === userAddress.toLowerCase()) {
+              totalPendingUnstakes += BigInt(request.amount.toString());
+            }
+          }
+
+          return totalPendingUnstakes;
+        };
+
         const pendingUnstakes = await fetchPendingUnstakes(connectedWallet);
         const pendingUnstakesBN = BigInt(pendingUnstakes.toString());
 
         setPendingUnstake(pendingUnstakesBN);
-
-        console.log(
-          `Fetched staked amount: ${stakedAmount.toString()}, Fetched pending unstakes: ${pendingUnstakes.toString()}`
-        );
 
         console.log(
           `Converted staked amount: ${stakedAmountBN}, Converted pending unstakes: ${pendingUnstakesBN}`
@@ -217,7 +232,7 @@ const StakingPage = () => {
       calculateAPY();
       fetchStatistics();
     }
-  }, [connectedWallet, isConnected]);
+  }, [connectedWallet, isConnected, StakingChainAddress]); // Removed fetchPendingUnstakes from dependencies
 
   const connectWallet = async () => {
     try {
@@ -284,14 +299,14 @@ const StakingPage = () => {
         connectedWallet
       );
 
-      const stakedAmountBN = BigInt(newStakedAmount.toString());
-      const pendingUnstakesBN = BigInt(newPendingUnstakes.toString());
+      const newStakedAmountBN = BigInt(newStakedAmount.toString());
+      const newPendingUnstakesBN = BigInt(newPendingUnstakes.toString());
 
-      setStakedAmount(stakedAmountBN);
-      setPendingUnstake(pendingUnstakesBN);
+      setStakedAmount(newStakedAmountBN);
+      setPendingUnstake(newPendingUnstakesBN);
 
-      const availableForUnstake = stakedAmountBN - pendingUnstakesBN;
-      setIsStaked(stakedAmountBN > 0n);
+      const availableForUnstake = newStakedAmountBN - newPendingUnstakesBN;
+      setIsStaked(newStakedAmountBN > 0n);
       setCanUnstake(availableForUnstake > 0n);
 
       setStakedMessage(`You staked ${amount} ETH in the Vortex Pool.`);
@@ -391,31 +406,6 @@ const StakingPage = () => {
       setLoadingUnstake(false);
     }
   };
-
-  async function fetchPendingUnstakes(userAddress) {
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const stakingContract = new ethers.Contract(
-      StakingChainAddress,
-      SimpleStakingJson.abi,
-      signer
-    );
-
-    let totalPendingUnstakes = BigInt(0);
-    const queueLength = await stakingContract.getUnstakeQueueLength();
-    for (let i = 0; i < queueLength; i++) {
-      const request = await stakingContract.getUnstakeRequest(i);
-      if (request.user.toLowerCase() === userAddress.toLowerCase()) {
-        totalPendingUnstakes += BigInt(request.amount.toString());
-      }
-    }
-
-    console.log(
-      `Total pending unstakes for ${userAddress}: ${totalPendingUnstakes.toString()}`
-    );
-
-    return totalPendingUnstakes;
-  }
 
   const handleClaimRewards = async () => {
     if (!isConnected) {

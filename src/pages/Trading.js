@@ -223,6 +223,7 @@ function Trading() {
             }}
           >
             <iframe
+              title="Chart"
               src={`https://dexscreener.com/${chain}/${contractAddress}?embed=1&info=${
                 showInfo ? 1 : 0
               }&trades=1&theme=dark`}
@@ -259,6 +260,7 @@ function Trading() {
         {/* Right Section (Uniswap) */}
         <div style={{ flex: "0 0 30%", marginLeft: "10px" }}>
           <iframe
+            title="Swap"
             src={`https://app.uniswap.org/swap?chain=${chain}&theme=dark&inputCurrency=eth&outputCurrency=${contractAddress}&forceNetwork=${chain}`}
             height="660px"
             width="100%"

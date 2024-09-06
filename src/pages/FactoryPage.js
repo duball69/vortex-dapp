@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ethers, BrowserProvider } from "ethers";
+import { ethers } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json";
 import "./FactoryPage.css";
 import {
@@ -12,15 +12,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
 import { firestore } from "../components/firebaseConfig.js";
-import {
-  collection,
-  doc,
-  setDoc,
-  deleteDoc,
-  getDocs,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
 const networkConfig = {
   // Example Chain IDs for Base and Sepolia
@@ -121,9 +113,8 @@ const ethersConfig = defaultConfig({
   enableEIP6963: true,
   enableInjected: true,
   enableCoinbase: false,
-  rpcUrl:
-    "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Replace with your RPC URL
-  defaultChainId: 11155111,
+  rpcUrl: process.env.BASE_RPC_URL,
+  defaultChainId: 8453,
   auth: {
     email: true, // Enable email login
     socials: ["google", "x", "github", "discord", "apple", "facebook"], // List of supported social platforms

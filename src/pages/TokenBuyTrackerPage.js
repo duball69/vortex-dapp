@@ -3,17 +3,11 @@ import { ethers } from "ethers";
 import Header2 from "../components/Header2.js";
 import Footer from "../components/Footer.js";
 import "./TokenBuyTrackerPage.css";
+// Remove unused imports
+// import { collection, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { firestore } from "../components/firebaseConfig.js";
 import { useWeb3ModalAccount, useWeb3Modal } from "@web3modal/ethers/react";
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  updateDoc,
-  increment,
-  runTransaction,
-} from "firebase/firestore";
+import { doc, updateDoc, increment, runTransaction } from "firebase/firestore";
 /* global BigInt */
 
 const TOKEN_ADDRESS = "0x02A54dD4ED8A088935486f435B1b686172e1AbA7"; // Replace with your token address
@@ -23,22 +17,12 @@ const TokenBuyTrackerPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const {
-    address: connectedWallet,
-    chainId,
-    isConnected,
-  } = useWeb3ModalAccount();
+  const { chainId, isConnected } = useWeb3ModalAccount();
   const { open } = useWeb3Modal();
 
   const DECIMALS = 18;
 
   const provider = new ethers.BrowserProvider(window.ethereum);
-
-  function formatTokenValue(rawValue) {
-    const factor = Math.pow(10, DECIMALS);
-    const value = rawValue / factor; // Adjust raw value by the token's decimals
-    return Number(value.toFixed(3)); // Convert to number again to remove any trailing zeros
-  }
 
   function hexToEther(hex) {
     const bigIntValue = BigInt(hex);
@@ -153,7 +137,7 @@ const TokenBuyTrackerPage = () => {
 
   useEffect(() => {
     fetchTokenTransfers();
-  }, []);
+  }, [fetchTokenTransfers]);
 
   const saveTransaction = async (tx) => {
     const txDocRef = doc(firestore, "transactions", tx.hash);

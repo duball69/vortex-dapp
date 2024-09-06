@@ -24,7 +24,47 @@ export const Web3ModalProvider = ({ children }) => {
       chainId: 11155111,
       name: "Sepolia",
       currency: "ETH",
-      explorerUrl: "https://sepolia.etherscan.io/",
+      explorerUrl: "https://eth-sepolia.blockscout.com",
+      rpcUrl: process.env.SEPOLIA_RPC_URL,
+    };
+
+    const baseMainnet = {
+      chainId: 8453,
+      name: "Base",
+      currency: "ETH",
+      explorerUrl: "https://base.blockscout.com/",
+      rpcUrl: process.env.BASE_RPC_URL,
+    };
+
+    const bscMainnet = {
+      chainId: 56,
+      name: "BSC",
+      currency: "BNB",
+      explorerUrl: "https://bscscan.com",
+      rpcUrl: process.env.BSC_RPC_URL,
+    };
+    const arbitrumMainnet = {
+      chainId: 42161,
+      name: "Arbitrum",
+      currency: "ETH",
+      explorerUrl: "https://arbitrum.blockscout.com/",
+      rpcUrl: process.env.ARBITRUM_RPC_URL,
+    };
+
+    const optimismMainnet = {
+      chainId: 10,
+      name: "Optimism",
+      currency: "ETH",
+      explorerUrl: "https://optimism.blockscout.com/",
+      rpcUrl: process.env.OPTIMISM_RPC_URL,
+    };
+
+    const celoMainnet = {
+      chainId: 42220,
+      name: "Celo",
+      currency: "CELO",
+      explorerUrl: "https://explorer.celo.org/mainnet/",
+      rpcUrl: process.env.CELO_RPC_URL,
     };
 
     const projectId = process.env.WALLETCONNECT_PROJECT_ID;
@@ -35,9 +75,8 @@ export const Web3ModalProvider = ({ children }) => {
         enableEIP6963: true, // Enable MetaMask
         enableInjected: true, // Enable MetaMask
         enableCoinbase: true, // Enable Coinbase Wallet
-        rpcUrl:
-          "https://eth-sepolia.g.alchemy.com/v2/M87svOeOrOhMsnQWJXB8iQECjn8MJNW0", // Replace with your RPC URL
-        defaultChainId: 11155111, // Sepolia Testnet Chain ID
+        rpcUrl: process.env.BASE_RPC_URL,
+        defaultChainId: 8453,
 
         auth: {
           email: true, // Enable email login
@@ -46,7 +85,14 @@ export const Web3ModalProvider = ({ children }) => {
           walletFeatures: true, // Enable wallet features like balance viewing and transactions
         },
       }),
-      chains: [sepoliaMainnet],
+      chains: [
+        sepoliaMainnet,
+        arbitrumMainnet,
+        baseMainnet,
+        bscMainnet,
+        optimismMainnet,
+        celoMainnet,
+      ],
       projectId,
       enableAnalytics: true,
       explorerExcludedWalletIds: [

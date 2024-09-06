@@ -2,15 +2,16 @@ const { ethers } = require("hardhat");
 
 async function main() {
   //Setting contract addresses
-  const uniswapV3Factory_address = process.env.SEPOLIA_UNISWAP_FACTORY;
+  const uniswapV3Factory_address =
+    process.env.BASE_POSITION_MANAGER_UNISWAP_FACTORY;
   //
-  const positionManager_address = process.env.SEPOLIA_POSITION_MANAGER;
+  const positionManager_address = process.env.BASE_POSITION_MANAGER;
 
-  const swap_router = process.env.SEPOLIA_SWAP_ROUTER;
+  const swap_router = process.env.BASE_SWAP_ROUTER;
   //
-  const WETH_address = process.env.SEPOLIA_WETH;
+  const WETH_address = process.env.BASE_WETH;
   //
-  const teamWallet = "0xdc28630221B2d58B8E249Df6d96c928f57bed952";
+  const teamWallet = "0x78516acac245f7ef9aa8f91c65f206268d3aeb4d";
 
   const [deployer] = await ethers.getSigners();
 
@@ -83,7 +84,7 @@ async function main() {
   console.log("Done!");
 
   // Amount of WETH to send (in Wei)
-  const amountInWei = ethers.parseUnits("0.0004", 18);
+  const amountInWei = ethers.parseUnits("0.00001", 18);
 
   /* const txx = await factory.transferWETHToFactory(amountInWei);
   await txx.wait();
