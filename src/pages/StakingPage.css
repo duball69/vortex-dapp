@@ -63,6 +63,7 @@ h5 {
   text-align: center; /* Center text within each item */
 }
 
+
 @media only screen and (max-width: 600px) {
   .staking-container {
     margin: 10px 10px 10px 10px; /* Add margin for mobile devices */
@@ -108,6 +109,10 @@ h5 {
   .button-container button {
     flex: 1 1 45%;
     margin: 5px;
+  }
+
+  .info-container {
+    margin-top: 30px; /* Add margin-top for mobile version */
   }
 }
 

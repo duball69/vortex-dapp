@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json";
 import "./FactoryPage.css";
@@ -197,7 +197,7 @@ function FactoryPage() {
       console.log("Factory Address initialized:", factoryChainAddress);
       setIsInitialized(true); // Prevent further initialization logs
     }
-  }, [chainId, isInitialized]);
+  }, [chainId, isInitialized, factoryChainAddress]);
 
   async function connectWallet() {
     try {
@@ -372,6 +372,7 @@ function FactoryPage() {
                 <a
                   href={`${explorerUrl}/address/${deployedContractAddress}`}
                   target="_blank"
+                  rel="noreferrer"
                   className="a"
                 >
                   <span>Check CA on BlockScout</span>

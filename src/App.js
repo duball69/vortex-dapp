@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import StakingPage from "./pages/StakingPage";
 import DashboardPage from "./pages/Dashboard";
-import RecentlyLaunched from "./pages/RecentlyLaunched";
 import FactoryPage from "./pages/FactoryPage";
 import PointsPage from "./pages/Points";
 import TaskPage from "./pages/Task";
@@ -27,7 +26,7 @@ function App() {
             path="/dashboard/:contractAddress"
             element={<DashboardPage />}
           />
-          <Route path="/recently" element={<RecentlyLaunched />} />
+
           <Route path="/tokens" element={<TokensPage />} />
 
           <Route path="/token/:contractAddress" element={<AfterLaunch />} />

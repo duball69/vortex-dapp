@@ -7,21 +7,21 @@ const tasks = [
     description: "Join our Telegram Group",
     points: 10,
     category: "Social",
-    link: "https://t.me/vortexdapp", // Link for this task
+    link: "https://t.me/vortexdapp", // Use full URL for external link
   },
   {
     id: 2,
     description: "Follow our Twitter",
     points: 10,
     category: "Social",
-    link: "https://x.com/vortexdapp", // Link for this task
+    link: "https://twitter.com/vortexdapp", // Use full URL for external link
   },
   {
     id: 3,
     description: "Stake ETH on Vortex Pool",
     points: "1 point per $ staked",
     category: "Stake",
-    link: "/staking", // Link for this task
+    link: "/staking", // Internal link
   },
 
   {
