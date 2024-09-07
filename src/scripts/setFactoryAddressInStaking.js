@@ -3,10 +3,10 @@ const { ethers } = require("hardhat");
 
 async function main() {
   // The address of your deployed SimpleStaking contract
-  const stakingContractAddress = "0x73d11D624f3cAf8D649CAE5712e00e72a98a0a61";
+  const stakingContractAddress = "0x3E303b4C2A5F477d4c52104570Af4E737108BEF1";
 
   // The desired new factory address you want to set
-  const newFactoryAddress = "0x38cf4a95bc2A3A08fA73fF83eeEeeADeCA8327e5"; //sepolia factory
+  const newFactoryAddress = "0x0CeD474F344497dc917D285a00eEE0394c6F044c"; //sepolia factory
 
   // Get signer information from the default account
   const [signer] = await ethers.getSigners();

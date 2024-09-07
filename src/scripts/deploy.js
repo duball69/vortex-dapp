@@ -2,26 +2,41 @@ const { ethers } = require("hardhat");
 
 async function main() {
   //Setting contract addresses
-  const uniswapV3Factory_address =
-    process.env.BASE_POSITION_MANAGER_UNISWAP_FACTORY;
+  const uniswapV3Factory_address = process.env.SEPOLIA_UNISWAP_FACTORY;
   //
-  const positionManager_address = process.env.BASE_POSITION_MANAGER;
+  const positionManager_address = process.env.SEPOLIA_POSITION_MANAGER;
 
-  const swap_router = process.env.BASE_SWAP_ROUTER;
+  const swap_router = process.env.SEPOLIA_SWAP_ROUTER;
   //
-  const WETH_address = process.env.BASE_WETH;
+  const WETH_address = process.env.SEPOLIA_WETH;
   //
-  const teamWallet = "0x78516acac245f7ef9aa8f91c65f206268d3aeb4d";
+  const teamWallet = "0x25038e5ED41aEE965f3B229238dAd5Cd2234b193";
+
+  //const teamWallet= "0x78516acac245f7ef9aa8f91c65f206268d3aeb4d"; - gnosis base
 
   const [deployer] = await ethers.getSigners();
 
   console.log("Deploying contracts with the account:", deployer.address);
 
   const MyLocker = await ethers.getContractFactory("LiquidityLocker");
-  const MyLockerDeployment = await MyLocker.deploy(positionManager_address);
 
-  console.log("MyLocker address:", MyLockerDeployment.target);
+  let MyLockerDeployment;
+  try {
+    MyLockerDeployment = await MyLocker.deploy(positionManager_address);
+    console.log("MyLocker address:", MyLockerDeployment.target);
+  } catch (error) {
+    console.error("Error deploying MyLocker:", error);
+    return; // Exit if deployment fails
+  }
+
   const lockerAddress = MyLockerDeployment.target;
+
+  console.log("Position Manager Address:", positionManager_address);
+  console.log("WETH Address:", WETH_address);
+  console.log("Uniswap V3 Factory Address:", uniswapV3Factory_address);
+  console.log("Swap Router Address:", swap_router);
+  console.log("Locker Address:", lockerAddress);
+  console.log("Team Wallet Address:", teamWallet);
 
   const MyFactory = await ethers.getContractFactory("MyFactory");
   const myFactory = await MyFactory.deploy(

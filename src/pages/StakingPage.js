@@ -42,7 +42,7 @@ const networkConfig = {
 
   //sepolia
   11155111: {
-    stakingAddress: "0x73d11D624f3cAf8D649CAE5712e00e72a98a0a61",
+    stakingAddress: "0x3E303b4C2A5F477d4c52104570Af4E737108BEF1",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },

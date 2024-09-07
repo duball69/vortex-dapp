@@ -24,7 +24,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x38cf4a95bc2A3A08fA73fF83eeEeeADeCA8327e5",
+    factoryAddress: "0x0CeD474F344497dc917D285a00eEE0394c6F044c",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://eth-sepolia.blockscout.com/",
   },

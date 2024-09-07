@@ -31,6 +31,10 @@ module.exports = {
       url: process.env.ALCHEMY_CELO_ENDPOINT,
       accounts: [process.env.SEPOLIA_PRIVATE_KEY],
     },
+    localhost: {
+      url: "http://127.0.0.1:8545", // This is the default URL for the Hardhat node
+      allowCors: true,
+    },
   },
   etherscan: {
     apiKey: {
