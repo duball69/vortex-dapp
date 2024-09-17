@@ -17,6 +17,7 @@ contract SimpleStaking is ReentrancyGuard {
     uint256 public accRewardPerShare;
     uint256 public lastRewardTime;
     uint256 public constant REWARD_INTERVAL = 7 days;
+    uint256 public rewardRate; // Rewards distributed per second
 
     event Stake(address indexed user, uint256 amount);
     event Unstake(address indexed user, uint256 amount);
@@ -38,6 +39,7 @@ contract SimpleStaking is ReentrancyGuard {
         uint256 pendingAmount
     );
     event FundsReceived(uint256 amount, uint256 timestamp);
+    event TotalRewardsUpdated(uint256 newTotalRewards);
 
     struct UnstakeRequest {
         address user;
@@ -159,20 +161,38 @@ contract SimpleStaking is ReentrancyGuard {
             return;
         }
 
-        uint256 multiplier = block.timestamp - lastRewardTime;
-        uint256 reward = (multiplier * totalRewards) / REWARD_INTERVAL;
+        uint256 timeElapsed = block.timestamp - lastRewardTime;
+        uint256 reward = timeElapsed * rewardRate;
 
-        if (reward > 0) {
-            accRewardPerShare += (reward * 1e12) / totalStaked;
+        // Ensure rewards do not exceed totalRewards
+        if (reward > totalRewards) {
+            reward = totalRewards;
         }
 
+        // Update accRewardPerShare
+        accRewardPerShare += (reward * 1e12) / totalStaked;
+
+        // Deduct the distributed rewards from totalRewards
+        totalRewards -= reward;
+
+        // Update lastRewardTime
         lastRewardTime = block.timestamp;
     }
 
     function addRewards() external payable {
         require(msg.value > 0, "No rewards to add");
         IWETH(weth).deposit{value: msg.value}();
+
+        // Update totalRewards
         totalRewards += msg.value;
+        emit TotalRewardsUpdated(totalRewards);
+
+        // Update rewardRate based on REWARD_INTERVAL
+        rewardRate = totalRewards / REWARD_INTERVAL;
+
+        // Reset lastRewardTime to current block timestamp
+        lastRewardTime = block.timestamp;
+
         updatePool();
         emit RewardsAdded(msg.value);
     }
@@ -180,11 +200,17 @@ contract SimpleStaking is ReentrancyGuard {
     function pendingReward(address _user) external view returns (uint256) {
         uint256 _accRewardPerShare = accRewardPerShare;
         if (block.timestamp > lastRewardTime && totalStaked != 0) {
-            uint256 multiplier = block.timestamp - lastRewardTime;
-            uint256 reward = (multiplier * totalRewards) / REWARD_INTERVAL;
+            uint256 timeElapsed = block.timestamp - lastRewardTime;
+            uint256 reward = timeElapsed * rewardRate;
+
+            // Ensure rewards do not exceed totalRewards
+            if (reward > totalRewards) {
+                reward = totalRewards;
+            }
+
             _accRewardPerShare += (reward * 1e12) / totalStaked;
         }
-        uint256 simulatedReward = ((stakes[_user] * _accRewardPerShare) / 1e12);
+        uint256 simulatedReward = (stakes[_user] * _accRewardPerShare) / 1e12;
         return simulatedReward - rewardDebt[_user];
     }
 
@@ -199,18 +225,21 @@ contract SimpleStaking is ReentrancyGuard {
         require(userStake > 0, "No staked amount to claim rewards for");
 
         uint256 accumulatedReward = (userStake * accRewardPerShare) / 1e12;
-        uint256 pendingReward = accumulatedReward - rewardDebt[msg.sender];
+        uint256 userpendingReward = accumulatedReward - rewardDebt[msg.sender];
 
-        require(pendingReward > 0, "No rewards to claim");
-        require(totalRewards >= pendingReward, "Not enough rewards in pool");
+        require(userpendingReward > 0, "No rewards to claim");
+        require(
+            totalRewards >= userpendingReward,
+            "Not enough rewards in pool"
+        );
 
-        totalRewards -= pendingReward;
+        totalRewards -= userpendingReward;
         rewardDebt[msg.sender] = accumulatedReward;
 
-        IWETH(weth).withdraw(pendingReward);
-        (bool sent, ) = payable(msg.sender).call{value: pendingReward}("");
+        IWETH(weth).withdraw(userpendingReward);
+        (bool sent, ) = payable(msg.sender).call{value: userpendingReward}("");
         require(sent, "Failed to send ETH");
-        emit RewardClaimed(msg.sender, pendingReward);
+        emit RewardClaimed(msg.sender, userpendingReward);
     }
 
     fallback() external payable {}

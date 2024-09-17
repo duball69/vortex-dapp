@@ -42,7 +42,7 @@ const networkConfig = {
 
   //sepolia
   11155111: {
-    stakingAddress: "0x3E303b4C2A5F477d4c52104570Af4E737108BEF1",
+    stakingAddress: "0x7198663fDC5EDE9A6788F3B72C24edf19180f912",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
@@ -222,9 +222,17 @@ const StakingPage = () => {
       const totalStaked = await stakingPoolContract.getTotalStaked();
       const totalRewards = await stakingPoolContract.getTotalRewards();
 
-      // Set the state with the fetched values
-      setTotalStaked(ethers.formatEther(totalStaked));
-      setTotalRewards(ethers.formatEther(totalRewards));
+      // Format the values to 4 decimal places
+      const formattedTotalStaked = Number(
+        ethers.formatEther(totalStaked)
+      ).toFixed(4);
+      const formattedTotalRewards = Number(
+        ethers.formatEther(totalRewards)
+      ).toFixed(4);
+
+      // Set the state with the formatted values
+      setTotalStaked(formattedTotalStaked);
+      setTotalRewards(formattedTotalRewards);
     };
 
     if (isConnected) {

@@ -3,13 +3,7 @@ import { ethers } from "ethers";
 import MyFactoryJson from "../contracts/MyFactory.json"; // Assuming you have a separate JSON file for the deployed
 import MyTokenJson from "../contracts/MyToken.json";
 import PositionManagerJson from "../contracts/PositionManager.json";
-import {
-  createWeb3Modal,
-  defaultConfig,
-  useWeb3Modal,
-  useWeb3ModalAccount,
-  open,
-} from "@web3modal/ethers/react";
+import { useWeb3Modal, useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { Link, useParams } from "react-router-dom";
 import "./Dashboard.css";
 import Header from "../components/Header.js";
@@ -35,7 +29,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x0CeD474F344497dc917D285a00eEE0394c6F044c",
+    factoryAddress: "0x1657D77D0bCB4838F853B8fc7f043A52194a4ffB",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://eth-sepolia.blockscout.com/",
   },

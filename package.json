@@ -12,7 +12,7 @@
     "@uniswap/v3-periphery": "^1.4.4",
     "@web3modal/ethers": "^4.2.3",
     "assert": "^2.1.0",
-    "axios": "^1.7.3",
+    "axios": "^1.7.7",
     "cors": "^2.8.5",
     "ethers": "^6.13.2",
     "express": "^4.19.2",
@@ -28,7 +28,8 @@
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
     "stream-http": "^3.2.0",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xml2js": "^0.6.2"
   },
   "scripts": {
     "start": "react-scripts start",

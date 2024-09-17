@@ -9,6 +9,7 @@ import PointsPage from "./pages/Points";
 import TaskPage from "./pages/Task";
 import AfterLaunch from "./pages/AfterLaunch";
 import TokensPage from "./pages/TokenListPage";
+import CombinedFactoryDashboard from "./pages/Launch";
 
 import Trading from "./pages/Trading";
 import { Web3ModalProvider } from "./Web3ModalContext";
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/factory" element={<FactoryPage />} />
+          <Route path="/launch" element={<CombinedFactoryDashboard />} />
           <Route path="/points" element={<PointsPage />} />
           <Route path="/tasks" element={<TaskPage />} />
           <Route
