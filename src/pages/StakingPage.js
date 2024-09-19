@@ -340,7 +340,7 @@ const StakingPage = () => {
     }
 
     const unstakeAmount = ethers.parseUnits(amount, 18);
-    const availableForUnstake = stakedAmount - pendingUnstake;
+    const availableForUnstake = stakedAmount;
 
     if (unstakeAmount > availableForUnstake) {
       setErrorMessage(
@@ -494,11 +494,10 @@ const StakingPage = () => {
                 >
                   {loadingStake ? "Staking..." : "Stake"}
                 </button>
-                {isStaked && canUnstake && (
-                  <button className="unstake-button" onClick={handleUnstake}>
-                    {loadingUnstake ? "Unstaking..." : "Unstake"}
-                  </button>
-                )}
+
+                <button className="unstake-button" onClick={handleUnstake}>
+                  {loadingUnstake ? "Unstaking..." : "Unstake"}
+                </button>
               </div>
 
               {isConnected && isStaked && (
