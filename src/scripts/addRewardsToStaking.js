@@ -2,7 +2,7 @@
 const { ethers } = require("hardhat");
 
 async function addRewards() {
-  const stakingContractAddress = "0x7198663fDC5EDE9A6788F3B72C24edf19180f912"; //sepolia
+  const stakingContractAddress = "0x1EA39826371c39507eCA966BAB6C79C0581EcCeE"; //sepolia
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();

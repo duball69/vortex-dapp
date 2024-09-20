@@ -1,16 +1,33 @@
-// scripts/sendEth.js
+// scripts/sendEthToStaking.js
 
 const { ethers } = require("hardhat");
 
-async function sendEthToStakingPool(stakingPoolAddress) {
+async function sendEthToStakingPool(stakingPoolAddress, wethAddress) {
   try {
     const [sender] = await ethers.getSigners(); // Get the first signer (deployer)
 
     console.log(
-      `Sending 0.01 ETH to StakingPool at address: ${stakingPoolAddress}`
+      `Converting ETH to WETH and sending to StakingPool at address: ${stakingPoolAddress}`
     );
 
-    // Get the contract instance
+    // Step 1: Convert ETH to WETH
+    const wethABI = [
+      "function deposit() payable",
+      "function transfer(address to, uint256 value) returns (bool)",
+    ];
+    const wethContract = new ethers.Contract(wethAddress, wethABI, sender);
+
+    const amountToConvert = ethers.parseEther("0.03");
+    const depositTx = await wethContract.deposit({ value: amountToConvert });
+    await depositTx.wait();
+
+    console.log(
+      `Successfully converted ${ethers.formatEther(
+        amountToConvert
+      )} ETH to WETH.`
+    );
+
+    // Step 2: Send WETH to the staking contract
     const stakingABI = [
       "function stake() payable",
       // Add other function signatures if needed
@@ -21,30 +38,28 @@ async function sendEthToStakingPool(stakingPoolAddress) {
       sender
     );
 
-    // Send 0.01 ETH to the stake function
-    const amountToSend = ethers.parseEther("0.01");
-    const tx = await stakingContract.stake({
-      value: amountToSend,
-    });
+    const transferTx = await wethContract.transfer(
+      stakingPoolAddress,
+      amountToConvert
+    );
+    await transferTx.wait();
 
-    // Wait for the transaction to be mined
-    const receipt = await tx.wait();
-    console.log("Transaction receipt:", receipt);
     console.log(
       `Successfully sent ${ethers.formatEther(
-        amountToSend
-      )} ETH to the staking contract.`
+        amountToConvert
+      )} WETH to the staking contract.`
     );
   } catch (error) {
-    console.error("An error occurred while sending ETH:", error);
+    console.error("An error occurred while sending WETH:", error);
     console.log("Error details:", error.message);
   }
 }
 
 async function main() {
-  const stakingPoolAddress = "0x78B6cEf9658DdA132e5C37EeBC786e10B2917625"; // Replace with your actual contract address
+  const stakingPoolAddress = "0x1EA39826371c39507eCA966BAB6C79C0581EcCeE"; // Replace with your actual contract address
+  const wethAddress = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; // Replace with the WETH address on your network
 
-  await sendEthToStakingPool(stakingPoolAddress);
+  await sendEthToStakingPool(stakingPoolAddress, wethAddress);
 }
 
 main()

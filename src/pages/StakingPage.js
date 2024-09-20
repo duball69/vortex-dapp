@@ -28,7 +28,7 @@ const CHAIN_NAMES = {
 const networkConfig = {
   //base
   8453: {
-    stakingAddress: "0xAC4A1fD60e7a33c4cD89F7D08Dc2D61dB6B940C6",
+    stakingAddress: "",
     WETH_address: "0x4200000000000000000000000000000000000006",
     explorerUrl: "https://base.blockscout.com/",
   },
@@ -42,7 +42,7 @@ const networkConfig = {
 
   //sepolia
   11155111: {
-    stakingAddress: "0x7198663fDC5EDE9A6788F3B72C24edf19180f912",
+    stakingAddress: "0x1EA39826371c39507eCA966BAB6C79C0581EcCeE",
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://sepolia.etherscan.io",
   },
