@@ -1,4 +1,5 @@
 // scripts/unstakeEth.js
+require("dotenv").config();
 
 const { ethers } = require("hardhat");
 
@@ -38,7 +39,7 @@ async function unstakeEthFromStakingPool(stakingPoolAddress, amountToUnstake) {
 }
 
 async function main() {
-  const stakingPoolAddress = "0xC3c7683f549c985B2236069355FFd8bC9Fa9f659"; // Replace with your actual contract address
+  const stakingContractAddress = process.env.REACT_APP_STAKING_SEPOLIA_CA; // Replace with your actual contract address
   const amountToUnstake = "0.01"; // Replace with the amount you want to unstake
 
   await unstakeEthFromStakingPool(stakingPoolAddress, amountToUnstake);

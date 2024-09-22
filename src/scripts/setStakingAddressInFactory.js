@@ -1,13 +1,14 @@
 // Importing ethers from Hardhat environment
+require("dotenv").config();
 const { ethers } = require("hardhat");
 
 async function main() {
   // The address of your deployed factory contract
-  const factoryContractAddress = "0x38cf4a95bc2A3A08fA73fF83eeEeeADeCA8327e5"; // Sepolia factory
+  const factoryContractAddress = process.env.REACT_APP_FACTORY_SEPOLIA_CA;
 
   // The address of your deployed SimpleStaking contract
-  const stakingContractAddress = "0x73d11D624f3cAf8D649CAE5712e00e72a98a0a61";
-
+  const stakingContractAddress = process.env.REACT_APP_STAKING_SEPOLIA_CA;
+  const treasuryAddress = "0xa9ca0489a345466C1909c4128AFEce68217e14A3";
   // Get signer information from the default account
   const [signer] = await ethers.getSigners();
 
@@ -18,8 +19,9 @@ async function main() {
   );
 
   // Call the setStakingPoolAddress function
-  const transactionResponse = await factory.setStakingAddress(
-    stakingContractAddress
+  const transactionResponse = await factory.setStakingAndTreasuryAddress(
+    stakingContractAddress,
+    treasuryAddress
   );
   console.log("Waiting for transaction to be mined...");
   await transactionResponse.wait();

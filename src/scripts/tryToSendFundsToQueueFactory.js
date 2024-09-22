@@ -1,9 +1,11 @@
 // Importing ethers from Hardhat environment
+require("dotenv").config();
+
 const { ethers } = require("hardhat");
 
 async function main() {
   // The address of your deployed factory contract
-  const factoryContractAddress = "0x00125DcE4b8d399e74fE20A9c962D1bCBC369382"; // Replace with your actual factory contract address on the correct network
+  const factoryContractAddress = process.env.REACT_APP_FACTORY_SEPOLIA_CA; // Replace with your actual factory contract address on the correct network
 
   // Get signer information from the default account
   const [signer] = await ethers.getSigners();

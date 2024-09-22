@@ -1,13 +1,13 @@
 // scripts/sendEthToStaking.js
-
+require("dotenv").config();
 const { ethers } = require("hardhat");
 
-async function sendEthToStakingPool(stakingPoolAddress, wethAddress) {
+async function sendEthToStakingPool(stakingContractAddress, wethAddress) {
   try {
     const [sender] = await ethers.getSigners(); // Get the first signer (deployer)
 
     console.log(
-      `Converting ETH to WETH and sending to StakingPool at address: ${stakingPoolAddress}`
+      `Converting ETH to WETH and sending to StakingPool at address: ${stakingContractAddress}`
     );
 
     // Step 1: Convert ETH to WETH
@@ -33,13 +33,13 @@ async function sendEthToStakingPool(stakingPoolAddress, wethAddress) {
       // Add other function signatures if needed
     ];
     const stakingContract = new ethers.Contract(
-      stakingPoolAddress,
+      stakingContractAddress,
       stakingABI,
       sender
     );
 
     const transferTx = await wethContract.transfer(
-      stakingPoolAddress,
+      stakingContractAddress,
       amountToConvert
     );
     await transferTx.wait();
@@ -56,10 +56,10 @@ async function sendEthToStakingPool(stakingPoolAddress, wethAddress) {
 }
 
 async function main() {
-  const stakingPoolAddress = "0x1EA39826371c39507eCA966BAB6C79C0581EcCeE"; // Replace with your actual contract address
+  const stakingContractAddress = process.env.REACT_APP_STAKING_SEPOLIA_CA; // Replace with your actual contract address
   const wethAddress = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; // Replace with the WETH address on your network
 
-  await sendEthToStakingPool(stakingPoolAddress, wethAddress);
+  await sendEthToStakingPool(stakingContractAddress, wethAddress);
 }
 
 main()

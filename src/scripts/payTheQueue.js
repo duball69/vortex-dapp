@@ -1,8 +1,9 @@
 // Importing ethers from Hardhat environment
+require("dotenv").config();
 const { ethers } = require("hardhat");
 
 async function handleReceivedWETHPublic() {
-  const stakingContractAddress = "0xAF7be3c33b75d7d6e104098781D782f854d3c764";
+  const stakingContractAddress = process.env.REACT_APP_STAKING_SEPOLIA_CA;
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();

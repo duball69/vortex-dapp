@@ -1,5 +1,5 @@
 // scripts/sendEthToFactory.js
-
+require("dotenv").config();
 const { ethers } = require("hardhat");
 
 async function convertEthAndSendToFactory(
@@ -50,7 +50,7 @@ async function convertEthAndSendToFactory(
       "function transferWETHToFactory(uint256 amount) external",
     ];
     const factoryContract = new ethers.Contract(
-      factoryAddress,
+      factoryContractAddress,
       factoryABI,
       sender
     );
@@ -75,11 +75,16 @@ async function convertEthAndSendToFactory(
 }
 
 async function main() {
-  const factoryAddress = "0x6c217942722C28F8D5a89B8b874FC0Bc4F5E7B30"; // Replace with your actual factory contract address
+  const factoryContractAddress = process.env.REACT_APP_FACTORY_SEPOLIA_CA;
+  // Replace with your actual factory contract address
   const wethAddress = "0xfff9976782d46cc05630d1f6ebab18b2324d6b14"; // Replace with the WETH address on your network
-  const amountInEth = 0.03; // The amount of ETH to convert to WETH and send
+  const amountInEth = 0.02; // The amount of ETH to convert to WETH and send
 
-  await convertEthAndSendToFactory(factoryAddress, wethAddress, amountInEth);
+  await convertEthAndSendToFactory(
+    factoryContractAddress,
+    wethAddress,
+    amountInEth
+  );
 }
 
 main()

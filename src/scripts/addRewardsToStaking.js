@@ -1,8 +1,9 @@
 // Importing ethers from Hardhat environment
+require("dotenv").config();
 const { ethers } = require("hardhat");
 
 async function addRewards() {
-  const stakingContractAddress = "0x1EA39826371c39507eCA966BAB6C79C0581EcCeE"; //sepolia
+  const stakingContractAddress = process.env.REACT_APP_STAKING_SEPOLIA_CA;
 
   // Get the first signer for demonstration purposes
   const [signer] = await ethers.getSigners();
