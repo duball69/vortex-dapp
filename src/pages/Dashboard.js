@@ -8,15 +8,8 @@ import { Link, useParams } from "react-router-dom";
 import "./Dashboard.css";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-import { firestore } from "../components/firebaseConfig.js";
+import supabase from "../supabaseClient";
+
 /* global BigInt */
 
 const networkConfig = {
@@ -29,7 +22,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x6c217942722C28F8D5a89B8b874FC0Bc4F5E7B30",
+    factoryAddress: process.env.REACT_APP_FACTORY_SEPOLIA_CA,
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://eth-sepolia.blockscout.com/",
   },
@@ -108,35 +101,30 @@ function DashboardPage() {
   async function fetchTokenDetails() {
     if (!contractAddress || !isConnected) return;
 
-    // Fetch token information from the blockchain
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const signer = await provider.getSigner();
-    const tokenContract = new ethers.Contract(
-      contractAddress,
-      MyTokenJson.abi,
-      provider
-    );
-    const name = await tokenContract.name();
-    const symbol = await tokenContract.symbol();
-    const supply = await tokenContract.totalSupply();
+    try {
+      // Fetch token details from Supabase
+      const { data, error } = await supabase
+        .from("tokens")
+        .select("name, symbol, supply, imageUrl")
+        .eq("address", contractAddress)
+        .single(); // Expecting a single record
 
-    // Fetch token image URL from Firestore
-    const tokensCollection = collection(firestore, "tokens");
-    const q = query(tokensCollection, where("address", "==", contractAddress));
-    const querySnapshot = await getDocs(q);
+      if (error) {
+        throw error;
+      }
 
-    let imageUrl = "";
-    querySnapshot.forEach((doc) => {
-      // Assuming there's one document matching the contract address
-      imageUrl = doc.data().imageUrl;
-    });
-
-    setTokenDetails({
-      name,
-      symbol,
-      supply: (supply.toString() / 10 ** 18).toString(),
-      imageUrl, // Add image URL to state
-    });
+      if (data) {
+        setTokenDetails({
+          name: data.name,
+          symbol: data.symbol,
+          supply: data.supply.toString(), // Ensure it's a string
+          imageUrl: data.imageUrl,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching token details from Supabase:", error);
+      setErrorMessage("Failed to fetch token details. Please try again."); // Updated here
+    }
   }
 
   async function handleMulticall() {
@@ -152,7 +140,7 @@ function DashboardPage() {
 
       // Setup for adding liquidity
       const tokenAmount = ethers.parseUnits(tokenDetails.supply, 18);
-      const wethAmount = ethers.parseUnits("0.05", 18); // Example amount of WETH
+      const wethAmount = ethers.parseUnits("0.03", 18); // Example amount of WETH
       const maxBuyWei = (wethAmount * BigInt(5)) / BigInt(100);
       setMaxBuyAmount(ethers.formatEther(maxBuyWei));
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -303,8 +291,8 @@ function DashboardPage() {
                   let value = e.target.value
                     ? parseFloat(e.target.value).toFixed(4)
                     : "0.0000";
-                  if (parseFloat(value) > 0.000005) {
-                    value = "0.000005"; // Set to max value if it exceeds the limit
+                  if (parseFloat(value) > 0.0015) {
+                    value = "0.0015"; // Set to max value if it exceeds the limit
                   }
                   setTokenAmountToBuy(value);
                 }}

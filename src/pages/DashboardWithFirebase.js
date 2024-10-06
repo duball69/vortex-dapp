@@ -7,7 +7,14 @@ import "./StakingPage.css";
 import Footer from "../components/Footer.js";
 import { ethers } from "ethers";
 import SimpleStakingJson from "../contracts/SimpleStaking.json";
-import supabase from "../supabaseClient";
+import { firestore } from "../components/firebaseConfig.js";
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
 
 const CHAIN_NAMES = {
   56: "BSC",
@@ -246,21 +253,15 @@ const StakingPage = () => {
 
   const logStakingEvent = async (action, amount) => {
     try {
-      const { data, error } = await supabase.from("stakingEvents").insert([
-        {
-          wallet: connectedWallet,
-          action,
-          amount: parseFloat(amount), // Ensure amount is a number
-          timestamp: new Date().toISOString(),
-          chain: CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`,
-        },
-      ]);
-
-      if (error) {
-        throw error;
-      }
-
-      console.log("Staking event logged to Supabase");
+      const stakingEventsCollection = collection(firestore, "stakingEvents");
+      await setDoc(doc(stakingEventsCollection), {
+        wallet: connectedWallet,
+        action,
+        amount,
+        timestamp: new Date(),
+        chain: CHAIN_NAMES[chainId] || `Unknown Chain (${chainId})`,
+      });
+      console.log("Staking event logged to Firestore");
     } catch (error) {
       console.error("Error logging staking event:", error);
     }
@@ -287,7 +288,6 @@ const StakingPage = () => {
         signer
       );
 
-      // Stake the amount
       const tx = await stakingPoolContract.stake({
         value: ethers.parseUnits(amount, 18),
         gasLimit: 500000, // Adjust the gas limit as needed
@@ -297,43 +297,27 @@ const StakingPage = () => {
 
       const uppercaseWallet = connectedWallet.toUpperCase();
 
-      // Upsert and increment points
-      try {
-        const { data: upsertData, error: upsertError } = await supabase
-          .from("userPoints")
-          .upsert(
-            {
-              wallet: uppercaseWallet,
-              points: 0, // Initialize with 0 points if the wallet doesn't exist
-            },
-            { onConflict: "wallet" }
-          );
-
-        if (!upsertError) {
-          // If upsert was successful, now increment the points
-          const { data: incrementData, error: incrementError } = await supabase
-            .from("userPoints")
-            .update({ points: supabase.increment(1) }) // Increment points by 1
-            .eq("wallet", uppercaseWallet);
-
-          if (incrementError) {
-            throw incrementError;
-          }
-        } else {
-          throw upsertError;
-        }
-      } catch (error) {
-        console.error("Error updating points:", error);
+      if (amount > 0.01) {
+        const userPointsDoc = doc(firestore, "userPoints", uppercaseWallet);
+        await updateDoc(userPointsDoc, { points: increment(1) });
       }
 
-      // Log the staking event
-      await logStakingEvent("stake", amount);
+      const newStakedAmount = await stakingPoolContract.getStake(
+        connectedWallet
+      );
+      const newPendingUnstakes = await stakingPoolContract.pendingUnstakes(
+        connectedWallet
+      );
 
-      // Adding a small delay to ensure contract state updates
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust delay as needed
+      const newStakedAmountBN = BigInt(newStakedAmount.toString());
+      const newPendingUnstakesBN = BigInt(newPendingUnstakes.toString());
 
-      // Fetch updated staking and pending unstakes data
-      await updateStakingState();
+      setStakedAmount(newStakedAmountBN);
+      setPendingUnstake(newPendingUnstakesBN);
+
+      const availableForUnstake = newStakedAmountBN - newPendingUnstakesBN;
+      setIsStaked(newStakedAmountBN > 0n);
+      setCanUnstake(availableForUnstake > 0n);
 
       setStakedMessage(`You staked ${amount} ETH in the Vortex Pool.`);
       fetchStatistics();
@@ -345,51 +329,6 @@ const StakingPage = () => {
       console.error("Error staking ETH:", error);
       setErrorMessage("An error occurred while staking. Please try again.");
       setLoadingStake(false);
-    }
-  };
-
-  // Separate function to update staking state
-  const updateStakingState = async () => {
-    try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const stakingPoolContract = new ethers.Contract(
-        StakingChainAddress,
-        SimpleStakingJson.abi,
-        signer
-      );
-
-      // Fetch new staked amount and pending unstakes
-      const newStakedAmount = await stakingPoolContract.getStake(
-        connectedWallet
-      );
-      const newPendingUnstakes = await stakingPoolContract.pendingUnstakes(
-        connectedWallet
-      );
-
-      const newStakedAmountBN = BigInt(newStakedAmount.toString());
-      const newPendingUnstakesBN = BigInt(newPendingUnstakes.toString());
-
-      // Log the new fetched values
-      console.log(
-        "Updated Staked Amount:",
-        ethers.formatEther(newStakedAmountBN)
-      );
-      console.log(
-        "Updated Pending Unstakes:",
-        ethers.formatEther(newPendingUnstakesBN)
-      );
-
-      // Update state with new values
-      setStakedAmount(newStakedAmountBN);
-      setPendingUnstake(newPendingUnstakesBN);
-
-      const availableForUnstake = newStakedAmountBN - newPendingUnstakesBN;
-      setIsStaked(newStakedAmountBN > 0n);
-      setCanUnstake(availableForUnstake > 0n);
-    } catch (error) {
-      console.error("Error updating staking state:", error);
-      setErrorMessage("An error occurred while updating staking state.");
     }
   };
 
@@ -439,8 +378,6 @@ const StakingPage = () => {
       );
 
       await txResponse.wait();
-
-      await logStakingEvent("unstake", amount);
 
       const updatedStakedAmount = await stakingPoolContract.getStake(
         connectedWallet

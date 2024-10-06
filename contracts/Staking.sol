@@ -2,7 +2,6 @@
 // VortexDapp Staking v0.1
 
 pragma solidity ^0.8.0;
-
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract SimpleStaking is ReentrancyGuard {
@@ -129,9 +128,11 @@ contract SimpleStaking is ReentrancyGuard {
         if (wethBalance >= amount) {
             processImmediateUnstake(msg.sender, amount);
         } else {
+            uint256 shortfall = amount - wethBalance;
+
             IFundsInterface(factoryAddress).provideFundsIfNeeded(
                 address(this),
-                amount
+                shortfall
             );
 
             wethBalance = IWETH(weth).balanceOf(address(this));
@@ -179,21 +180,26 @@ contract SimpleStaking is ReentrancyGuard {
         lastRewardTime = block.timestamp;
     }
 
-    function addRewards() external payable {
+    function addRewards() external payable onlyAuth {
         require(msg.value > 0, "No rewards to add");
+
+        // Deposit ETH to WETH
         IWETH(weth).deposit{value: msg.value}();
 
-        // Update totalRewards
+        // First, update the pool to process any pending rewards
+        updatePool();
+
+        // Add the newly deposited rewards to totalRewards
         totalRewards += msg.value;
         emit TotalRewardsUpdated(totalRewards);
 
-        // Update rewardRate based on REWARD_INTERVAL
+        // Recalculate rewardRate based on the updated totalRewards and REWARD_INTERVAL
         rewardRate = totalRewards / REWARD_INTERVAL;
 
-        // Reset lastRewardTime to current block timestamp
+        // Update lastRewardTime to the current block timestamp
         lastRewardTime = block.timestamp;
 
-        updatePool();
+        // Emit event indicating new rewards have been added
         emit RewardsAdded(msg.value);
     }
 
@@ -251,6 +257,16 @@ contract SimpleStaking is ReentrancyGuard {
         _;
     }
 
+    modifier onlyAuth() {
+        require(
+            msg.sender == owner ||
+                msg.sender == address(this) ||
+                msg.sender == factoryAddress,
+            "Caller is not authorized"
+        );
+        _;
+    }
+
     function setFactoryAddress(address _factoryAddress) external onlyOwner {
         factoryAddress = _factoryAddress;
     }
@@ -282,54 +298,30 @@ contract SimpleStaking is ReentrancyGuard {
     event FailedToProcessUnstake(address user, uint256 amount);
     event FundsRequested(uint256 amount);
 
-    function handleReceivedWETH() internal {
+    function handleReceivedWETH() public nonReentrant {
         uint256 availableWETH = IWETH(weth).balanceOf(address(this));
         emit DebugAvailableWETH(availableWETH);
 
-        if (unstakeQueue.length > 0) {
-            UnstakeRequest storage request = unstakeQueue[0];
-            emit UnstakeRequestDetails(
-                0,
-                request.user,
-                request.amount,
-                request.timestamp
-            );
+        uint256 fundsNeeded = 0;
+
+        for (uint i = 0; i < unstakeQueue.length && availableWETH > 0; ) {
+            UnstakeRequest storage request = unstakeQueue[i];
 
             if (availableWETH >= request.amount) {
                 processImmediateUnstake(request.user, request.amount);
-                removeFromQueue(0);
-                totalFundsNeeded -= ((request.amount * 70) / 100);
+                availableWETH -= request.amount;
 
-                availableWETH = IWETH(weth).balanceOf(address(this));
+                unstakeQueue[i] = unstakeQueue[unstakeQueue.length - 1];
+                unstakeQueue.pop();
             } else {
-                uint256 wethShortfall = request.amount - availableWETH;
-                notifyFactoryForFunds(wethShortfall);
-                emit FundsRequested(wethShortfall);
+                fundsNeeded += request.amount - availableWETH;
+                i++;
             }
         }
-    }
 
-    function handleReceivedWETHFromScript() external {
-        uint256 availableWETH = IWETH(weth).balanceOf(address(this));
-        emit DebugAvailableWETH(availableWETH);
-
-        if (unstakeQueue.length > 0) {
-            UnstakeRequest storage request = unstakeQueue[0];
-            emit UnstakeRequestDetails(
-                0,
-                request.user,
-                request.amount,
-                request.timestamp
-            );
-
-            if (availableWETH >= request.amount) {
-                processImmediateUnstake(request.user, request.amount);
-                removeFromQueue(0);
-            } else {
-                uint256 wethShortfall = request.amount - availableWETH;
-                notifyFactoryForFunds(wethShortfall);
-                emit FundsRequested(wethShortfall);
-            }
+        if (fundsNeeded > 0) {
+            notifyFactoryForFunds(fundsNeeded);
+            emit FundsRequested(fundsNeeded);
         }
     }
 

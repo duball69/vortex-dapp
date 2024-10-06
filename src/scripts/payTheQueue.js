@@ -2,7 +2,7 @@
 require("dotenv").config();
 const { ethers } = require("hardhat");
 
-async function handleReceivedWETHPublic() {
+async function handleReceivedWETH() {
   const stakingContractAddress = process.env.REACT_APP_STAKING_SEPOLIA_CA;
 
   // Get the first signer for demonstration purposes
@@ -17,7 +17,7 @@ async function handleReceivedWETHPublic() {
 
   try {
     // Sending a transaction to handle received WETH and process the unstake queue
-    const tx = await stakingContract.handleReceivedWETHPublic();
+    const tx = await stakingContract.handleReceivedWETH();
     console.log("Transaction sent:", tx.hash);
 
     // Wait for the transaction to be mined
@@ -31,7 +31,7 @@ async function handleReceivedWETHPublic() {
 
 async function main() {
   try {
-    await handleReceivedWETHPublic();
+    await handleReceivedWETH();
   } catch (error) {
     console.error(error);
     process.exit(1); // Exit with failure in case of an error

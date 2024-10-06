@@ -67,7 +67,7 @@ export const Web3ModalProvider = ({ children }) => {
       rpcUrl: process.env.CELO_RPC_URL,
     };
 
-    const projectId = process.env.WALLETCONNECT_PROJECT_ID;
+    const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
 
     const initWeb3Modal = createWeb3Modal({
       ethersConfig: defaultConfig({

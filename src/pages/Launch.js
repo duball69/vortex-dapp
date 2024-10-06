@@ -87,7 +87,7 @@ const ethersConfig = defaultConfig({
   },
 });
 
-const projectId = process.env.REACT_APP_WALLETCONNECT_PROJECT_ID;
+const projectId = process.env.WALLETCONNECT_PROJECT_ID;
 
 const web3Modal = createWeb3Modal({
   ethersConfig,

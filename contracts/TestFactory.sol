@@ -27,7 +27,7 @@ contract MyFactory {
     address teamWallet;
     uint256 rewardAmount;
     address treasuryAddress;
-    uint256 wethProvided = 0.0001 ether;
+    uint256 wethProvided = 0.03 ether;
 
     struct TokenDetails {
         address tokenAddress;
@@ -1065,7 +1065,7 @@ interface ILocker {
 }
 
 /* // Define the interface for the token contract
-    interface IMyToken {
-        function setVortexWallet(address wallet) external;
-        function enableMaxWalletLimit() external;
-    } */
+        interface IMyToken {
+            function setVortexWallet(address wallet) external;
+            function enableMaxWalletLimit() external;
+        } */

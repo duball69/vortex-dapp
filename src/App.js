@@ -1,5 +1,4 @@
 // App.js
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import StakingPage from "./pages/StakingPage";
@@ -10,6 +9,7 @@ import TaskPage from "./pages/Task";
 import AfterLaunch from "./pages/AfterLaunch";
 import TokensPage from "./pages/TokenListPage";
 import CombinedFactoryDashboard from "./pages/Launch";
+import TokenBuyTrackerPage from "./pages/TokenBuyTrackerPage";
 
 import Trading from "./pages/Trading";
 import { Web3ModalProvider } from "./Web3ModalContext";
@@ -24,6 +24,7 @@ function App() {
           <Route path="/launch" element={<CombinedFactoryDashboard />} />
           <Route path="/points" element={<PointsPage />} />
           <Route path="/tasks" element={<TaskPage />} />
+          <Route pah="tokenbuy" element={<TokenBuyTrackerPage />} />
           <Route
             path="/dashboard/:contractAddress"
             element={<DashboardPage />}

@@ -11,8 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import Header from "../components/Header.js";
 import Footer from "../components/Footer.js";
-import { firestore } from "../components/firebaseConfig.js";
-import { collection, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import supabase from "../supabaseClient";
 
 const networkConfig = {
   // Example Chain IDs for Base and Sepolia
@@ -24,7 +23,7 @@ const networkConfig = {
   },
   11155111: {
     // Sepolia Testnet Chain ID
-    factoryAddress: "0x6c217942722C28F8D5a89B8b874FC0Bc4F5E7B30",
+    factoryAddress: process.env.REACT_APP_FACTORY_SEPOLIA_CA,
     WETH_address: "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
     explorerUrl: "https://eth-sepolia.blockscout.com/",
   },
@@ -250,33 +249,51 @@ function FactoryPage() {
 
       const logs = receipt.logs;
       if (logs.length > 0) {
+        // Assuming the first log contains the deployed address
         const deployedAddress = logs[0].address;
         setDeployedContractAddress(deployedAddress);
 
-        // Save to Firestore
-        const tokensCollection = collection(firestore, "tokens");
-        await setDoc(doc(tokensCollection, deployedAddress), {
-          name: tokenName,
-          symbol: tokenSymbol,
-          supply: tokenSupply,
-          address: deployedAddress,
-          imageUrl: imageUrl,
-          deployer: connectedWallet,
-          timestamp: new Date(),
-          chain: CHAIN_NAMES[chainId],
-        });
+        // Save to Supabase
+        const { data, error } = await supabase.from("tokens").insert([
+          {
+            name: tokenName,
+            symbol: tokenSymbol,
+            supply: tokenSupply,
+            address: deployedAddress,
+            imageUrl: imageUrl,
+            deployer: connectedWallet,
+            timestamp: new Date().toISOString(),
+            chain: CHAIN_NAMES[chainId],
+          },
+        ]);
 
-        const uppercaseWallet = connectedWallet.toUpperCase();
+        if (error) {
+          throw error;
+        }
 
         // Update Points
-        const userPointsDoc = doc(firestore, "userPoints", uppercaseWallet);
-        const userPointsSnapshot = await getDoc(userPointsDoc);
+        const { data: upsertData, error: upsertError } = await supabase
+          .from("userPoints")
+          .upsert(
+            {
+              wallet: connectedWallet.toUpperCase(),
+              points: 1, // Set the initial value to 1 if the wallet doesn't exist
+            },
+            { onConflict: "wallet" }
+          );
 
-        if (userPointsSnapshot.exists()) {
-          const currentPoints = userPointsSnapshot.data().points;
-          await updateDoc(userPointsDoc, { points: currentPoints + 1 });
+        if (!upsertError) {
+          // If upsert was successful, now increment the points
+          const { data: incrementData, error: incrementError } = await supabase
+            .from("userPoints")
+            .update({ points: supabase.increment(1) }) // Increment points by 1
+            .eq("wallet", connectedWallet.toUpperCase());
+
+          if (incrementError) {
+            throw incrementError;
+          }
         } else {
-          await setDoc(userPointsDoc, { points: 1 });
+          throw upsertError;
         }
       }
     } catch (error) {
@@ -412,7 +429,6 @@ function FactoryPage() {
             {" "}
             Telegram
           </a>
-          .
         </p>
       </div>
       <Footer />
